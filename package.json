@@ -1,0 +1,22 @@
+{
+  "name": "metamui-sdk",
+  "version": "1.0.0",
+  "description": "An SDk to implement function calls to the metablockchain-core",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fennsaji/metamui-sdk.git"
+  },
+  "author": "Anubhab Patnaik",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fennsaji/metamui-sdk/issues"
+  },
+  "homepage": "https://github.com/fennsaji/metamui-sdk#readme",
+  "devDependencies": {
+    "typescript": "^4.8.2"
+  }
+}
