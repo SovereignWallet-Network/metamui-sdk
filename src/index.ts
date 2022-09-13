@@ -1,4 +1,5 @@
-function main(){
+export function printfromindex(){
 		console.log("Hello World");
 }
-main();
+printfromindex();
+module.exports= printfromindex;
