@@ -1,25 +1,26 @@
 {
     "name": "metamui-sdk",
     "version": "1.0.0",
-    "description": "An SDk to implement function calls to the metablockchain-core",
+    "description": "An SDK to implement function calls to the metamui-core",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "prepare": "yarn build",
         "build": "babel ./src --presets babel-preset-es2015 --out-dir dist",
         "test": "env PROVIDER_NETWORK=testnet mocha --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local mocha --no-timeouts --exit",
-        "generate:docs": "jsdoc2md src/$FILE.js > docs/$FILE.md"
+        "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/fennsaji/metamui-sdk.git"
+        "url": "git+https://github.com/SovereignWallet-Network/metamui-sdk.git"
     },
-    "author": "Anubhab Patnaik",
+    "author": "SovereignWallet-Network",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/fennsaji/metamui-sdk/issues"
+        "url": "https://github.com/SovereignWallet-Network/metamui-sdk/issues"
     },
-    "homepage": "https://github.com/fennsaji/metamui-sdk#readme",
+    "homepage": "https://github.com/SovereignWallet-Network/metamui-sdk#readme",
     "devDependencies": {
         "@types/mocha": "^9.1.1",
         "@typescript-eslint/eslint-plugin": "^5.0.0",
