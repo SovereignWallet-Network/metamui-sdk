@@ -21,7 +21,11 @@
     },
     "homepage": "https://github.com/fennsaji/metamui-sdk#readme",
     "devDependencies": {
+        "@types/mocha": "^9.1.1",
         "@typescript-eslint/eslint-plugin": "^5.0.0",
+        "babel-cli": "^6.26.0",
+        "babel-preset-es2015": "^6.24.1",
+        "chai": "^4.3.4",
         "eslint": "^8.0.1",
         "eslint-config-prettier": "^8.5.0",
         "eslint-config-standard-with-typescript": "^22.0.0",
@@ -29,12 +33,10 @@
         "eslint-plugin-n": "^15.0.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-promise": "^6.0.0",
-        "prettier": "^2.7.1",
-        "typescript": "*",
-        "@types/mocha": "^9.1.1",
         "jsdoc-to-markdown": "^7.1.0",
-        "chai": "^4.3.4",
-        "sinon": "^9.2.2"
+        "prettier": "^2.7.1",
+        "sinon": "^9.2.2",
+        "typescript": "*"
     },
     "dependencies": {
         "@polkadot/api": "^4.2.2-4",
