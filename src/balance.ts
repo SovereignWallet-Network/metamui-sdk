@@ -31,9 +31,9 @@ export const subscribeToBalanceChanges = async (identifier: any, callback: (arg0
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
-    return provider.query.did.account(did_hex, ({ data: { free: currentBalance: Number } }) => {
-      callback(currentBalance.toNumber() / 1e6);
-    });
+    return provider.query.did.account(did_hex, ({ data: { free: currentBalance } }) => {
+        callback(currentBalance.toNumber() / 1e6);
+      });
   } catch (err) {
     return null;
   }
