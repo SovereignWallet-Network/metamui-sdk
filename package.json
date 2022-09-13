@@ -35,12 +35,14 @@
         "eslint-plugin-n": "^15.0.0",
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-promise": "^6.0.0",
+        "esm": "^3.2.25",
         "jsdoc-to-markdown": "^7.1.0",
         "mocha": "^10.0.0",
         "prettier": "^2.7.1",
         "sinon": "^9.2.2",
         "ts-mocha": "^10.0.0",
         "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.1.0",
         "typescript": "*"
     },
     "dependencies": {
