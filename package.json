@@ -3,6 +3,7 @@
     "version": "1.0.0",
     "description": "An SDK to implement function calls to the metamui-core",
     "main": "index.js",
+    "type": "module",
     "scripts": {
         "prepare": "yarn build",
         "build": "babel --presets @babel/preset-typescript src/index.ts --out-dir dist --extensions .ts  ",
