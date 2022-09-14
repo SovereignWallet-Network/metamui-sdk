@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "prepare": "yarn build",
-        "build": "babel --presets @babel/preset-typescript src/index.ts --out-dir dist --extensions .ts  ",
+        "build": "babel --presets @babel/preset-typescript src/ --out-dir dist --extensions .ts  ",
         "test": "env PROVIDER_NETWORK=testnet ts-mocha -p ./tsconfig.json ./test/**/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local mocha --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
