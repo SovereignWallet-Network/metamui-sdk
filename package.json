@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "prepare": "yarn build",
-        "build": "babel ./src --presets babel-preset-es2015 --out-dir dist --extensions .ts",
+        "build": "babel ./src --presets babel-preset-latest --out-dir dist --extensions .ts",
         "test": "env PROVIDER_NETWORK=testnet ts-mocha -p ./tsconfig.json ./test/**/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local mocha --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
@@ -27,6 +27,7 @@
         "@typescript-eslint/eslint-plugin": "^5.0.0",
         "babel-cli": "^6.26.0",
         "babel-preset-es2015": "^6.24.1",
+        "babel-preset-latest": "^6.24.1",
         "chai": "^4.3.4",
         "eslint": "^8.0.1",
         "eslint-config-prettier": "^8.5.0",
