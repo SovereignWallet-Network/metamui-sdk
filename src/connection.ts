@@ -1,6 +1,6 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { METABLOCKCHAIN_PROVIDER } from './config';
-import { METABLOCKCHAIN_TYPES } from './utils';
+import { METABLOCKCHAIN_PROVIDER } from './config.js';
+import { METABLOCKCHAIN_TYPES } from './utils.js';
 
 // assign network
 const NETWORK_PROVIDER = {
