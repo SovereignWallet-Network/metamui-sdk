@@ -8,7 +8,7 @@ const constants = require('./test_constants');
 const { removeDid } = require('./helper/helper.js');
 
 describe('Transaction works correctly', () => {
-  let sigKeypairWithBal = null;
+  let sigKeypairWithBal:any = null;
   let sigKeypairWithoutBal = null;
   let provider;
   before(async () => {

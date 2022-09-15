@@ -1,13 +1,11 @@
-const assert = require('assert');
-const did = require('../src/did.js');
-const { initKeyring } = require('../src/config');
-const { buildConnection } = require('../src/connection.js');
-const constants = require('./test_constants');
-const { hexToString } = require('../src/utils');
-const {
-  mnemonicValidate,
-} = require('@polkadot/util-crypto');
-const { removeDid } = require('./helper/helper.js');
+import assert from 'assert';
+import * as did from '../src/did.js';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection.js';
+import * as constants from './test_constants';
+import { hexToString } from '../src/utils';
+import { mnemonicValidate } from '@polkadot/util-crypto';
+import { removeDid } from './helper/helper.js';
 
 describe('DID Module works correctly', () => {
   const TEST_MNEMONIC =
@@ -20,9 +18,9 @@ describe('DID Module works correctly', () => {
     'strong offer usual inmate reform universe zero erode reopen mosquito blossom bachelor';
   const expectedNewPubkey =
     '04249359400f54ceb6ecf51edfeb1c02c8233e8ca563492df998a5d91266fa64';
-  let provider = null;
+  let provider: any = null;
   let sigKeypairWithBal = null;
-  let keyring = null;
+  let keyring: any = null;
 
   before(async () => {
     keyring = await initKeyring();
@@ -39,7 +37,7 @@ describe('DID Module works correctly', () => {
 
   it('DID details are fetched correctly - positive test', async () => {
     //  Alice is expected in the test chain
-    const data = await did.getDIDDetails('did:ssid:swn', provider);
+    const data: any = await did.getDIDDetails('did:ssid:swn', provider);
     assert.strictEqual(
       data.public_key,
       '0x48b5b5a2b56cf1558e6aa3d2df1b7877c9bd7ca512984e85892fb351bd2a912e'
@@ -77,7 +75,7 @@ describe('DID Module works correctly', () => {
   });
 
   it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider, 0);
+    const data: any = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
     // Alice's DID is created at block number 0
     assert.strictEqual(data, '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
   });
@@ -92,7 +90,7 @@ describe('DID Module works correctly', () => {
   });
 
   it.skip('updateMetadata works correctly', async () => {
-    const data = await did.updateMetadata(
+    const data: any = await did.updateMetadata(
       'did:ssid:swn',
       'TestMetadata',
       sigKeypairWithBal,
@@ -111,7 +109,7 @@ describe('DID Module works correctly', () => {
       sigKeypairWithBal,
       provider
     );
-    await assert.rejects(data, (err) => {
+    await assert.rejects(data, (err: any) => {
       assert.strictEqual(err.message, 'did.DIDDoesNotExist');
       return true;
     });
@@ -132,8 +130,8 @@ describe('DID Module works correctly', () => {
 
   // These test cases should only run in local environment
   if (constants.providerNetwork == 'local') {
-    let addedDidBlockNum = null;
-    let updatedKeyBlockNum = null;
+    let addedDidBlockNum: any = null;
+    let updatedKeyBlockNum: any = null;
     let testIdentifier = 'did:ssid:rocket';
 
     it('storeDIDOnChain works correctly', async () => {
@@ -149,7 +147,7 @@ describe('DID Module works correctly', () => {
     it('storeDIDOnChain throws error on duplicate ssid', async () => {
       const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
       const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      await assert.rejects(data, (err) => {
+      await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.DIDAlreadyExists');
         return true;
       });
@@ -158,7 +156,7 @@ describe('DID Module works correctly', () => {
     it('storeDIDOnChain throws error on duplicate public key', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
       const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      await assert.rejects(data, (err) => {
+      await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
       });
@@ -179,7 +177,7 @@ describe('DID Module works correctly', () => {
     it('updateDidKey throws error on using existing public key', async () => {
       const pubKey = await keyring.addFromUri(NEW_MNEMONIC).publicKey;
       const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
-      await assert.rejects(data, (err) => {
+      await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
       });
@@ -188,14 +186,14 @@ describe('DID Module works correctly', () => {
     it('updateDidKey throws error on using non existent did', async () => {
       const pubKey = await keyring.addFromUri(TEST_MNEMONIC).publicKey;
       const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
-      await assert.rejects(data, (err) => {
+      await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');
         return true;
       });
     });
 
     it('Resolve test DID to account at block number 0 works correctly', async () => {
-      const data = await did.resolveDIDToAccount(testIdentifier, provider, 0);
+      const data: number = await did.resolveDIDToAccount(testIdentifier, provider, null);
       assert.strictEqual(data, null);
       return true;
     });
@@ -210,7 +208,7 @@ describe('DID Module works correctly', () => {
     });
 
     it('Resolve DID to account after key updated works correctly', async () => {
-      const prevBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum-1);
+      const prevBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum+(-1));
       const keyUpdateBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum);
       const nextblockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum+1);
       assert.strictEqual(prevBlockNumberAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');

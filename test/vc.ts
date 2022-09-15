@@ -1,18 +1,18 @@
-const assert = require('assert');
-const vc = require('../src/vc.js');
-const tx = require('../src/transaction.js');
-const did = require('../src/did.js');
-const { initKeyring, SSID_BASE_URL } = require('../src/config');
-const { buildConnection } = require('../src/connection.js');
-const constants = require('./test_constants');
-const utils = require('../src/utils');
-const { removeDid, storeVC, sudoStoreVC } = require('./helper/helper.js');
+import * as assert from 'assert';
+import * as vc from '../src/vc.js';
+import * as tx from '../src/transaction.js';
+import * as did from '../src/did.js';
+import { initKeyring, SSID_BASE_URL } from '../src/config';
+import { buildConnection } from '../src/connection.js';
+import * as constants from './test_constants';
+import * as utils from '../src/utils';
+import { removeDid, storeVC, sudoStoreVC } from './helper/helper.js';
 
 describe('VC works correctly', () => {
-  let sigKeypair = null;
+  let sigKeypair: any = null;
   const TEST_DID = 'did:ssid:rocket';
   const EVE_DID = 'did:ssid:eve';
-  var provider = null;
+  var provider: any = null;
   let keyring;
   let sigKeypairBob;
   let signKeypairEve;
@@ -234,7 +234,7 @@ describe('VC works correctly', () => {
     })
 
     it('Store VC works correctly', async () => {
-      const transaction = await storeVC(actualHex, sigKeypairBob, sigKeypair, signKeypairDave, provider);
+      const transaction: any = await storeVC(actualHex, sigKeypairBob, sigKeypair, signKeypairDave, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -279,7 +279,7 @@ describe('VC works correctly', () => {
     });
 
     it('Update status works correctly', async () => {
-      const transaction = await vc.updateStatus(vcId, { InActive: 1 }, sigKeypair, provider);
+      const transaction: any = await vc.updateStatus(vcId, { InActive: 1 }, sigKeypair, provider);
       assert.doesNotReject(transaction);
       const vcs = await vc.getVCs(vcId, provider);
       assert.strictEqual(vcs[1], 'Inactive');
@@ -295,7 +295,7 @@ describe('VC works correctly', () => {
         EVE_DID,
       ];
       const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypair, provider, ssidUrl);
-      const transaction = await vc.storeVC(vcHex, sigKeypairBob, provider);
+      const transaction: any = await vc.storeVC(vcHex, sigKeypairBob, provider);
       const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
       vcId = vcsByDid[vcsByDid.length-1];
       await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);

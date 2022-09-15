@@ -1,15 +1,16 @@
-const assert = require('assert');
+import assert from 'assert';
 
-const collective = require('../src/collective');
-const did = require('../src/did');
-const tx = require('../src/transaction');
-const { initKeyring } = require('../src/config');
-const { buildConnection } = require('../src/connection');
-const constants = require('./test_constants');
-const { removeDid } = require('./helper/helper');
+import * as collective from '../src/collective';
+import * as did from '../src/did';
+import * as tx from '../src/transaction';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection';
+import * as constants from './test_constants';
+import { removeDid } from './helper/helper';
+import { KeyringPair } from '@polkadot/keyring/types';
 
 describe('Collective works correctly', () => {
-  let provider = null;
+  let provider: any = null;
   let sudoKey;
   let sudoPair;
   let newMembers;
@@ -19,6 +20,8 @@ describe('Collective works correctly', () => {
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
   const vcHex = '0xcc090ccf4e1e6fd1325d3884479dccd50f457d35b9b239333b6d9b4a531a25d46469643a737369643a726f636b65740000000000000000000000000000000000046469643a737369643a73776e000000000000000000000000000000000000000004242043f42ef6eb8a403d49d26c5d072e3af043d27a29611ca7f00d10d9603327991cedbb45a651c19ffc6b3f9681311deb6fdf129c3b62251c4312186483be8c00007465737400000000000000000000000010270000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+  let sigKeypairBob: KeyringPair;
+  let sigKeypairDave: KeyringPair;
 
   if (constants.providerNetwork == 'local') {
     before(async () => {
@@ -59,7 +62,7 @@ describe('Collective works correctly', () => {
         TEST_ROCKET_DID,
         TEST_SWN_DID,
       ]
-      let transaction = await collective.setMembers(newMembers, TEST_SWN_DID, 0, sudoPair, provider);
+      let transaction: any = await collective.setMembers(newMembers, TEST_SWN_DID, 0, sudoPair, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -83,7 +86,7 @@ describe('Collective works correctly', () => {
 
     it('should set proposals correctly', async () => {
       const call = provider.tx.vc.store(vcHex);
-      let transaction = await collective.propose(3, call, 1000, sigKeypairBob, provider);
+      let transaction: any = await collective.propose(3, call, 1000, sigKeypairBob, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -106,9 +109,9 @@ describe('Collective works correctly', () => {
     });
 
     it('should vote correctly', async () => {
-      let transaction = await collective.vote(proposalHash, index, true, sudoPair, provider);
+      let transaction: any = await collective.vote(proposalHash, index, true, sudoPair, provider);
       assert.doesNotReject(transaction);
-      let otherTransaction = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
+      let otherTransaction:any = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
       assert.doesNotReject(otherTransaction);
     });
 
@@ -122,7 +125,7 @@ describe('Collective works correctly', () => {
     });
 
     it('should close proposal correctly', async () => {
-      let transaction = await collective.close(proposalHash, index, 1000, 1000, sudoPair, provider);
+      let transaction: any = await collective.close(proposalHash, index, 1000, 1000, sudoPair, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -138,7 +141,7 @@ describe('Collective works correctly', () => {
       await collective.propose(3, call, 1000, sigKeypairBob, provider);
       const actualProposals = await collective.getProposals(provider);
       proposalHash = actualProposals[0];
-      let transaction = await collective.disapproveProposal(proposalHash, sudoPair, provider);
+      let transaction: any = await collective.disapproveProposal(proposalHash, sudoPair, provider);
       assert.doesNotReject(transaction);
     });
 

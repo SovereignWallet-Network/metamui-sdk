@@ -1,11 +1,11 @@
-const assert = require('assert');
-const sha256 = require('js-sha256');
-const { stringToU8a, u8aToHex } = require('@polkadot/util');
-const vc = require('../src/verified_credentials.js');
-const vcJson = require('../src/vc_schema/identity.json');
-const { initKeyring } = require('../src/config');
-const { buildConnection } = require('../src/connection.js');
-const constants = require('./test_constants');
+import * as assert from 'assert';
+import sha256 from 'js-sha256';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
+import * as vc from '../src/verified_credentials.js';
+import vcJson from '../src/vc_schema/identity.json';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection.js';
+import * as constants from './test_constants';
 
 describe('VC works correctly', () => {
   const originJson = vcJson;
@@ -16,10 +16,10 @@ describe('VC works correctly', () => {
   originJson.issued_block = '2244';
   // this schema is expected in the dev chain for the test to pass
   const schemaToTest = constants.validSchema;
-  const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(originJson))));
-  let sigKeypair = null;
+  const expectedHash = u8aToHex(stringToU8a(JSON.stringify(originJson)));
+  let sigKeypair :any = null;
   const sigDid = 'did:ssid:swn';
-  var provider = null;
+  var provider: any = null;
 
   before(async () => {
     const keyring = await initKeyring();

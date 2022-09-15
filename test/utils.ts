@@ -1,5 +1,5 @@
-const assert = require('assert');
-const utils = require('../src/utils.js');
+import * as assert from 'assert';
+import * as utils from '../src/utils.js';
 
 describe('Utils Module works correctly', () => {
 

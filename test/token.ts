@@ -1,20 +1,20 @@
-const assert = require('assert');
-const token = require('../src/token');
-const tx = require('../src/transaction');
-const vc = require('../src/vc');
-const { initKeyring } = require('../src/config');
-const { buildConnection } = require('../src/connection');
-const constants = require('./test_constants');
-const { expect } = require('chai');
-const did = require('../src/did');
-const { hexToString, encodeData, CURRENCY_CODE_BYTES } = require('../src/utils');
-const { removeDid, sudoStoreVC, storeVCDirectly } = require('./helper/helper');
+import assert from 'assert';
+import * as token from '../src/token';
+import * as tx from '../src/transaction';
+import * as vc from '../src/vc';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection';
+import * as constants from './test_constants';
+import { expect } from 'chai';
+import * as did from '../src/did';
+import { hexToString, encodeData, CURRENCY_CODE_BYTES } from '../src/utils';
+import { removeDid, sudoStoreVC, storeVCDirectly } from './helper/helper';
 
 describe('Token Module works correctly', () => {
-  let sigKeypairRoot = null;
+  let sigKeypairRoot: any = null;
   let signKeypairOrgA;
   let sigKeypairMeta;
-  let provider = null;
+  let provider: any = null;
   let from = null;
   let keyring;
   const TEST_META_DID = 'did:ssid:rocket';
@@ -78,11 +78,11 @@ describe('Token Module works correctly', () => {
     });
 
     it('Token Issuance works correctly', async () => {
-      const transfer = await token.issueToken(
+      const transfer: any = await token.issueToken(
         vcId,
         10000000,
         signKeypairOrgA,
-        provider
+        provider,
       );
       assert.doesNotReject(transfer);
     });
@@ -143,14 +143,14 @@ describe('Token Module works correctly', () => {
 
     it('Get token issuer works correctly', async () => {
       let issuer = await token.getTokenIssuer(currencyCode, provider);
-      decodeIssuer = hexToString(issuer);
+      const decodeIssuer = hexToString(issuer);
       assert.strictEqual(decodeIssuer, TEST_ORG_A_DID);
     });
 
     it('Mint Token works correctly', async () => {
       await storeVCDirectly(vcId, currencyCode, 1, "MintTokens", signKeypairOrgA, provider);
       let mintVcId = (await vc.getVCIdsByDID(TEST_ORG_A_DID))[1];
-      const transaction = await token.mintToken(mintVcId, signKeypairOrgA, provider);
+      const transaction:any = await token.mintToken(mintVcId, signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -160,14 +160,14 @@ describe('Token Module works correctly', () => {
     });
 
     it('Withdraw from treasury works correctly', async () => {
-      const data = await token.withdrawTreasuryReserve(TEST_SWN_DID, TEST_META_DID, 10000, sigKeypairMeta, provider);
+      const data: any = await token.withdrawTreasuryReserve(TEST_SWN_DID, TEST_META_DID, 10000, sigKeypairMeta, provider);
       assert.doesNotReject(data);
     });
 
     it('Slash Token works correctly', async () => {
       await storeVCDirectly(vcId, currencyCode, 1, "SlashTokens", signKeypairOrgA, provider);
       let slashVcId = (await vc.getVCIdsByDID(TEST_ORG_A_DID))[2];
-      const transaction = await token.slashToken(slashVcId, signKeypairOrgA, provider);
+      const transaction: any= await token.slashToken(slashVcId, signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -179,7 +179,7 @@ describe('Token Module works correctly', () => {
     it('Transfer Token With VC works correctly', async () => {
       await storeVCDirectly(vcId, currencyCode, 1, "TokenTransferVC", signKeypairOrgA, provider);
       let transferVCId = (await vc.getVCIdsByDID(TEST_ORG_A_DID))[3];
-      const transaction = await token.transferTokenWithVC(transferVCId, TEST_SWN_DID, signKeypairOrgA, provider);
+      const transaction: any= await token.transferTokenWithVC(transferVCId, TEST_SWN_DID, signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -189,7 +189,7 @@ describe('Token Module works correctly', () => {
     });
 
     it('Token transfer works correctly', async () => {
-      const transaction = await token.transferToken(TEST_SWN_DID, currencyCode, 0.01, signKeypairOrgA, provider);
+      const transaction: any = await token.transferToken(TEST_SWN_DID, currencyCode, 0.01, signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -199,7 +199,7 @@ describe('Token Module works correctly', () => {
     });
 
     it('Token transfer with memo works correctly', async () => {
-      const transaction = await token.transferTokenWithMemo(TEST_SWN_DID, currencyCode, 0.01, 'Tested Memo', signKeypairOrgA, provider);
+      const transaction:any = await token.transferTokenWithMemo(TEST_SWN_DID, currencyCode, 0.01, 'Tested Memo', signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -209,7 +209,7 @@ describe('Token Module works correctly', () => {
     });
 
     it('Token transfer all works correctly', async () => {
-      const transaction = await token.transferAll(TEST_SWN_DID, currencyCode, signKeypairOrgA, provider);
+      const transaction: any= await token.transferAll(TEST_SWN_DID, currencyCode, signKeypairOrgA, provider);
       assert.doesNotReject(transaction);
     });
 
@@ -219,7 +219,7 @@ describe('Token Module works correctly', () => {
     });
 
     it('Token set balance works correctly', async () => {
-      const transaction = await token.setBalance(TEST_SWN_DID, currencyCode, 0.01, signKeypairOrgA, provider);
+      const transaction:any = await token.setBalance(TEST_SWN_DID, currencyCode, 0.01, signKeypairOrgA, provider, null);
       assert.doesNotReject(transaction);
     });
 
@@ -234,7 +234,7 @@ describe('Token Module works correctly', () => {
     });
 
     it('Remove Token works correctly', async () => {
-      let transaction = await token.removeToken(currencyCode, vcId, true, sigKeypairRoot, null, provider);
+      let transaction:any = await token.removeToken(currencyCode, vcId, true, sigKeypairRoot, null, provider);
       assert.doesNotReject(transaction);
     });
   }

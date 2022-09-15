@@ -1,7 +1,8 @@
-const vc = require('../../src/vc.js');
-const did = require('../../src/did.js');
-const collective = require('../../src/collective.js');
-const tx = require('../../src/transaction.js');
+import * as vc from '../../src/vc.js';
+import * as did from '../../src/did.js';
+import * as collective from '../../src/collective.js';
+import * as tx from '../../src/transaction.js';
+import { ApiPromise } from '@polkadot/api';
 
 const TEST_DID = 'did:ssid:rocket';
 const TEST_DAVE_DID = "did:ssid:dave";
@@ -55,9 +56,9 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
   const call = provider.tx.vc.store(vcHex);
   await collective.propose(3, call, 1000, sigKeypairOwner, provider);
   const actualProposals = await collective.getProposals(provider);
-  proposalHash = actualProposals[0];
+  const proposalHash = actualProposals[0];
   let vote = await collective.getVotes(proposalHash, provider);
-  index = vote.index;
+  const index = vote.index;
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
   await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
@@ -72,6 +73,7 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
  * @param  {KeyPair} sigKeypairRoot
  * @param  {KeyPair} sigKeypairCouncil
  * @param  {Api} provider
+ * @param  {ApiPromse=} api
  */
 async function storeVCDirectly(vcId, currencyCode, amount, vcType, sigKeypairOwner, provider) {
   let vcProperty = {
@@ -89,6 +91,7 @@ async function storeVCDirectly(vcId, currencyCode, amount, vcType, sigKeypairOwn
 
 async function sudoStoreVC(vcHex, sudoKeyPair, provider) {
   return new Promise(async (resolve, reject) => {
+    
     const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
     await tx.signAndSend(sudoKeyPair, { nonce: -1 }, ({ status, dispatchError }) => {
       if (dispatchError) {
@@ -106,7 +109,7 @@ async function sudoStoreVC(vcHex, sudoKeyPair, provider) {
   });
 }
 
-module.exports = {
+export {
   removeDid,
   storeVC,
   storeVCDirectly,

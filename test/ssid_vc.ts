@@ -1,17 +1,17 @@
-const assert = require('assert');
-const ssidVC = require('../src/ssid_vc.js');
-const sha256 = require('js-sha256');
-const { stringToU8a, u8aToHex } = require('@polkadot/util');
-const ssidJson = require('../src/vc_schema/ssid.json');
-const { initKeyring } = require('../src/config');
-const constants = require('./test_constants');
+import assert from 'assert';
+import * as ssidVC from '../src/ssid_vc.js';
+import sha256 from 'js-sha256';
+import { stringToU8a, u8aToHex } from '@polkadot/util';
+import ssidJson from '../src/vc_schema/ssid.json';
+import { initKeyring } from '../src/config';
+import * as constants from './test_constants';
 
 describe('SSID VC works correctly', () => {
   const originJson = ssidJson;
   originJson.did = 'did:ssid:metamui';
   originJson.public_key = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-  const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(originJson))));
-  let sigKeypairWithBal = null;
+  const expectedHash = u8aToHex(stringToU8a(JSON.stringify(originJson)));
+  let sigKeypairWithBal :any= null;
 
   before(async () => {
     const keyring = await initKeyring();
