@@ -31,7 +31,7 @@ function buildNewConnection(network = 'local') {
  * Note : setting the ignoreCache value to true will create a new ws
  * ws conection on every call
  */
-export function buildConnection(network = 'local', ignoreCache = false) {
+function buildConnection(network = 'local', ignoreCache = false) {
   if (!providerInstance || ignoreCache) {
     console.log('Creating new websocket connection!');
     providerInstance = buildNewConnection(network);
@@ -39,6 +39,6 @@ export function buildConnection(network = 'local', ignoreCache = false) {
   return providerInstance;
 }
 
-module.exports = {
+export {
   buildConnection,
 };

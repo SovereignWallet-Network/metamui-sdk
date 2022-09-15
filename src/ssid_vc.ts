@@ -52,7 +52,7 @@ async function verifySsidVC(vcJson) {
   ).isValid;
 }
 
-module.exports = {
+export {
   createSsidVC,
   signSsidVC,
   verifySsidVC,

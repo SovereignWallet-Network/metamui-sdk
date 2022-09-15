@@ -97,7 +97,7 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
  * @param {String} identifier DID Identifier
  * @returns {JSON}
  */
-export async function getDIDDetails(identifier, api = false) {
+ async function getDIDDetails(identifier, api = false) {
   try {
     const provider = api || (await buildConnection('local'));
     const did_hex = sanitiseDid(identifier);
@@ -120,7 +120,7 @@ export async function getDIDDetails(identifier, api = false) {
  * @param {Number} blockNumber
  * @returns {String}
  */
-export async function resolveDIDToAccount(identifier, api = false, blockNumber = null) {
+ async function resolveDIDToAccount(identifier, api = false, blockNumber = null) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if(!blockNumber && blockNumber != 0) {
@@ -147,7 +147,7 @@ export async function resolveDIDToAccount(identifier, api = false, blockNumber =
  * @param {ApiPromise} api
  * @returns {String | Boolean} (false if not found)
  */
-export async function resolveAccountIdToDid(accountId, api = false) {
+ async function resolveAccountIdToDid(accountId, api = false) {
   const provider = api || (await buildConnection('local'));
   const data = (await provider.query.did.rLookup(accountId)).toHuman();
   // return false if empty
@@ -221,7 +221,7 @@ function convertFixedSizeHex(data, size = 64) {
  * @param {String} did
  * @return {String} Hex did
  */
-export const sanitiseDid = (did) => {
+ const sanitiseDid = (did) => {
   
   if (did.startsWith('0x')) {
     // already hex string
@@ -239,7 +239,7 @@ export const sanitiseDid = (did) => {
  * @param {ApiPromise} api
  * @returns {Boolean}
  */
-export async function isDidValidator(identifier, api = false) {
+ async function isDidValidator(identifier, api = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
@@ -252,7 +252,7 @@ export async function isDidValidator(identifier, api = false) {
  * @param {ApiPromise} api
  * @returns {Array}
  */
-export async function getDidKeyHistory(identifier, api = false) {
+ async function getDidKeyHistory(identifier, api = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = (await provider.query.did.prevKeys(did_hex)).toHuman();
@@ -300,7 +300,7 @@ async function updateMetadata(identifier, metadata, signingKeypair, api:any = fa
   });
 }
 
-module.exports = {
+export {
   generateMnemonic,
   generateDID,
   storeDIDOnChain,

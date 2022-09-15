@@ -471,7 +471,7 @@ async function verifyGenericVC(vcId, data, api=false) {
   }
 }
 
-module.exports = {
+export{
   createTokenVC,
   generateVC,
   approveVC,

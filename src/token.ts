@@ -664,7 +664,7 @@ async function withdrawTreasuryReserve(
  * @param {APIPromise} provider
  * @return {Number} tokenAmount in lowest form else error
  */
-export async function getFormattedTokenAmount(currencyCode, tokenAmount, provider) {
+ async function getFormattedTokenAmount(currencyCode, tokenAmount, provider) {
   let amount_decimals = 0;
   tokenAmount = String(tokenAmount);
   // Check if valid number or not
@@ -729,8 +729,7 @@ export async function getFormattedTokenAmount(currencyCode, tokenAmount, provide
   });
 }
 
-
-module.exports = {
+export {
   transferToken,
   transferTokenWithMemo,
   transferAll,
