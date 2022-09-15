@@ -1,13 +1,13 @@
 import assert from 'assert';
 
 import * as balance from '../src/balance';
-import * as initKeyring from '../src/config';
+import {initKeyring} from '../src/config';
 import { buildConnection } from '../src/connection';
-import constants from './test_constants';
+import * as constants from './test_constants';
 
 describe('Balances works correctly', () => {
   let provider: any = null;
-  let sigKeypairWithBal = null;
+  let sigKeypairWithBal;
 
   before(async () => {
     provider = await buildConnection(constants.providerNetwork);
