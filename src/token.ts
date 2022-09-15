@@ -5,9 +5,9 @@
  * @notice Token pallet not released to mainnet.
  * So uncomment in index after the release.
  */
-import { resolveDIDToAccount } from './did';
+import { resolveDIDToAccount } from './did.js';
 import { buildConnection } from './connection.js';
-import { sanitiseDid } from './did';
+import { sanitiseDid } from './did.js';
 // 8 bytes for currency_code
 const CURRENCY_CODE_LENGTH = 16;
 /**

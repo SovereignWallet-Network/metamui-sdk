@@ -1,5 +1,5 @@
-import { buildConnection } from './connection';
-import { sanitiseDid } from './did';
+import { buildConnection } from './connection.js';
+import { sanitiseDid } from './did.js';
 
 /**
  * Get account balance(Highest Form) based on the did supplied.

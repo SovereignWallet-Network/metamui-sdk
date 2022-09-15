@@ -1,4 +1,4 @@
-import * as did from './did';
+import * as did from './did.js';
 import { buildConnection } from './connection.js';
 
 /**
