@@ -115,7 +115,7 @@ async function transfer(
   });
 }
 
-module.exports = {
+export {
   sendTransaction,
   transfer
 };

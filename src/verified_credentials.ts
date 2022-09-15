@@ -33,7 +33,7 @@
   *
   * @returns {JSON}
   */
- export async function createVC(propertiesJson, schemaHash, api=false) {
+  async function createVC(propertiesJson, schemaHash, api=false) {
    // Check to validate schemaHash
    // if (!(await doesSchemaExist(schemaHash, api))) {
    //   throw Error('SchemaHash not valid!');
@@ -54,7 +54,7 @@
   * @param {KeyPair} signingKeyPair
   * @returns {JSON}
   */
- export async function signVC(vcJson, verifierDid, signingKeyPair) {
+  async function signVC(vcJson, verifierDid, signingKeyPair) {
    // check if the hash and the properties are a match
    const expectedHash = u8aToHex(stringToU8a(JSON.stringify(vcJson.properties)));
    if (expectedHash !== vcJson.hash) {
@@ -77,7 +77,7 @@
   *
   * @returns {Boolean} true if valid VC
   */
- export async function verifyVC(vcJson, api = false) {
+  async function verifyVC(vcJson, api = false) {
    const provider = api || (await buildConnection('local'));
  
    // check if the vc has signature and verifier
@@ -115,7 +115,7 @@
    return signatureVerify(hexToU8a(vcJson.hash), hexToU8a(vcJson.signature), signerAddress.toString()).isValid;
  }
  
- module.exports = {
+ export {
    createVC,
    signVC,
    verifyVC,

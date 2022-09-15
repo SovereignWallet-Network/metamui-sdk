@@ -74,7 +74,7 @@ async function storeSchemaOnChain(schema, signingKeypair, api:any = false) {
  * @param {Hex} schemaHash
  * @returns {Boolean} Will return true, if valid schemaHash
  */
-export async function doesSchemaExist(schemaHash, provider) {
+ async function doesSchemaExist(schemaHash, provider) {
   // regex to test for a valid hex value
   const format = /\b0[xX][0-9a-fA-F]+\b/;
   if (!format.test(schemaHash)) {
@@ -84,7 +84,7 @@ export async function doesSchemaExist(schemaHash, provider) {
   return result !== null;
 }
 
-module.exports = {
+export {
   createNewSchema,
   storeSchemaOnChain,
   doesSchemaExist,

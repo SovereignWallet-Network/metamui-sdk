@@ -1,9 +1,9 @@
 import { u8aToHex, hexToU8a, hexToString as polkadotHextoString, stringToU8a, stringToHex } from '@polkadot/util';
 import { base58Decode, blake2AsHex } from '@polkadot/util-crypto';
 
-import types from '@polkadot/types';
+import * as types from '@polkadot/types';
 
-export const VCType = {
+ const VCType = {
   TokenVC: "TokenVC",
   MintTokens: "MintTokens",
   SlashTokens: "SlashTokens",
@@ -13,7 +13,7 @@ export const VCType = {
 };
 Object.freeze(VCType);
 
-export const METABLOCKCHAIN_TYPES = {
+ const METABLOCKCHAIN_TYPES = {
   "PeerId": "OpaquePeerId",
   "identifier": "[u8;32]",
   "public_key": "[u8;32]",
@@ -138,15 +138,15 @@ const ENCODE_TYPES = {
   "CID": "[u8;64]",
 };
 
-export const TOKEN_NAME_BYTES = 16;
-export const CURRENCY_CODE_BYTES = 8;
-export const VC_PROPERTY_BYTES = 128;
-export const CID_BYTES = 64;
+ const TOKEN_NAME_BYTES = 16;
+ const CURRENCY_CODE_BYTES = 8;
+ const VC_PROPERTY_BYTES = 128;
+ const CID_BYTES = 64;
 
 /**
  * @param  {Bytes} inputBytes u8[]
  */
-export const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
+ const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
 /**
  * @param  {String} inputString
  */
@@ -162,7 +162,7 @@ const stringToBytes = (inputString) => stringToU8a(inputString);
 /**
  * @param  {Hex} hexString
  */
-export const hexToString = (hexString) => polkadotHextoString(hexString).replace(/^\0+/, '').replace(/\0+$/, '');
+ const hexToString = (hexString) => polkadotHextoString(hexString).replace(/^\0+/, '').replace(/\0+$/, '');
 
 
 /**
@@ -179,7 +179,7 @@ registry.register(ENCODE_TYPES);
  * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
  * @returns {String} Encoded Hex
  */
-export function encodeData(data, typeKey) {
+ function encodeData(data, typeKey) {
   return types.createType(registry, typeKey, data).toHex();
 }
 
@@ -196,7 +196,7 @@ function decodeHex(hexValue, typeKey) {
  * @param  {} str
  * @returns bool
  */
-export function isUpperAndValid(str) {
+ function isUpperAndValid(str) {
   return /^[A-Z]+$/.test(str);
 }
 
@@ -216,7 +216,7 @@ function tidy(s) {
  * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
  * @returns {Object | String} Decoded Object/String
  */
- export function getVCS(hexValue, typeKey) {
+  function getVCS(hexValue, typeKey) {
   let vcs = decodeHex(hexValue, typeKey);
   if(Boolean(vcs.token_name))
     vcs["token_name"] = hexToString(vcs.token_name);
@@ -278,13 +278,13 @@ function sortObjectByKeys(unorderedObj) {
  * @param  {Object} unordered unordered object
  * @returns {Object} ordered object by key
  */
-export function generateObjectHash(object) {
+ function generateObjectHash(object) {
   const sortedData = sortObjectByKeys(object);
   const encodedData = stringToHex(JSON.stringify(sortedData));
   return blake2AsHex(encodedData);
 }
 
-module.exports = {
+export {
   METABLOCKCHAIN_TYPES,
   TOKEN_NAME_BYTES,
   CURRENCY_CODE_BYTES,
@@ -305,4 +305,3 @@ module.exports = {
   sortObjectByKeys,
   generateObjectHash,
 };
-export {};

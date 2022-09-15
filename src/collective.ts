@@ -303,7 +303,7 @@ async function getProposalCount(api = false) {
   return (await provider.query.council.proposalCount()).toHuman();
 }
 
-module.exports = {
+export {
   setMembers,
   propose,
   execute,

@@ -8,7 +8,7 @@ import { sanitiseDid } from './did.js';
  * @returns {String} Balance In Highest Form
  * @example await getBalanceFromDID(did, api)
  */
-export const getBalance = async (did: any, api = false) => {
+const getBalance = async (did: any, api = false) => {
   // Resolve the did to get account ID
   try {
     const provider = api || await buildConnection('local');
@@ -27,7 +27,7 @@ export const getBalance = async (did: any, api = false) => {
  * @param {Function} callback Cb function to execute with new balance in Highest Form
  * @param {ApiPromise=} api Api Object from Build Connection
  */
-export const subscribeToBalanceChanges = async (identifier: any, callback: (arg0: number) => void, api: any = false) => {
+const subscribeToBalanceChanges = async (identifier: any, callback: (arg0: number) => void, api: any = false) => {
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
@@ -39,7 +39,4 @@ export const subscribeToBalanceChanges = async (identifier: any, callback: (arg0
   }
 };
 
-module.exports = {
-  getBalance,
-  subscribeToBalanceChanges,
-};
+export { getBalance, subscribeToBalanceChanges };
