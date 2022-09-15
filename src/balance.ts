@@ -27,7 +27,7 @@ export const getBalance = async (did: any, api = false) => {
  * @param {Function} callback Cb function to execute with new balance in Highest Form
  * @param {ApiPromise=} api Api Object from Build Connection
  */
-export const subscribeToBalanceChanges = async (identifier: any, callback: (arg0: number) => void, api = false) => {
+export const subscribeToBalanceChanges = async (identifier: any, callback: (arg0: number) => void, api: any = false) => {
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
