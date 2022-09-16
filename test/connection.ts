@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { buildConnection } from '../src/connection';
+import assert from 'assert';
+import { buildConnection } from '../src-test/connection';
 import * as sinon from 'sinon';
 import { providerNetwork } from './test_constants';
 

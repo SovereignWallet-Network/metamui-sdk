@@ -1,8 +1,8 @@
 import { KeyringPair } from '@polkadot/keyring/types';
 import assert from 'assert';
-import * as balance from './src-test/balance';
-import {initKeyring} from './src-test/config';
-import { buildConnection } from './src-test/connection';
+import * as balance from '../src-test/balance';
+import {initKeyring} from '../src-test/config';
+import { buildConnection } from '../src-test/connection';
 import * as constants from './test_constants';
 
 // const { KeyringPair } = require('@polkadot/keyring/types');

@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as utils from '../src/utils.js';
+import * as utils from '../src-test/utils';
 
 describe('Utils Module works correctly', () => {
 
