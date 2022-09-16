@@ -1,8 +1,13 @@
-import * as vc from '../../src/vc.js';
-import * as did from '../../src/did.js';
-import * as collective from '../../src/collective.js';
-import * as tx from '../../src/transaction.js';
-import { ApiPromise } from '@polkadot/api';
+// const vc = require('./vc');
+// const did = require('./did');
+// const collective = require('./collective');
+// const tx = require('./transaction');
+
+import * as vc from '../vc';
+import * as did from '../did';
+import * as collective from '../collective';
+import * as tx from '../transaction';
+
 
 const TEST_DID = 'did:ssid:rocket';
 const TEST_DAVE_DID = "did:ssid:dave";
@@ -73,7 +78,6 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
  * @param  {KeyPair} sigKeypairRoot
  * @param  {KeyPair} sigKeypairCouncil
  * @param  {Api} provider
- * @param  {ApiPromse=} api
  */
 async function storeVCDirectly(vcId, currencyCode, amount, vcType, sigKeypairOwner, provider) {
   let vcProperty = {
@@ -89,9 +93,8 @@ async function storeVCDirectly(vcId, currencyCode, amount, vcType, sigKeypairOwn
   await vc.storeVC(vcHex, sigKeypairOwner, provider)
 }
 
-async function sudoStoreVC(vcHex, sudoKeyPair, provider) {
+async function sudoStoreVC(vcHex, sudoKeyPair, provider, api: any = false) {
   return new Promise(async (resolve, reject) => {
-    
     const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
     await tx.signAndSend(sudoKeyPair, { nonce: -1 }, ({ status, dispatchError }) => {
       if (dispatchError) {

@@ -1,11 +1,11 @@
 import assert from 'assert';
-import * as did from '../src/did.js';
-import { initKeyring } from '../src/config';
-import { buildConnection } from '../src/connection.js';
+import * as did from '../src-test/did';
+import { initKeyring } from '../src-test/config';
+import { buildConnection } from '../src-test/connection';
 import * as constants from './test_constants';
-import { hexToString } from '../src/utils';
+import { hexToString } from '../src-test/utils';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { removeDid } from './helper/helper.js';
+import { removeDid } from '../src-test/helper/helper';
 
 describe('DID Module works correctly', () => {
   const TEST_MNEMONIC =
@@ -58,7 +58,7 @@ describe('DID Module works correctly', () => {
   it('Resolve AccountID to DID works correctly', async () => {
     //  Alice is expected in the test chain
     const data = await did.resolveAccountIdToDid(
-      '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A',
+      '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
       provider
     );
     assert.strictEqual(

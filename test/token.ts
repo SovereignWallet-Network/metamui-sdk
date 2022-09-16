@@ -1,14 +1,14 @@
 import assert from 'assert';
-import * as token from '../src/token';
-import * as tx from '../src/transaction';
-import * as vc from '../src/vc';
-import { initKeyring } from '../src/config';
-import { buildConnection } from '../src/connection';
+import * as token from '../src-test/token';
+import * as tx from '../src-test/transaction';
+import * as vc from '../src-test/vc';
+import { initKeyring } from '../src-test/config';
+import { buildConnection } from '../src-test/connection';
 import * as constants from './test_constants';
 import { expect } from 'chai';
-import * as did from '../src/did';
-import { hexToString, encodeData, CURRENCY_CODE_BYTES } from '../src/utils';
-import { removeDid, sudoStoreVC, storeVCDirectly } from './helper/helper';
+import * as did from '../src-test/did';
+import { hexToString, encodeData, CURRENCY_CODE_BYTES } from '../src-test/utils';
+import { removeDid, sudoStoreVC, storeVCDirectly } from '../src-test/helper/helper';
 
 describe('Token Module works correctly', () => {
   let sigKeypairRoot: any = null;

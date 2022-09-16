@@ -1,11 +1,11 @@
 const assert = require('assert');
 const { expect } = require('chai');
-const tx = require('../src/transaction.js');
-const did = require('../src/did.js');
-const { initKeyring } = require('../src/config');
-const { buildConnection } = require('../src/connection.js');
+const tx = require('../src-test/transaction');
+const did = require('../src-test/did');
+const { initKeyring } = require('../src-test/config');
+const { buildConnection } = require('../src-test/connection');
 const constants = require('./test_constants');
-const { removeDid } = require('./helper/helper.js');
+const { removeDid } = require('../src-test/helper/helper');
 
 describe('Transaction works correctly', () => {
   let sigKeypairWithBal:any = null;

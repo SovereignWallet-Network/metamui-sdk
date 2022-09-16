@@ -1,12 +1,12 @@
 import * as assert from 'assert';
-import * as vc from '../src/vc.js';
-import * as tx from '../src/transaction.js';
-import * as did from '../src/did.js';
-import { initKeyring, SSID_BASE_URL } from '../src/config';
-import { buildConnection } from '../src/connection.js';
+import * as vc from '../src-test/vc';
+import * as tx from '../src-test/transaction';
+import * as did from '../src-test/did';
+import { initKeyring, SSID_BASE_URL } from '../src-test/config';
+import { buildConnection } from '../src-test/connection';
 import * as constants from './test_constants';
-import * as utils from '../src/utils';
-import { removeDid, storeVC, sudoStoreVC } from './helper/helper.js';
+import * as utils from '../src-test/utils';
+import { removeDid, storeVC, sudoStoreVC } from '../src-test/helper/helper';
 
 describe('VC works correctly', () => {
   let sigKeypair: any = null;
