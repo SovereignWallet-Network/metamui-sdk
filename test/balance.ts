@@ -1,23 +1,23 @@
-// import { KeyringPair } from '@polkadot/keyring/types';
-// import assert from 'assert';
+import { KeyringPair } from '@polkadot/keyring/types';
+import assert from 'assert';
+import * as balance from './src-test/balance';
+import {initKeyring} from './src-test/config';
+import { buildConnection } from './src-test/connection';
+import * as constants from './test_constants';
 
-const { KeyringPair } = require('@polkadot/keyring/types');
-
-// import * as balance from '../src/balance';
-// import {initKeyring} from '../src/config';
-// import { buildConnection } from '../src/connection';
-// import * as constants from './test_constants';
-const { Keyring } = require('@polkadot/keyring');
-const assert = require('assert');
-const balance = require('../src/balance');
-const {initKeyring} = require('../src/config');
-const {buildConnection} = require('../src/connection');
-const constants = require('./test_constants');
+// const { KeyringPair } = require('@polkadot/keyring/types');
+// const { Keyring } = require('@polkadot/keyring');
+// const assert = require('assert');
+// const balance = require('../src/balance');
+// const {initKeyring} = require('../src/config');
+// const {buildConnection} = require('../src/connection');
+// const constants = require('./test_constants');
 
 
 describe('Balances works correctly', () => {
   let provider: any = null;
-  let sigKeypairWithBal: typeof KeyringPair = null;
+  let sigKeypairWithBal;
+  // let sigKeypairWithBal: typeof KeyringPair = null;
 
   before(async () => {
     provider = await buildConnection(constants.providerNetwork);
