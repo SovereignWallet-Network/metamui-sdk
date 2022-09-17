@@ -20,17 +20,17 @@
  */
  import { signatureVerify, blake2AsHex } from '@polkadot/util-crypto';
  import sha256 from 'js-sha256';
- import { sanitiseDid, resolveDIDToAccount } from './did.js';
- import { buildConnection } from './connection.js';
- import { doesSchemaExist } from './schema.js';
- import { VCType } from './utils.js';
- import * as did from './did.js';
- import * as utils from './utils.js';
- import { getFormattedTokenAmount } from './token.js';
- import { createVC, signVC, verifyVC } from './verified_credentials.js';
+ import { sanitiseDid, resolveDIDToAccount } from './did';
+ import { buildConnection } from './connection';
+ import { doesSchemaExist } from './schema';
+ import { VCType } from './utils';
+ import * as did from './did';
+ import * as utils from './utils';
+ import { getFormattedTokenAmount } from './token';
+ import { createVC, signVC, verifyVC } from './verified_credentials';
 import { default as axios } from 'axios';
 import { hexToU8a } from '@polkadot/util';
-import { SSID_BASE_URL } from './config.js';
+import { SSID_BASE_URL } from './config';
  
  /** Encodes Token VC and pads with appropriate bytes
   * @param  {Object} TokenVC

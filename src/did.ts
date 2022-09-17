@@ -1,6 +1,6 @@
 import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
-import { initKeyring } from './config.js';
-import { buildConnection } from './connection.js';
+import { initKeyring } from './config';
+import { buildConnection } from './connection';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;

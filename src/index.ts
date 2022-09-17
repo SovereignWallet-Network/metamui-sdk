@@ -1,15 +1,15 @@
 
-  import * as balance from './balance.js';
-  import * as connection from './connection.js';
-  import * as collective from './collective.js';
-  import * as ssidVC from './ssid_vc.js';
-  import * as did from './did.js';
-  import * as schema from './schema.js';
-  import * as transaction from './transaction.js';
-  import * as utils from './utils.js';
-  import * as vc from './vc.js';
-  import * as token from './token.js';
-  import * as config from './config.js';
+  import * as balance from './balance';
+  import * as connection from './connection';
+  import * as collective from './collective';
+  import * as ssidVC from './ssid_vc';
+  import * as did from './did';
+  import * as schema from './schema';
+  import * as transaction from './transaction';
+  import * as utils from './utils';
+  import * as vc from './vc';
+  import * as token from './token';
+  import * as config from './config';
 // };
 export{
     balance

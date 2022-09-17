@@ -1,5 +1,5 @@
-import { buildConnection } from './connection.js';
-import { resolveDIDToAccount } from './did.js';
+import { buildConnection } from './connection';
+import { resolveDIDToAccount } from './did';
 
 /**
  * The function will perform a metamui transfer operation from the account of senderAccount to the

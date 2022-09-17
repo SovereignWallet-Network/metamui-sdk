@@ -9,7 +9,7 @@
  */
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import sha256 from 'js-sha256';
-import { buildConnection } from './connection.js';
+import { buildConnection } from './connection';
 
 /**
  * Create a new schema with the properties provided in the schema_properties json

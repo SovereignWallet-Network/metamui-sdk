@@ -1,8 +1,8 @@
 const assert = require('assert');
-const schema = require('../src-test/schema');
-const { buildConnection } = require('../src-test/connection');
-const ssidJson = require('../src-test/vc_schema/ssid.json');
-const identityJSON = require('../src-test/vc_schema/identity.json');
+const schema = require('../src/schema');
+const { buildConnection } = require('../src/connection');
+const ssidJson = require('../src/vc_schema/ssid.json');
+const identityJSON = require('../src/vc_schema/identity.json');
 const sha256 = require('js-sha256');
 const { stringToU8a, u8aToHex } = require('@polkadot/util');
 const constants = require('./test_constants');

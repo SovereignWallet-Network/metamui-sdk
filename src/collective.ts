@@ -1,5 +1,5 @@
-import * as did from './did.js';
-import { buildConnection } from './connection.js';
+import * as did from './did';
+import { buildConnection } from './connection';
 
 /**
  * Set Members and prime of collective pallet

@@ -1,10 +1,10 @@
 import * as assert from 'assert';
 import sha256 from 'js-sha256';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import * as vc from '../src-test/verified_credentials';
-import vcJson from '../src-test/vc_schema/identity.json';
-import { initKeyring } from '../src-test/config';
-import { buildConnection } from '../src-test/connection';
+import * as vc from '../src/verified_credentials';
+import vcJson from '../src/vc_schema/identity.json';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection';
 import * as constants from './test_constants';
 
 describe('VC works correctly', () => {

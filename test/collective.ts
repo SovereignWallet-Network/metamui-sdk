@@ -1,12 +1,12 @@
 import assert from 'assert';
 
-import * as collective from '../src-test/collective';
-import * as did from '../src-test/did';
-import * as tx from '../src-test/transaction';
-import { initKeyring } from '../src-test/config';
-import { buildConnection } from '../src-test/connection';
+import * as collective from '../src/collective';
+import * as did from '../src/did';
+import * as tx from '../src/transaction';
+import { initKeyring } from '../src/config';
+import { buildConnection } from '../src/connection';
 import * as constants from './test_constants';
-import { removeDid } from '../src-test/helper/helper';
+import { removeDid } from './helper/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 
 describe('Collective works correctly', () => {

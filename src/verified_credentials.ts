@@ -21,9 +21,9 @@
  import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
  import { signatureVerify } from '@polkadot/util-crypto';
  import sha256 from 'js-sha256';
- import { getDIDDetails, getDidKeyHistory, isDidValidator } from './did.js';
- import { buildConnection } from './connection.js';
- import { doesSchemaExist } from './schema.js';
+ import { getDIDDetails, getDidKeyHistory, isDidValidator } from './did';
+ import { buildConnection } from './connection';
+ import { doesSchemaExist } from './schema';
  
  /**
   * The function returns the VC in the expected format, the verifier and

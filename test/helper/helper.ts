@@ -3,10 +3,10 @@
 // const collective = require('./collective');
 // const tx = require('./transaction');
 
-import * as vc from '../vc';
-import * as did from '../did';
-import * as collective from '../collective';
-import * as tx from '../transaction';
+import * as vc from '../../src/vc';
+import * as did from '../../src/did';
+import * as collective from '../../src/collective';
+import * as tx from '../../src/transaction';
 
 
 const TEST_DID = 'did:ssid:rocket';
@@ -29,7 +29,7 @@ async function removeDid(didString, sigKeyPair, provider) {
         resolve(status.asFinalized.toHex());
       }
     }));
-  } catch (err) {
+  } catch (err: any) {
     throw new Error(err);
   }
 }

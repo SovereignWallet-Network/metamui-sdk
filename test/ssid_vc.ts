@@ -1,9 +1,9 @@
 import assert from 'assert';
-import * as ssidVC from '../src-test/ssid_vc';
+import * as ssidVC from '../src/ssid_vc';
 import sha256 from 'js-sha256';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import ssidJson from '../src-test/vc_schema/ssid.json';
-import { initKeyring } from '../src-test/config';
+import ssidJson from '../src/vc_schema/ssid.json';
+import { initKeyring } from '../src/config';
 import * as constants from './test_constants';
 
 describe('SSID VC works correctly', () => {
