@@ -3,10 +3,9 @@
     "version": "1.0.0",
     "description": "An SDK to implement function calls to the metamui-core",
     "main": "index.js",
-    "type": "module",
     "scripts": {
         "prepare": "yarn build",
-        "build": "tsc src/index.ts --outDir dist",
+        "build": "tsc ",
         "test": "env PROVIDER_NETWORK=testnet ts-mocha -p ./tsconfig.json ./test/**/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local mocha --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
