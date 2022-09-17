@@ -6,8 +6,8 @@
     "type": "module",
     "scripts": {
         "prepare": "yarn build",
-        "build": "babel --presets @babel/preset-typescript src/ --out-dir dist --extensions .ts  ",
-        "test": "env PROVIDER_NETWORK=testnet ts-mocha -p ./tsconfig-test.json ./test/**/*.ts --timeout 80000 --exit",
+        "build": "tsc src/index.ts --outDir dist",
+        "test": "env PROVIDER_NETWORK=testnet ts-mocha -p ./tsconfig.json ./test/**/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local mocha --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
     },
@@ -55,6 +55,7 @@
         "@polkadot/util-crypto": "^6.0.5",
         "axios": "^0.25.0",
         "js-sha256": "^0.9.0",
+        "tsc": "^2.0.4",
         "typescript": "*"
     }
 }
