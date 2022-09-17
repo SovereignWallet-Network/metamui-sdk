@@ -26,4 +26,5 @@ jobs:
       - name: GitHub Action for Yarn
         uses: Borales/actions-yarn@v3
       - run: yarn
+      - run: ls test/
       - run: yarn test
