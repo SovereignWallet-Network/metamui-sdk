@@ -7,9 +7,9 @@
  * Schema can only be created by privileged users, ie. the user account has to be present in the
  * validator-set pallet.
  */
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-// import sha256 from 'js-sha256';
-const sha256 = require('js-sha256');
+import { stringToHex, stringToU8a, u8aToHex } from '@polkadot/util';
+import { sha256 } from 'js-sha256';
+// const sha256 = require('js-sha256');
 import { buildConnection } from './connection';
 
 /**
@@ -22,7 +22,7 @@ import { buildConnection } from './connection';
 function createNewSchema(schemaProperties) {
   return {
     json_data: JSON.stringify(schemaProperties),
-    hash: u8aToHex(sha256(stringToU8a(JSON.stringify(schemaProperties)))),
+    hash: stringToHex(sha256(stringToU8a(JSON.stringify(schemaProperties)))),
   };
 }
 
@@ -32,7 +32,7 @@ function createNewSchema(schemaProperties) {
  * @param {JSON} schema
  * @param {String} signingKeypair
  */
-async function storeSchemaOnChain(schema, signingKeypair, api:any = false) {
+async function storeSchemaOnChain(schema, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
@@ -42,8 +42,8 @@ async function storeSchemaOnChain(schema, signingKeypair, api:any = false) {
         schema.json_data,
       );
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
-      await signedTx.send(function ({ status, dispatchError }){
+      let signedTx = tx.sign(signingKeypair, { nonce });
+      await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
@@ -75,7 +75,7 @@ async function storeSchemaOnChain(schema, signingKeypair, api:any = false) {
  * @param {Hex} schemaHash
  * @returns {Boolean} Will return true, if valid schemaHash
  */
- async function doesSchemaExist(schemaHash, provider) {
+async function doesSchemaExist(schemaHash, provider) {
   // regex to test for a valid hex value
   const format = /\b0[xX][0-9a-fA-F]+\b/;
   if (!format.test(schemaHash)) {
