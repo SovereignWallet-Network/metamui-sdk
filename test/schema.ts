@@ -12,8 +12,8 @@ describe('Schema Module works correctly', () => {
   let expectedHashId = '';
 
   before(() => {
-    expectedHashSsid = u8aToHex(stringToU8a(JSON.stringify(ssidJson)));
-    expectedHashId = u8aToHex(stringToU8a(JSON.stringify(identityJSON)));
+    expectedHashSsid = u8aToHex(sha256(stringToU8a(JSON.stringify(ssidJson))));
+    expectedHashId = u8aToHex(sha256(stringToU8a(JSON.stringify(identityJSON))));
   });
 
   it('Schema is created in correct format', async () => {

@@ -8,7 +8,8 @@
  * validator-set pallet.
  */
 import { stringToU8a, u8aToHex } from '@polkadot/util';
-import sha256 from 'js-sha256';
+// import sha256 from 'js-sha256';
+const sha256 = require('js-sha256');
 import { buildConnection } from './connection';
 
 /**
@@ -21,7 +22,7 @@ import { buildConnection } from './connection';
 function createNewSchema(schemaProperties) {
   return {
     json_data: JSON.stringify(schemaProperties),
-    hash: u8aToHex(stringToU8a(JSON.stringify(schemaProperties))),
+    hash: u8aToHex(sha256(stringToU8a(JSON.stringify(schemaProperties)))),
   };
 }
 

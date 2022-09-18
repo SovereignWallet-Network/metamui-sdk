@@ -1,6 +1,7 @@
 import assert from 'assert';
 import * as ssidVC from '../src/ssid_vc';
-import sha256 from 'js-sha256';
+// import sha256 from 'js-sha256';
+const sha256 = require('js-sha256');
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import ssidJson from '../src/vc_schema/ssid.json';
 import { initKeyring } from '../src/config';
@@ -10,7 +11,7 @@ describe('SSID VC works correctly', () => {
   const originJson = ssidJson;
   originJson.did = 'did:ssid:metamui';
   originJson.public_key = '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY';
-  const expectedHash = u8aToHex(stringToU8a(JSON.stringify(originJson)));
+  const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(originJson))));
   let sigKeypairWithBal :any= null;
 
   before(async () => {
