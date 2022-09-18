@@ -9,6 +9,7 @@
 // * }
 import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
 import { signatureVerify } from '@polkadot/util-crypto';
+// import {sha256} from 'js-sha256';
 const sha256 = require('js-sha256');
 /**
  * The function returns the VC in the expected format, the

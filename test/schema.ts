@@ -12,7 +12,7 @@ describe('Schema Module works correctly', () => {
   let expectedHashId = '';
 
   before(() => {
-     expectedHashSsid = u8aToHex(sha256(stringToU8a(JSON.stringify(ssidJson))));
+    expectedHashSsid = u8aToHex(sha256(stringToU8a(JSON.stringify(ssidJson))));
     expectedHashId = u8aToHex(sha256(stringToU8a(JSON.stringify(identityJSON))));
   });
 

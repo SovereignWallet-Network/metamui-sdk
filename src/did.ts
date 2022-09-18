@@ -57,7 +57,7 @@ const generateDID = async (mnemonic, identifier, metadata = '') => {
  * @param {ApiPromise} api
  * @returns {String} txnId Txnid for storage operation.
  */
-function storeDIDOnChain(DID, signingKeypair, api: any= false) {
+function storeDIDOnChain(DID, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
@@ -65,8 +65,8 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
       const tx = provider.tx.did.add(DID.public_key, sanitiseDid(DID.identity), DID.metadata);
 
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
-      await signedTx.send(function ({ status, dispatchError }){
+      let signedTx = tx.sign(signingKeypair, { nonce });
+      await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
@@ -97,7 +97,7 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
  * @param {String} identifier DID Identifier
  * @returns {JSON}
  */
- async function getDIDDetails(identifier, api = false) {
+async function getDIDDetails(identifier, api = false) {
   try {
     const provider = api || (await buildConnection('local'));
     const did_hex = sanitiseDid(identifier);
@@ -120,22 +120,22 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
  * @param {Number} blockNumber
  * @returns {String}
  */
- async function resolveDIDToAccount(identifier, api = false, blockNumber = 0) {
+async function resolveDIDToAccount(identifier, api = false, blockNumber: number | null = null) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  if(!blockNumber && blockNumber != 0) {
+  if (!blockNumber && blockNumber !== 0) {
     return (await provider.query.did.lookup(did_hex)).toHuman();
   }
   const didDetails = await getDIDDetails(identifier, provider);
-  if(blockNumber >= didDetails.added_block) {
+  if (blockNumber >= didDetails.added_block) {
     return (await provider.query.did.lookup(did_hex)).toHuman();
   }
   const keyHistories = await getDidKeyHistory(identifier, provider);
-  if(!keyHistories) {
+  if (!keyHistories) {
     return null;
   }
   const keyIndex = keyHistories.reverse().findIndex((value) => blockNumber >= parseInt(value[1]));
-  if(keyIndex < 0) {
+  if (keyIndex < 0) {
     return null;
   }
   return keyHistories[keyIndex][0];
@@ -147,7 +147,7 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
  * @param {ApiPromise} api
  * @returns {String | Boolean} (false if not found)
  */
- async function resolveAccountIdToDid(accountId, api = false) {
+async function resolveAccountIdToDid(accountId, api = false) {
   const provider = api || (await buildConnection('local'));
   const data = (await provider.query.did.rLookup(accountId)).toHuman();
   // return false if empty
@@ -174,8 +174,8 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
       // call the rotateKey extrinsinc
       const tx = provider.tx.did.rotateKey(did_hex, newKey);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
-      await signedTx.send(function ({ status, dispatchError }){
+      let signedTx = tx.sign(signingKeypair, { nonce });
+      await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
@@ -221,15 +221,15 @@ function convertFixedSizeHex(data, size = 64) {
  * @param {String} did
  * @return {String} Hex did
  */
- const sanitiseDid = (did) => {
-  
+const sanitiseDid = (did) => {
+
   if (did.startsWith('0x')) {
     // already hex string
     return did.padEnd(DID_HEX_LEN, '0');
   }
   // console.log('Converting to hex');
   let hex_did = Buffer.from(did, 'utf8').toString('hex');
-  hex_did = '0x'+ hex_did.padEnd(DID_HEX_LEN, '0');
+  hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
   return hex_did;
 }
 
@@ -239,7 +239,7 @@ function convertFixedSizeHex(data, size = 64) {
  * @param {ApiPromise} api
  * @returns {Boolean}
  */
- async function isDidValidator(identifier, api = false) {
+async function isDidValidator(identifier, api = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
@@ -252,7 +252,7 @@ function convertFixedSizeHex(data, size = 64) {
  * @param {ApiPromise} api
  * @returns {Array}
  */
- async function getDidKeyHistory(identifier, api = false) {
+async function getDidKeyHistory(identifier, api = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = (await provider.query.did.prevKeys(did_hex)).toHuman();
@@ -266,15 +266,15 @@ function convertFixedSizeHex(data, size = 64) {
  * @param {KeyringObj} signingKeypair of a validator account
  * @param {ApiPromise} api
  */
-async function updateMetadata(identifier, metadata, signingKeypair, api:any = false) {
+async function updateMetadata(identifier, metadata, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
       const did_hex = sanitiseDid(identifier);
       const tx = provider.tx.did.updateMetadata(did_hex, metadata);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
-      await signedTx.send(function ({ status, dispatchError }){
+      let signedTx = tx.sign(signingKeypair, { nonce });
+      await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
@@ -313,4 +313,4 @@ export {
   updateMetadata,
   sanitiseDid,
 };
-export{};
+export { };
