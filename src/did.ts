@@ -120,7 +120,7 @@ function storeDIDOnChain(DID, signingKeypair, api: any= false) {
  * @param {Number} blockNumber
  * @returns {String}
  */
- async function resolveDIDToAccount(identifier, api = false, blockNumber = null) {
+ async function resolveDIDToAccount(identifier, api = false, blockNumber = 0) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if(!blockNumber && blockNumber != 0) {

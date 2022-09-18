@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import sha256 from 'js-sha256';
+const sha256 = require('js-sha256');
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 import * as vc from '../src/verified_credentials';
 import vcJson from '../src/vc_schema/identity.json';
@@ -16,7 +16,7 @@ describe('VC works correctly', () => {
   originJson.issued_block = '2244';
   // this schema is expected in the dev chain for the test to pass
   const schemaToTest = constants.validSchema;
-  const expectedHash = u8aToHex(stringToU8a(JSON.stringify(originJson)));
+ const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(originJson))));
   let sigKeypair :any = null;
   const sigDid = 'did:ssid:swn';
   var provider: any = null;

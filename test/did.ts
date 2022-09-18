@@ -58,7 +58,7 @@ describe('DID Module works correctly', () => {
   it('Resolve AccountID to DID works correctly', async () => {
     //  Alice is expected in the test chain
     const data = await did.resolveAccountIdToDid(
-      '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY',
+      '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A',
       provider
     );
     assert.strictEqual(
@@ -75,7 +75,7 @@ describe('DID Module works correctly', () => {
   });
 
   it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data: any = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
+    const data: number = await did.resolveDIDToAccount('did:ssid:swn', provider, 0);
     // Alice's DID is created at block number 0
     assert.strictEqual(data, '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
   });
@@ -193,7 +193,7 @@ describe('DID Module works correctly', () => {
     });
 
     it('Resolve test DID to account at block number 0 works correctly', async () => {
-      const data: number = await did.resolveDIDToAccount(testIdentifier, provider, null);
+      const data: number = await did.resolveDIDToAccount(testIdentifier, provider, 0);
       assert.strictEqual(data, null);
       return true;
     });
