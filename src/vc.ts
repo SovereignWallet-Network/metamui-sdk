@@ -19,7 +19,7 @@
  * }
  */
  import { signatureVerify, blake2AsHex } from '@polkadot/util-crypto';
- import sha256 from 'js-sha256';
+  const sha256 = require('js-sha256');
  import { sanitiseDid, resolveDIDToAccount } from './did';
  import { buildConnection } from './connection';
  import { doesSchemaExist } from './schema';
