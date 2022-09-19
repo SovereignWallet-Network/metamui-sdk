@@ -18,10 +18,9 @@
  *   "signature" : "The signature of the verifier, verifying the hash"
  * }
  */
-import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
+import { stringToU8a, u8aToHex, hexToU8a, stringToHex } from '@polkadot/util';
 import { signatureVerify } from '@polkadot/util-crypto';
-//  import sha256 from 'js-sha256';
-const sha256 = require('js-sha256');
+import { sha256 } from 'js-sha256';
 import { getDIDDetails, getDidKeyHistory, isDidValidator } from './did';
 import { buildConnection } from './connection';
 import { doesSchemaExist } from './schema';
@@ -42,7 +41,7 @@ async function createVC(propertiesJson, schemaHash, api = false) {
   return {
     schema: schemaHash,
     properties: propertiesJson,
-    hash: u8aToHex(sha256(stringToU8a(JSON.stringify(propertiesJson)))),
+    hash: stringToHex(sha256(stringToU8a(JSON.stringify(propertiesJson)))),
     verifier: undefined,
     signature: undefined,
   };
@@ -57,7 +56,7 @@ async function createVC(propertiesJson, schemaHash, api = false) {
  */
 async function signVC(vcJson, verifierDid, signingKeyPair) {
   // check if the hash and the properties are a match
-  const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(vcJson.properties))));
+  const expectedHash = stringToHex(sha256(stringToU8a(JSON.stringify(vcJson.properties))));
   if (expectedHash !== vcJson.hash) {
     throw new Error('Data Mismatch!');
   }
@@ -87,7 +86,7 @@ async function verifyVC(vcJson, api = false) {
   }
 
   // check if the hash and the properties are a match
-  const expectedHash = u8aToHex(sha256(stringToU8a(JSON.stringify(vcJson.properties))));
+  const expectedHash = stringToHex(sha256(stringToU8a(JSON.stringify(vcJson.properties))));
   if (expectedHash !== vcJson.hash) {
     throw new Error('Data Mismatch!');
   }

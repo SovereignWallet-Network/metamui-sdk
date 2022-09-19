@@ -9,7 +9,6 @@
  */
 import { stringToHex, stringToU8a, u8aToHex } from '@polkadot/util';
 import { sha256 } from 'js-sha256';
-// const sha256 = require('js-sha256');
 import { buildConnection } from './connection';
 
 /**
