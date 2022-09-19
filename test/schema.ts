@@ -1,19 +1,19 @@
-const assert = require('assert');
-const schema = require('../src/schema');
-const { buildConnection } = require('../src/connection');
-const ssidJson = require('../src/vc_schema/ssid.json');
-const identityJSON = require('../src/vc_schema/identity.json');
-const sha256 = require('js-sha256');
-const { stringToU8a, u8aToHex } = require('@polkadot/util');
-const constants = require('./test_constants');
+import assert from 'assert';
+import * as schema from '../src/schema';
+import { buildConnection } from '../src/connection';
+import ssidJson from '../src/vc_schema/ssid.json';
+import identityJSON from '../src/vc_schema/identity.json';
+import { sha256 } from 'js-sha256';
+import { stringToU8a, stringToHex } from '@polkadot/util';
+import * as constants from './test_constants';
 
 describe('Schema Module works correctly', () => {
   let expectedHashSsid = '';
   let expectedHashId = '';
 
   before(() => {
-    expectedHashSsid = u8aToHex(sha256(stringToU8a(JSON.stringify(ssidJson))));
-    expectedHashId = u8aToHex(sha256(stringToU8a(JSON.stringify(identityJSON))));
+    expectedHashSsid = stringToHex(sha256(stringToU8a(JSON.stringify(ssidJson))));
+    expectedHashId = stringToHex(sha256(stringToU8a(JSON.stringify(identityJSON))));
   });
 
   it('Schema is created in correct format', async () => {
