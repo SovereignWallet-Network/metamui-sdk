@@ -7,10 +7,9 @@
 // *   "hash" : "SHA512 hash of the properties field",
 // *   "signature" : "The signature of the verifier, verifying the hash"
 // * }
-import { stringToU8a, u8aToHex, hexToU8a } from '@polkadot/util';
+import { stringToU8a, u8aToHex, hexToU8a, stringToHex } from '@polkadot/util';
 import { signatureVerify } from '@polkadot/util-crypto';
-// import {sha256} from 'js-sha256';
-const sha256 = require('js-sha256');
+import { sha256 } from 'js-sha256';
 /**
  * The function returns the VC in the expected format, the
  * signature field is left blank to be filled by signing function
@@ -20,7 +19,7 @@ const sha256 = require('js-sha256');
 function createSsidVC(propertiesJson) {
   return {
     properties: propertiesJson,
-    hash: u8aToHex(sha256(stringToU8a(JSON.stringify(propertiesJson)))),
+    hash: stringToHex(sha256(stringToU8a(JSON.stringify(propertiesJson)))),
     signature: undefined,
   };
 }
