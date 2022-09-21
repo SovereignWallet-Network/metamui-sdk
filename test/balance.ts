@@ -1,7 +1,7 @@
 import { KeyringPair } from '@polkadot/keyring/types';
 import assert from 'assert';
 import * as balance from '../src/balance';
-import {initKeyring} from '../src/config';
+import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './test_constants';
 
@@ -16,12 +16,13 @@ import * as constants from './test_constants';
 
 describe('Balances works correctly', () => {
   let provider: any = null;
-  let sigKeypairWithBal;
+  let sigKeypairWithBal: KeyringPair;
   // let sigKeypairWithBal: typeof KeyringPair = null;
 
   before(async () => {
     provider = await buildConnection(constants.providerNetwork);
     const keyring = await initKeyring();
+    // console.log('Awaiting keyring succesfull: ', keyring);
     sigKeypairWithBal = await keyring.addFromUri(constants.mnemonicWithBalance);
   });
 
@@ -33,7 +34,8 @@ describe('Balances works correctly', () => {
   it('subscribeToBalanceChanges works correctly', (done) => {
     let isCallbackCalled = false;
     balance.subscribeToBalanceChanges('did:ssid:swn', (balanceAmount) => {
-      if(isCallbackCalled) return;
+      console.log('Awaiting balance succesfull: ', balanceAmount);
+      if (isCallbackCalled) return;
       isCallbackCalled = true;
       assert.strictEqual(Math.floor(balanceAmount) >= 0, true);
       done();

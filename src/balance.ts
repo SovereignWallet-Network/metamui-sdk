@@ -8,7 +8,7 @@ import { sanitiseDid } from './did';
  * @returns {String} Balance In Highest Form
  * @example await getBalanceFromDID(did, api)
  */
-const getBalance = async (did: any, api = false) => {
+const getBalance = async (did: string, api = false) => {
   // Resolve the did to get account ID
   try {
     const provider = api || await buildConnection('local');
@@ -27,13 +27,13 @@ const getBalance = async (did: any, api = false) => {
  * @param {Function} callback Cb function to execute with new balance in Highest Form
  * @param {ApiPromise=} api Api Object from Build Connection
  */
-const subscribeToBalanceChanges = async (identifier: any, callback: (arg0: number) => void, api: any = false) => {
+const subscribeToBalanceChanges = async (identifier: string, callback: (arg0: number) => void, api: any = false) => {
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
-    return provider.query.did.account(did_hex, ({ data: { free: currentBalance } }) => {
-        callback(currentBalance.toNumber() / 1e6);
-      });
+    return provider.query.mui.account(did_hex, ({ data: { free: currentBalance } }) => {
+      callback(currentBalance.toNumber() / 1e6);
+    });
   } catch (err) {
     return null;
   }
