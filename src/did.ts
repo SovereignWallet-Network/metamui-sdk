@@ -97,11 +97,11 @@ function storeDIDOnChain(DID, signingKeypair, api: any = false) {
  * @param {String} identifier DID Identifier
  * @returns {JSON}
  */
-async function getDIDDetails(identifier, api = false) {
+async function getDIDDetails(identifier: string, api: any = false) {
   try {
-    const provider = api || (await buildConnection('local'));
+    const provider = api;
     const did_hex = sanitiseDid(identifier);
-    const data = (await provider.query.did.dIDs(did_hex)).toJSON();
+    const data = (await provider.query.did.diDs(did_hex)).toJSON();
     return {
       identifier: data[0].identifier,
       public_key: data[0].public_key,
@@ -109,7 +109,7 @@ async function getDIDDetails(identifier, api = false) {
       added_block: data[1],
     };
   } catch (error) {
-    throw Error('Failed to fetch details');
+    throw Error('Failed to fetch details: ' + error);
   }
 }
 
@@ -120,7 +120,7 @@ async function getDIDDetails(identifier, api = false) {
  * @param {Number} blockNumber
  * @returns {String}
  */
-async function resolveDIDToAccount(identifier, api = false, blockNumber: number | null = null) {
+async function resolveDIDToAccount(identifier, api: boolean | string = false, blockNumber: number | null = null) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {

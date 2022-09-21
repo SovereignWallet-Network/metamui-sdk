@@ -75,9 +75,9 @@ describe('DID Module works correctly', () => {
   });
 
   it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider, 0);
+    const data = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
     // Alice's DID is created at block number 0
-    assert.strictEqual(data, '5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY');
+    assert.strictEqual(data, '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A');
   });
 
   it('isDidValidator works correctly', async () => {

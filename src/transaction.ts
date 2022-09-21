@@ -14,11 +14,11 @@ import { resolveDIDToAccount } from './did';
  * @returns {Uint8Array}
  */
 async function sendTransaction(
-  senderAccountKeyPair,
-  receiverDID,
-  amount,
-  api:any = false,
-  nonce = false,
+  senderAccountKeyPair: { address: any; },
+  receiverDID: any,
+  amount: any,
+  api: any = false,
+  nonce: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -28,31 +28,31 @@ async function sendTransaction(
       if (!receiverAccountID) {
         throw new Error('balances.RecipentDIDNotRegistered');
       }
-      const tx = await provider.tx.balances
-        .transfer(receiverAccountID, amount);
+      const tx = await provider.tx.balances.transfer(receiverAccountID, amount);
       nonce = nonce || await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      const signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      // console.log((await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address)));
+      const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
-          console.log('Transaction status:', status.type);
-          if (dispatchError) {
-            if (dispatchError.isModule) {
-              // for module errors, we have the section indexed, lookup
-              const decoded = api.registry.findMetaError(dispatchError.asModule);
-              const { documentation, name, section } = decoded;
-              // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-              reject(new Error(`${section}.${name}`));
-            } else {
-              // Other, CannotLookup, BadOrigin, no extra info
-              // console.log(dispatchError.toString());
-              reject(new Error(dispatchError.toString()));
-            }
-          } else if (status.isFinalized) {
-            // console.log('Finalized block hash', status.asFinalized.toHex());
-            resolve(signedTx.hash.toHex())
+        console.log('Transaction status:', status.type);
+        if (dispatchError) {
+          if (dispatchError.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { documentation, name, section } = decoded;
+            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
+            reject(new Error(`${section}.${name}`));
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            // console.log(dispatchError.toString());
+            reject(new Error(dispatchError.toString()));
           }
-        });
+        } else if (status.isFinalized) {
+          // console.log('Finalized block hash', status.asFinalized.toHex());
+          resolve(signedTx.hash.toHex())
+        }
+      });
     } catch (err) {
-      // console.log(err);
+      console.log(err);
       reject(err);
     }
   });
@@ -71,11 +71,11 @@ async function sendTransaction(
  */
 async function transfer(
   senderAccountKeyPair,
-  receiverDID,
+  receiverDID: string,
   amount,
   memo,
-  api:any = false,
-  nonce = false,
+  api: any = false,
+  nonce: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -88,26 +88,26 @@ async function transfer(
       const tx = provider.tx.balances
         .transferWithMemo(receiverAccountID, amount, memo);
       nonce = nonce || await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      const signedTx = tx.sign(senderAccountKeyPair, {nonce});
-      return signedTx.send(function ({ status, dispatchError }) {
-          console.log('Transaction status:', status.type);
-          if (dispatchError) {
-            if (dispatchError.isModule) {
-              // for module errors, we have the section indexed, lookup
-              const decoded = api.registry.findMetaError(dispatchError.asModule);
-              const { documentation, name, section } = decoded;
-              // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-              reject(new Error(`${section}.${name}`));
-            } else {
-              // Other, CannotLookup, BadOrigin, no extra info
-              // console.log(dispatchError.toString());
-              reject(new Error(dispatchError.toString()));
-            }
-          } else if (status.isFinalized) {
-            // console.log('Finalized block hash', status.asFinalized.toHex());
-            resolve(signedTx.hash.toHex());
+      const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
+      await signedTx.send(function ({ status, dispatchError }) {
+        console.log('Transaction status:', status.type);
+        if (dispatchError) {
+          if (dispatchError.isModule) {
+            // for module errors, we have the section indexed, lookup
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { documentation, name, section } = decoded;
+            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
+            reject(new Error(`${section}.${name}`));
+          } else {
+            // Other, CannotLookup, BadOrigin, no extra info
+            // console.log(dispatchError.toString());
+            reject(new Error(dispatchError.toString()));
           }
-        });
+        } else if (status.isFinalized) {
+          // console.log('Finalized block hash', status.asFinalized.toHex());
+          resolve(signedTx.hash.toHex());
+        }
+      });
     } catch (err) {
       // console.log(err);
       reject(err);
