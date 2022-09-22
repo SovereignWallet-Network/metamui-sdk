@@ -3,7 +3,7 @@ import { base58Decode, blake2AsHex } from '@polkadot/util-crypto';
 
 import * as types from '@polkadot/types';
 
- const VCType = {
+const VCType = {
   TokenVC: "TokenVC",
   MintTokens: "MintTokens",
   SlashTokens: "SlashTokens",
@@ -13,17 +13,33 @@ import * as types from '@polkadot/types';
 };
 Object.freeze(VCType);
 
- const METABLOCKCHAIN_TYPES = {
+const METABLOCKCHAIN_TYPES = {
+  "MaxMetadata": "ConstU32<32>",
+  "MaxRegNumLen": "ConstU32<32>",
+  "MaxCompNameLen": "ConstU32<32>",
   "PeerId": "OpaquePeerId",
   "identifier": "[u8;32]",
   "public_key": "[u8;32]",
-  "metadata": "Vec<u8>",
-  "DidStruct": {
+  "metadata": "BoundedVec<u8, MaxMetadata>",
+
+  "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
+  "CompanyName": "BoundedVec<u8, MaxCompNameLen>",
+  "PrivateDid": {
     "identifier": "identifier",
     "public_key": "public_key",
     "metadata": "metadata"
   },
-  "Did": "[u8;32]",
+  "PublicDid": {
+    "identifier": "identifier",
+    "public_key": "public_key",
+    "metadata": "metadata",
+    "registration_number": "RegistrationNumber",
+    "comapny_name": "CompanyName"
+  },
+  "DIDType": {
+    "Public": "PublicDid",
+    "Private": "PrivateDid",
+  },
   "PublicKey": "[u8;32]",
   "Address": "MultiAddress",
   "LookupSource": "MultiAddress",
@@ -138,15 +154,15 @@ const ENCODE_TYPES = {
   "CID": "[u8;64]",
 };
 
- const TOKEN_NAME_BYTES = 16;
- const CURRENCY_CODE_BYTES = 8;
- const VC_PROPERTY_BYTES = 128;
- const CID_BYTES = 64;
+const TOKEN_NAME_BYTES = 16;
+const CURRENCY_CODE_BYTES = 8;
+const VC_PROPERTY_BYTES = 128;
+const CID_BYTES = 64;
 
 /**
  * @param  {Bytes} inputBytes u8[]
  */
- const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
+const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
 /**
  * @param  {String} inputString
  */
@@ -162,7 +178,7 @@ const stringToBytes = (inputString) => stringToU8a(inputString);
 /**
  * @param  {Hex} hexString
  */
- const hexToString = (hexString) => polkadotHextoString(hexString).replace(/^\0+/, '').replace(/\0+$/, '');
+const hexToString = (hexString) => polkadotHextoString(hexString).replace(/^\0+/, '').replace(/\0+$/, '');
 
 
 /**
@@ -179,7 +195,7 @@ registry.register(ENCODE_TYPES);
  * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
  * @returns {String} Encoded Hex
  */
- function encodeData(data, typeKey) {
+function encodeData(data, typeKey) {
   return types.createType(registry, typeKey, data).toHex();
 }
 
@@ -196,7 +212,7 @@ function decodeHex(hexValue, typeKey) {
  * @param  {} str
  * @returns bool
  */
- function isUpperAndValid(str) {
+function isUpperAndValid(str) {
   return /^[A-Z]+$/.test(str);
 }
 
@@ -206,39 +222,39 @@ function decodeHex(hexValue, typeKey) {
  */
 function tidy(s) {
   const tidy = typeof s === 'string'
-    ? s.replace( /[\x00-\x1F\x7F-\xA0]+/g, '' )
-    : s ;
+    ? s.replace(/[\x00-\x1F\x7F-\xA0]+/g, '')
+    : s;
   return tidy;
 }
 
- /** function that decodes hex of createTokenVC
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
- */
-  function getVCS(hexValue, typeKey) {
+/** function that decodes hex of createTokenVC
+* @param  {String} hexValue Hex String to be decoded
+* @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+* @returns {Object | String} Decoded Object/String
+*/
+function getVCS(hexValue, typeKey) {
   let vcs = decodeHex(hexValue, typeKey);
-  if(Boolean(vcs.token_name))
+  if (Boolean(vcs.token_name))
     vcs["token_name"] = hexToString(vcs.token_name);
-  if(Boolean(vcs.currency_code))
+  if (Boolean(vcs.currency_code))
     vcs["currency_code"] = hexToString(vcs.currency_code);
   return vcs;
- }
+}
 
-  /** function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
- */
- function decodeVC(hexValue, typeKey) {
+/** function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
+* @param  {String} hexValue Hex String to be decoded
+* @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+* @returns {Object | String} Decoded Object/String
+*/
+function decodeVC(hexValue, typeKey) {
   let vcs = decodeHex(hexValue, typeKey);
   vcs["owner"] = hexToString(vcs.owner);
   let issuer_did: string[] = [];
-  for(let i=0; i<vcs.issuers.length; i++){
+  for (let i = 0; i < vcs.issuers.length; i++) {
     issuer_did.push(hexToString(vcs.issuers[i]));
   }
   vcs["issuers"] = issuer_did;
-  switch(vcs.vc_type) {
+  switch (vcs.vc_type) {
     case VCType.MintTokens:
       vcs["vc_property"] = getVCS(vcs.vc_property, VCType.SlashMintTokens);
       break;
@@ -266,8 +282,8 @@ function tidy(s) {
  */
 function sortObjectByKeys(unorderedObj) {
   return Object.keys(unorderedObj).sort().reduce(
-    (obj, key) => { 
-      obj[key] = unorderedObj[key]; 
+    (obj, key) => {
+      obj[key] = unorderedObj[key];
       return obj;
     },
     {}
@@ -278,7 +294,7 @@ function sortObjectByKeys(unorderedObj) {
  * @param  {Object} unordered unordered object
  * @returns {Object} ordered object by key
  */
- function generateObjectHash(object) {
+function generateObjectHash(object) {
   const sortedData = sortObjectByKeys(object);
   const encodedData = stringToHex(JSON.stringify(sortedData));
   return blake2AsHex(encodedData);

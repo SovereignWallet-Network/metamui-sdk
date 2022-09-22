@@ -10,7 +10,7 @@
         "test-win": "ts-mocha -p ./tsconfig.json ./test/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md",
-        "dummytest": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/balance.ts --timeout 80000  --exit"
+        "dummytest": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/transaction.ts --timeout 80000  --exit"
     },
     "repository": {
         "type": "git",
