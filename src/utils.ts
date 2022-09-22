@@ -36,6 +36,7 @@ const METABLOCKCHAIN_TYPES = {
     "registration_number": "RegistrationNumber",
     "comapny_name": "CompanyName"
   },
+  "Did": "[u8;32]",
   "DIDType": {
     "Public": "PublicDid",
     "Private": "PrivateDid",
