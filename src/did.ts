@@ -57,14 +57,20 @@ const generateDID = async (mnemonic, identifier, metadata = '') => {
  * @param {ApiPromise} api
  * @returns {String} txnId Txnid for storage operation.
  */
+
+
+
 function storeDIDOnChain(DID: { public_key: string; identity: string; metadata: string; }, signingKeypair: { address: string; }, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
-      const tx = provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata);
+      const tx = provider.tx.validatorCommittee.execute(
+        provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata), 1000
+      );
+      // const tx = provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata);
       let nonce: any = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       let signedTx: any = await tx.signAsync(signingKeypair, { nonce });
-      console.log('Sending tx: ', await signedTx.send());
+      console.log('Sending tx: ', await signedTx.eth.send());
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -119,6 +125,9 @@ async function getDIDDetails(identifier: string, api: any = false) {
  * @param {Number} blockNumber
  * @returns {String}
  */
+
+
+
 async function resolveDIDToAccount(identifier: string, api: boolean | string = false, blockNumber: number | null = null) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);

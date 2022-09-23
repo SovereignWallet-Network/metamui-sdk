@@ -38,8 +38,10 @@ const METABLOCKCHAIN_TYPES = {
   },
   "Did": "[u8;32]",
   "DIDType": {
-    "Public": "PublicDid",
-    "Private": "PrivateDid",
+    "_enum": {
+      "Public": "PublicDid",
+      "Private": "PrivateDid"
+    }
   },
   "PublicKey": "[u8;32]",
   "Address": "MultiAddress",
