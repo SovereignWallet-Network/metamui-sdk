@@ -6,6 +6,8 @@ import * as constants from './test_constants';
 import { hexToString } from '../src/utils';
 import { mnemonicValidate } from '@polkadot/util-crypto';
 import { removeDid } from './helper/helper';
+import { ApiPromise, Keyring } from '@polkadot/api';
+import { KeyringPair } from '@polkadot/keyring/types';
 
 describe('DID Module works correctly', () => {
   const TEST_MNEMONIC =
@@ -18,15 +20,17 @@ describe('DID Module works correctly', () => {
     'strong offer usual inmate reform universe zero erode reopen mosquito blossom bachelor';
   const expectedNewPubkey =
     '04249359400f54ceb6ecf51edfeb1c02c8233e8ca563492df998a5d91266fa64';
-  let provider: any = null;
-  let sigKeypairWithBal = null;
-  let keyring: any = null;
+
+  let provider: ApiPromise | undefined;
+  let keyring: Keyring | undefined;
+  let sigKeypairWithBal: KeyringPair | undefined;
 
   before(async () => {
     keyring = await initKeyring();
     provider = await buildConnection(constants.providerNetwork);
-    sigKeypairWithBal = await keyring.addFromUri(constants.mnemonicWithBalance);
+    sigKeypairWithBal = keyring.addFromUri(constants.mnemonicWithBalance);
   });
+
 
   it('DID is created in correct format', async () => {
     const didObj = await did.generateDID(TEST_MNEMONIC, TEST_DID, TEST_METADATA);
@@ -136,6 +140,7 @@ describe('DID Module works correctly', () => {
 
     it('storeDIDOnChain works correctly', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'rocket', TEST_METADATA);
+      if (typeof sigKeypairWithBal === 'undefined') return
       await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
       const newDidDetails = await did.getDIDDetails(newDidObj.identity, provider);
       addedDidBlockNum = newDidDetails.added_block;
@@ -146,6 +151,7 @@ describe('DID Module works correctly', () => {
 
     it('storeDIDOnChain throws error on duplicate ssid', async () => {
       const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
+      if (typeof sigKeypairWithBal === 'undefined') return
       const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.DIDAlreadyExists');
@@ -155,6 +161,7 @@ describe('DID Module works correctly', () => {
 
     it('storeDIDOnChain throws error on duplicate public key', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
+      if (typeof sigKeypairWithBal === 'undefined') return
       const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
@@ -164,18 +171,24 @@ describe('DID Module works correctly', () => {
 
     it('updateDidKey works correctly', async () => {
       const didString = testIdentifier;
-      const pubKey = await keyring.addFromUri(NEW_MNEMONIC).publicKey;
+
+      assert(typeof keyring !== 'undefined', "Keyring is undefined");
+      if (typeof keyring === 'undefined') return;
+
+      const pubKey = keyring.addFromUri(NEW_MNEMONIC).publicKey;
       await did.updateDidKey(didString, pubKey, sigKeypairWithBal, provider);
       const newUpdatedDidDetails = await did.getDIDDetails(didString, provider);
       updatedKeyBlockNum = newUpdatedDidDetails.added_block;
       assert.strictEqual(newUpdatedDidDetails.public_key, `0x${expectedNewPubkey}`);
       assert.strictEqual(newUpdatedDidDetails.identifier, did.sanitiseDid(testIdentifier));
       const keyHistory = (await did.getDidKeyHistory(didString, provider));
-      assert.equal(keyHistory.map(data => data[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
+      assert.equal(keyHistory
+        && Array.isArray(keyHistory)
+        && keyHistory.map(data => data?.[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
     })
 
     it('updateDidKey throws error on using existing public key', async () => {
-      const pubKey = await keyring.addFromUri(NEW_MNEMONIC).publicKey;
+      const pubKey = keyring?.addFromUri(NEW_MNEMONIC).publicKey;
       const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
@@ -184,7 +197,7 @@ describe('DID Module works correctly', () => {
     });
 
     it('updateDidKey throws error on using non existent did', async () => {
-      const pubKey = await keyring.addFromUri(TEST_MNEMONIC).publicKey;
+      const pubKey = keyring?.addFromUri(TEST_MNEMONIC).publicKey;
       const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');

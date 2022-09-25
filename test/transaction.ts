@@ -8,7 +8,7 @@ const constants = require('./test_constants');
 const { removeDid } = require('./helper/helper');
 
 describe('Transaction works correctly', () => {
-  let sigKeypairWithBal:any = null;
+  let sigKeypairWithBal: any = null;
   let sigKeypairWithoutBal = null;
   let provider;
   before(async () => {
@@ -31,16 +31,16 @@ describe('Transaction works correctly', () => {
       };
       try {
         await did.storeDIDOnChain(didObjDave, sigKeypairWithBal, provider);
-      } catch(err) {
+      } catch (err) {
         console.log(err);
       }
       try {
         await did.storeDIDOnChain(didObj, sigKeypairWithBal, provider);
-      } catch(err) {
+      } catch (err) {
         console.log(err);
       }
     }
-    const transfer = await tx.sendTransaction(sigKeypairWithBal, 'did:ssid:metamui', '1', provider);
+    const transfer = await tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', '1', provider);
     assert.doesNotReject(transfer);
   });
 
@@ -97,6 +97,6 @@ describe('Transaction works correctly', () => {
       await removeDid('did:ssid:testing_mui', sigKeypairWithBal, provider);
     }
   })
-  
+
   return true;
 });

@@ -1,5 +1,6 @@
 import { Keyring } from '@polkadot/api';
 import { cryptoWaitReady } from '@polkadot/util-crypto';
+import { KeypairType } from '@polkadot/util-crypto/types';
 
 const METABLOCKCHAIN_PROVIDER = {
   LOCAL: 'ws://127.0.0.1:9944',
@@ -16,10 +17,9 @@ const SSID_BASE_URL = {
   mainnet: 'https://ssid.metabit.exchange/prod',
 }
 
-const initKeyring = async (type: any = 'sr25519') => {
+const initKeyring = async (type: KeypairType = 'sr25519') => {
   await cryptoWaitReady();
-  const keyring = await new Keyring({ type });
-  return keyring;
+  return new Keyring({ type });
 };
 
 export {

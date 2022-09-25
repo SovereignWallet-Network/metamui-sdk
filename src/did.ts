@@ -1,3 +1,5 @@
+import { ApiPromise } from '@polkadot/api';
+import { AnyJson } from '@polkadot/types/types';
 import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
 import { initKeyring } from './config';
 import { buildConnection } from './connection';
@@ -21,12 +23,9 @@ const checkIdentifierFormat = (identifier) => {
 
 /**
  * Generate did object to be stored in blockchain.
- * @param {String} mnemonic
- * @param {String} identifier
- * @param {String} metadata
  * @returns {Object} Object containing did structure
  */
-const generateDID = async (mnemonic, identifier, metadata = '') => {
+const generateDID = async (mnemonic: string, identifier: string, metadata = '') => {
   const keyring = await initKeyring();
   const isValidIdentifier = checkIdentifierFormat(identifier);
   const isValidMnemonic = mnemonicValidate(mnemonic);
@@ -60,24 +59,23 @@ const generateDID = async (mnemonic, identifier, metadata = '') => {
 
 
 
-function storeDIDOnChain(DID: { public_key: string; identity: string; metadata: string; }, signingKeypair: { address: string; }, api: any = false) {
+function storeDIDOnChain(DID: { public_key: Uint8Array; identity: string; metadata: string; }, signingKeypair: { address: string; }, api?: ApiPromise) {
   return new Promise(async (resolve, reject) => {
     try {
-      const provider = api || (await buildConnection('local'));
+      const provider = api || (await buildConnection('local')) as ApiPromise;
       const tx = provider.tx.validatorCommittee.execute(
         provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata), 1000
       );
       // const tx = provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata);
-      let nonce: any = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx: any = await tx.signAsync(signingKeypair, { nonce });
-      console.log('Sending tx: ', await signedTx.eth.send());
+      const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+      const signedTx = await tx.signAsync(signingKeypair.address, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { documentation, name, section } = decoded;
+            const decoded = provider.registry.findMetaError(dispatchError.asModule);
+            const { name, section } = decoded;
             // console.log(`${section}.${name}: ${documentation.join(' ')}`);
             reject(new Error(`${section}.${name}`));
           } else {
@@ -128,7 +126,7 @@ async function getDIDDetails(identifier: string, api: any = false) {
 
 
 
-async function resolveDIDToAccount(identifier: string, api: boolean | string = false, blockNumber: number | null = null) {
+async function resolveDIDToAccount(identifier: string, api: ApiPromise | false = false, blockNumber: number | null = null) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {
@@ -142,27 +140,29 @@ async function resolveDIDToAccount(identifier: string, api: boolean | string = f
   if (!keyHistories) {
     return null;
   }
-  const keyIndex = keyHistories.reverse().findIndex((value: string[]) => blockNumber >= parseInt(value[1]));
+  if (!Array.isArray(keyHistories)) return null
+
+  const keyIndex = keyHistories.reverse().findIndex((value: AnyJson) => blockNumber >= parseInt(value?.[1]));
   if (keyIndex < 0) {
     return null;
   }
-  return keyHistories[keyIndex][0];
+  return keyHistories[keyIndex]?.[0];
 }
 
 /**
  * Get the DID associated to given accountID
  * @param {String} accountId (hex/base64 version works)
  * @param {ApiPromise} api
- * @returns {String | Boolean} (false if not found)
  */
-async function resolveAccountIdToDid(accountId, api = false) {
+async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | boolean> {
   const provider = api || (await buildConnection('local'));
   const data = (await provider.query.did.rLookup(accountId)).toHuman();
   // return false if empty
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     return false;
   }
-  return data;
+
+  return (typeof data === 'string') ? data : false;
 }
 
 /**
@@ -245,13 +245,15 @@ const sanitiseDid = (did) => {
  * Check if the user is an approved validator
  * @param {String} identifier
  * @param {ApiPromise} api
- * @returns {Boolean}
  */
-async function isDidValidator(identifier, api = false) {
+async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
-  return vList.includes(did_hex);
+  if (vList && Array.isArray(vList)) {
+    return vList.includes(did_hex);
+  }
+  return false
 }
 
 /**
@@ -260,11 +262,10 @@ async function isDidValidator(identifier, api = false) {
  * @param {ApiPromise} api
  * @returns {Array}
  */
-async function getDidKeyHistory(identifier, api = false) {
+async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  const data = (await provider.query.did.prevKeys(did_hex)).toHuman();
-  return data;
+  return (await provider.query.did.prevKeys(did_hex)).toHuman();
 }
 
 /**

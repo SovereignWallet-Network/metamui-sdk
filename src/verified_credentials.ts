@@ -24,6 +24,7 @@ import { sha256 } from 'js-sha256';
 import { getDIDDetails, getDidKeyHistory, isDidValidator } from './did';
 import { buildConnection } from './connection';
 import { doesSchemaExist } from './schema';
+import { ApiPromise } from '@polkadot/api';
 
 /**
  * The function returns the VC in the expected format, the verifier and
@@ -33,7 +34,7 @@ import { doesSchemaExist } from './schema';
  *
  * @returns {JSON}
  */
-async function createVC(propertiesJson, schemaHash, api = false) {
+async function createVC(propertiesJson, schemaHash, api?: ApiPromise) {
   // Check to validate schemaHash
   // if (!(await doesSchemaExist(schemaHash, api))) {
   //   throw Error('SchemaHash not valid!');
@@ -77,7 +78,7 @@ async function signVC(vcJson, verifierDid, signingKeyPair) {
  *
  * @returns {Boolean} true if valid VC
  */
-async function verifyVC(vcJson, api = false) {
+async function verifyVC(vcJson, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
 
   // check if the vc has signature and verifier
@@ -104,7 +105,9 @@ async function verifyVC(vcJson, api = false) {
   if (didDetails.added_block > parseInt(vcJson.properties.issued_block, 10)) {
     console.log('Signing key has been rotated, searching for previous key history!');
     const prevKeyDetails = await getDidKeyHistory(vcJson.verifier);
-    prevKeyDetails.forEach(([accountId, blockNo]) => {
+    if (!Array.isArray(prevKeyDetails)) return null
+    prevKeyDetails.forEach((prevKeyDetail) => {
+      const [accountId, blockNo] = prevKeyDetail as any
       if (parseInt(vcJson.properties.issued_block, 10) > blockNo) {
         console.log('Signing key found!');
         signerAddress = accountId;

@@ -61,9 +61,9 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
   const call = provider.tx.vc.store(vcHex);
   await collective.propose(3, call, 1000, sigKeypairOwner, provider);
   const actualProposals = await collective.getProposals(provider);
-  const proposalHash = actualProposals[0];
+  const proposalHash = actualProposals?.[0];
   let vote = await collective.getVotes(proposalHash, provider);
-  const index = vote.index;
+  const index = vote?.index;
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
   await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);

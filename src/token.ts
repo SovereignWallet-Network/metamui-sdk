@@ -8,6 +8,7 @@
 import { resolveDIDToAccount } from './did';
 import { buildConnection } from './connection';
 import { sanitiseDid } from './did';
+import { ApiPromise } from '@polkadot/api';
 // 8 bytes for currency_code
 const CURRENCY_CODE_LENGTH = 16;
 /**
@@ -33,7 +34,7 @@ async function issueToken(
         totalIssuanceAmt,
       );
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -69,12 +70,12 @@ async function issueToken(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function transferToken(
+async function transferToken(
   recipentDid,
   currencyCode,
   tokenAmount,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -88,7 +89,7 @@ async function issueToken(
       tokenAmount = await getFormattedTokenAmount(ccode, tokenAmount, provider);
       const tx = provider.tx.tokens.transfer(receiverAccountID, ccode, tokenAmount);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -125,13 +126,13 @@ async function issueToken(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function transferTokenWithMemo(
+async function transferTokenWithMemo(
   recipentDid,
   currencyCode,
   tokenAmount,
   memo,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -145,7 +146,7 @@ async function issueToken(
       tokenAmount = await getFormattedTokenAmount(ccode, tokenAmount, provider);
       const tx = provider.tx.tokens.transferTokenWithMemo(receiverAccountID, ccode, tokenAmount, memo);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -180,11 +181,11 @@ async function issueToken(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function transferAll(
+async function transferAll(
   recipentDid,
   currencyCode,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -196,7 +197,7 @@ async function issueToken(
       }
       const tx = provider.tx.tokens.transferAll(receiverAccountID, sanitiseCCode(currencyCode));
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -230,17 +231,17 @@ async function issueToken(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function slashToken(
+async function slashToken(
   vcId,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
       const tx = provider.tx.tokens.slashToken(vcId);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -277,14 +278,14 @@ async function issueToken(
 async function mintToken(
   vcId,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
       const tx = provider.tx.tokens.mintToken(vcId);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -318,13 +319,14 @@ async function mintToken(
  * @param {ApiPromise} api
  * @returns {String} Balance In Highest Form
  */
-async function getTokenBalance(did, currencyCode, api = false) {
+async function getTokenBalance(did, currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(did);
   const ccode = sanitiseCCode(currencyCode);
   const tokenData = await getTokenData(ccode, provider);
-  const data = (await provider.query.tokens.accounts(did_hex, ccode))
-                  .toJSON().data.free/(Math.pow(10,tokenData.decimal));
+
+  // @ts-ignore
+  const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON().data.free / (Math.pow(10, tokenData.decimal));
   return data;
 }
 
@@ -336,16 +338,17 @@ async function getTokenBalance(did, currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {Object} In Highest Form
  */
- const subscribeToGetTokenBalance = async (did, currencyCode, callback, api = false) => {
+const subscribeToGetTokenBalance = async (did, currencyCode, callback, api?: ApiPromise) => {
   try {
     const provider = api || (await buildConnection('local'));
     const did_hex = sanitiseDid(did);
     const ccode = sanitiseCCode(currencyCode);
     const tokenData = await getTokenData(ccode, provider);
+    if (!tokenData) return null
     return provider.query.tokens.accounts(did_hex, ccode, (data) => {
-      callback(data.toJSON().data.free/(Math.pow(10,tokenData.decimal)));
+      callback(data.toJSON().data.free / (Math.pow(10, tokenData['decimal'])));
     });
-  } 
+  }
   catch (err) {
     return null;
   }
@@ -358,16 +361,20 @@ async function getTokenBalance(did, currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {Object} In Highest Form
  */
- async function getDetailedTokenBalance(did, currencyCode, api = false) {
+async function getDetailedTokenBalance(did, currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(did);
   const ccode = sanitiseCCode(currencyCode);
   const tokenData = await getTokenData(ccode, provider);
-  const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON().data;
+  const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON()?.['data'];
+
   return {
-    frozen: data.frozen/(Math.pow(10,tokenData.decimal)),
-    free: data.free/(Math.pow(10,tokenData.decimal)),
-    reserved: data.reserved/(Math.pow(10,tokenData.decimal)),
+    // @ts-ignore
+    frozen: data.frozen / (Math.pow(10, tokenData['decimal'])),
+    // @ts-ignore
+    free: data.free / (Math.pow(10, tokenData['decimal'])),
+    // @ts-ignore
+    reserved: data.reserved / (Math.pow(10, tokenData.decimal)),
   };
 }
 
@@ -379,7 +386,7 @@ async function getTokenBalance(did, currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {Object} In Highest Form
  */
- const subscribeToGetDetailedTokenBalance = async (did, currencyCode, callback, api = false) => {
+const subscribeToGetDetailedTokenBalance = async (did, currencyCode, callback, api?: ApiPromise) => {
   try {
     const provider = api || (await buildConnection('local'));
     const did_hex = sanitiseDid(did);
@@ -388,12 +395,16 @@ async function getTokenBalance(did, currencyCode, api = false) {
     return provider.query.tokens.accounts(did_hex, ccode, (data) => {
       let Data = data.toJSON().data;
       callback({
-        frozen: Data.frozen/(Math.pow(10,tokenData.decimal)),
-        free: Data.free/(Math.pow(10,tokenData.decimal)),
-        reserved: Data.reserved/(Math.pow(10,tokenData.decimal)),
+
+        // @ts-ignore
+        frozen: Data.frozen / (Math.pow(10, tokenData.decimal)),
+        // @ts-ignore
+        free: Data.free / (Math.pow(10, tokenData.decimal)),
+        // @ts-ignore
+        reserved: Data.reserved / (Math.pow(10, tokenData.decimal)),
       });
     });
-  } 
+  }
   catch (err) {
     return null;
   }
@@ -404,13 +415,18 @@ async function getTokenBalance(did, currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {Array} [ { id: '1', name: 'XYZ' }, { id: '2', name: 'ABC' } ]
  */
-async function getTokenList(api = false) {
+async function getTokenList(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const data = await provider.query.tokens.tokenData.entries();
   return data.map(([{ args: [currency_code] }, value]) => ({
+
+    // @ts-ignore
     name: value.toHuman().token_name,
+    // @ts-ignore
     currencyCode: value.toHuman().currency_code,
+    // @ts-ignore
     decimal: value.toHuman().decimal,
+    // @ts-ignore
     blockNumber: value.toHuman().block_number,
   }));
 }
@@ -421,10 +437,10 @@ async function getTokenList(api = false) {
  * @param {ApiPromise} api
  * @returns {Object}
  */
- async function getTokenData(currencyCode, api = false) {
+async function getTokenData(currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const data = await provider.query.tokens.tokenData(sanitiseCCode(currencyCode));
-  if(!data) {
+  if (!data) {
     throw new Error("Token Data does not exist");
   }
   return data.toHuman();
@@ -436,11 +452,12 @@ async function getTokenList(api = false) {
  * @param {ApiPromise} api
  * @returns {String} TotalSupply In Highest Form
  */
-async function getTokenTotalSupply(currencyCode, api = false) {
+async function getTokenTotalSupply(currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const tokenData = await getTokenData(sanitiseCCode(currencyCode), provider);
   const data = await provider.query.tokens.totalIssuance(sanitiseCCode(currencyCode));
-  return data.toJSON()/(Math.pow(10,tokenData.decimal));
+  // @ts-ignore
+  return data.toJSON() / (Math.pow(10, tokenData.decimal));
 }
 
 /**
@@ -449,7 +466,7 @@ async function getTokenTotalSupply(currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {Object} 
  */
- async function getLocks(did, currencyCode, api = false) {
+async function getLocks(did, currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const accountId = await resolveDIDToAccount(did, provider);
   if (!accountId) {
@@ -465,7 +482,7 @@ async function getTokenTotalSupply(currencyCode, api = false) {
  * @param {ApiPromise} api
  * @returns {String}
  */
- async function getTokenIssuer(currencyCode, api = false) {
+async function getTokenIssuer(currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const data = await provider.query.tokens.tokenIssuer(sanitiseCCode(currencyCode));
   return data.toHuman();
@@ -486,7 +503,7 @@ async function withdrawTreasuryReserve(
   from,
   amount,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -501,7 +518,7 @@ async function withdrawTreasuryReserve(
       }
       const tx = provider.tx.tokens.withdrawReserved(toAccountId, fromAccountId, amount);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -536,11 +553,11 @@ async function withdrawTreasuryReserve(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function transferTokenWithVC(
+async function transferTokenWithVC(
   vcId,
   receiverDID,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
 ) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -552,7 +569,7 @@ async function withdrawTreasuryReserve(
       }
       const tx = provider.tx.tokens.transferToken(vcId, receiverAccountID);
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -589,12 +606,12 @@ async function withdrawTreasuryReserve(
  * @param {APIPromise} api
  * @returns {hexString}
  */
- async function setBalance(
+async function setBalance(
   dest,
   currencyCode,
   amount,
   senderAccountKeyPair,
-  api:any = false,
+  api: any = false,
   nonce
 ) {
   return new Promise(async (resolve, reject) => {
@@ -602,8 +619,10 @@ async function withdrawTreasuryReserve(
       const provider = api || (await buildConnection('local'));
       const ccode = sanitiseCCode(currencyCode);
       const tokenData = await getTokenData(ccode, provider);
-      amount = amount * (Math.pow(10,tokenData.decimal));
+      // @ts-ignore
+      amount = amount * (Math.pow(10, tokenData.decimal));
       if (amount < 1) {
+        // @ts-ignore
         throw new Error(`Invalid token amount, max supported decimal for this token is ${tokenData.decimal}`);
       }
       const tx = provider.tx.tokens.setBalance(
@@ -612,7 +631,7 @@ async function withdrawTreasuryReserve(
         amount,
       );
       nonce = nonce || await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, {nonce});
+      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -644,15 +663,15 @@ async function withdrawTreasuryReserve(
  * @param {String} currency_code
  * @return {String} Hex currency_code
  */
- const sanitiseCCode = (code) => {
-  
+const sanitiseCCode = (code) => {
+
   if (code.startsWith('0x')) {
     // already hex string
     return code.padEnd(CURRENCY_CODE_LENGTH, '0');
   }
   // console.log('Converting to hex');
   let hex_code = Buffer.from(code, 'utf8').toString('hex');
-  hex_code = '0x'+ hex_code.padEnd(CURRENCY_CODE_LENGTH, '0');
+  hex_code = '0x' + hex_code.padEnd(CURRENCY_CODE_LENGTH, '0');
   return hex_code;
 }
 
@@ -664,7 +683,7 @@ async function withdrawTreasuryReserve(
  * @param {APIPromise} provider
  * @return {Number} tokenAmount in lowest form else error
  */
- async function getFormattedTokenAmount(currencyCode, tokenAmount, provider) {
+async function getFormattedTokenAmount(currencyCode, tokenAmount, provider) {
   let amount_decimals = 0;
   tokenAmount = String(tokenAmount);
   // Check if valid number or not
@@ -675,10 +694,13 @@ async function withdrawTreasuryReserve(
     amount_decimals = tokenAmount.split('.')[1].length;
   };
   const tokenData = await getTokenData(currencyCode, provider);
+  // @ts-ignore
   if (amount_decimals > tokenData.decimal) {
+    // @ts-ignore
     throw new Error(`Invalid token amount, max supported decimal by ${tokenData.currency_code} is ${tokenData.decimal}`);
   }
-  tokenAmount = Math.round(parseFloat(tokenAmount) * (Math.pow(10,tokenData.decimal)));
+  // @ts-ignore
+  tokenAmount = Math.round(parseFloat(tokenAmount) * (Math.pow(10, tokenData.decimal)));
   return tokenAmount;
 }
 
@@ -691,21 +713,21 @@ async function withdrawTreasuryReserve(
  * @param  {String} identity
  * @returns {String} Hash
  */
- async function removeToken(currencyCode, vcId, clearAccounts, signingKeypair, identity=null, api:any = false) {
+async function removeToken(currencyCode, vcId, clearAccounts, signingKeypair, identity = null, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
-      identity = identity ? sanitiseDid(identity): null;
+      identity = identity ? sanitiseDid(identity) : null;
       const ccode = sanitiseCCode(currencyCode);
       const tx = provider.tx.sudo.sudo(
         provider.tx.tokens.removeToken(ccode, vcId, clearAccounts, identity)
       );
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
-          if (dispatchError.isModule) { 
+          if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { documentation, name, section } = decoded;

@@ -12,9 +12,9 @@ const NETWORK_PROVIDER = {
 };
 
 // global obj to cache ws connection
-let providerInstance: any = null;
+let providerInstance: Promise<ApiPromise> | null = null;
 
-function buildNewConnection(network = 'local') {
+function buildNewConnection(network = 'local'): Promise<ApiPromise> {
   if (!(network in NETWORK_PROVIDER)) throw new Error('Invalid Network!');
 
   const provider = new WsProvider(NETWORK_PROVIDER[network]);
@@ -26,12 +26,12 @@ function buildNewConnection(network = 'local') {
 
 /**
  * Return an APIPromise object
- * @param {String} network MetaMUI network provider to connect
- * @param {Boolen=} ignoreCache (optional) (default=true)
+ * @param {string} network MetaMUI network provider to connect
+ * @param {boolean} ignoreCache (optional) (default=true)
  * Note : setting the ignoreCache value to true will create a new ws
  * ws conection on every call
  */
-function buildConnection(network = 'local', ignoreCache = false) {
+function buildConnection(network = 'local', ignoreCache = false): Promise<ApiPromise> {
   if (!providerInstance || ignoreCache) {
     console.log('Creating new websocket connection!');
     providerInstance = buildNewConnection(network);

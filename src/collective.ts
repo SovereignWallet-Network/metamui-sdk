@@ -1,5 +1,6 @@
 import * as did from './did';
 import { buildConnection } from './connection';
+import { ApiPromise } from '@polkadot/api'
 
 /**
  * Set Members and prime of collective pallet
@@ -14,16 +15,16 @@ async function setMembers(newMembers, prime, oldCount, signingKeypair, api: any 
     try {
       const provider = api || await buildConnection('local');
       newMembers = newMembers.map(newMember => did.sanitiseDid(newMember));
-      prime = prime ? did.sanitiseDid(prime): null;
+      prime = prime ? did.sanitiseDid(prime) : null;
       const tx = provider.tx.sudo.sudo(
         provider.tx.council.setMembers(newMembers, prime, oldCount)
       );
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
-          if (dispatchError.isModule) { 
+          if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { documentation, name, section } = decoded;
@@ -55,13 +56,13 @@ async function setMembers(newMembers, prime, oldCount, signingKeypair, api: any 
  * @param  {Number} lengthCount Length of call
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function propose(threshold, proposal, lengthCount, signingKeypair, api:any = false) {
+async function propose(threshold, proposal, lengthCount, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
       const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -95,13 +96,13 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
  * @param  {Number} lengthCount Length of Call
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
- async function execute(proposal, lengthCount, signingKeypair, api:any = false) {
+async function execute(proposal, lengthCount, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
       const tx = provider.tx.council.execute(proposal, lengthCount);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -136,13 +137,13 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
  * @param  {Boolean} approve True/false
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
- async function vote(proposalHash, index, approve, signingKeypair, api:any = false) {
+async function vote(proposalHash, index, approve, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
       const tx = provider.tx.council.vote(proposalHash, index, approve);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -178,13 +179,13 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
  * @param  {Number} lengthCount Length
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
- async function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeypair, api:any = false) {
+async function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
       const tx = provider.tx.council.close(proposalHash, index, proposalWeightBond, lengthCount);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -217,7 +218,7 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
  * @param  {String} proposalHash Hash
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
- async function disapproveProposal(proposalHash, signingKeypair, api:any = false) {
+async function disapproveProposal(proposalHash, signingKeypair, api: any = false) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || await buildConnection('local');
@@ -225,7 +226,7 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
         provider.tx.council.disapproveProposal(proposalHash)
       );
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, {nonce});
+      let signedTx = tx.sign(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
@@ -256,7 +257,7 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api:any
  * Get Members of Council
  * @param  {Boolean} api Network Provider
  */
-async function getMembers(api = false) {
+async function getMembers(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.members()).toHuman();
 }
@@ -264,7 +265,7 @@ async function getMembers(api = false) {
  * Get Prime of Council
  * @param  {Boolean} api Network Provider
  */
-async function getPrime(api = false) {
+async function getPrime(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.prime()).toHuman();
 }
@@ -272,7 +273,7 @@ async function getPrime(api = false) {
  * Get All Proposals
  * @param  {Boolean} api Network Provider
  */
-async function getProposals(api = false) {
+async function getProposals(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposals()).toHuman();
 }
@@ -281,7 +282,7 @@ async function getProposals(api = false) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {Boolean} api Network Provider
  */
-async function getProposalOf(proposalHash, api = false) {
+async function getProposalOf(proposalHash, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposalOf(proposalHash)).toHuman();
 }
@@ -290,7 +291,7 @@ async function getProposalOf(proposalHash, api = false) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {Boolean} api Network Provider
  */
-async function getVotes(proposalHash, api = false) {
+async function getVotes(proposalHash, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.voting(proposalHash)).toHuman();
 }
@@ -298,7 +299,7 @@ async function getVotes(proposalHash, api = false) {
  * Get Total proposals count
  * @param  {Boolean} api Network Provider
  */
-async function getProposalCount(api = false) {
+async function getProposalCount(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposalCount()).toHuman();
 }

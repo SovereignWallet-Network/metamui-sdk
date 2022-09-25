@@ -1,3 +1,4 @@
+import { ApiPromise } from '@polkadot/api';
 import { buildConnection } from './connection';
 import { sanitiseDid } from './did';
 
@@ -8,13 +9,13 @@ import { sanitiseDid } from './did';
  * @returns {String} Balance In Highest Form
  * @example await getBalanceFromDID(did, api)
  */
-const getBalance = async (did: string, api = false) => {
+const getBalance = async (did: string, api?: ApiPromise) => {
   // Resolve the did to get account ID
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(did);
     const accountInfo = await provider.query.did.account(did_hex);
-    const { data } = accountInfo.toJSON();
+    const data = accountInfo.toJSON()?.['data'];
     return data.free / 1e6;
   } catch (err) {
     // console.log(err);
