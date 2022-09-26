@@ -18,6 +18,7 @@
  *   "signature" : "The signature of the verifier, verifying the hash"
  * }
  */
+
 import { signatureVerify, blake2AsHex } from '@polkadot/util-crypto';
 import sha256 from 'js-sha256';
 import { sanitiseDid, resolveDIDToAccount } from './did';

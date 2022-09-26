@@ -206,7 +206,7 @@ describe('DID Module works correctly', () => {
     });
 
     it('Resolve test DID to account at block number 0 works correctly', async () => {
-      const data: number = await did.resolveDIDToAccount(testIdentifier, provider, null);
+      const data: number = await did.resolveDIDToAccount(testIdentifier, provider, 0);
       assert.strictEqual(data, null);
       return true;
     });
