@@ -19,15 +19,19 @@ describe('Transaction works correctly', () => {
     if (constants.providerNetwork == 'local') {
       let sigKeypairEve = await keyring.addFromUri('//Eve');
       const didObj = {
-        public_key: sigKeypairEve.publicKey, // this is the public key linked to the did
-        identity: 'did:ssid:metamui', // this is the actual did
-        metadata: 'Metadata',
+        private: {
+          public_key: sigKeypairEve.publicKey, // this is the public key linked to the did
+          identity: 'did:ssid:metamui', // this is the actual did
+          metadata: 'Metadata',
+        }
       };
       let sigKeypairDave = await keyring.addFromUri('//Dave');
       const didObjDave = {
-        public_key: sigKeypairDave.publicKey, // this is the public key linked to the did
-        identity: 'did:ssid:testing_mui', // this is the actual did
-        metadata: 'Metadata',
+        private: {
+          public_key: sigKeypairDave.publicKey, // this is the public key linked to the did
+          identity: 'did:ssid:testing_mui', // this is the actual did
+          metadata: 'Metadata',
+        }
       };
       try {
         await did.storeDIDOnChain(didObjDave, sigKeypairWithBal, provider);

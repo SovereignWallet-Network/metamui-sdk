@@ -41,11 +41,13 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
   ) {
     throw new Error('Invalid Identifier length');
   }
-  const pubKey = await keyring.addFromUri(mnemonic).publicKey;
+  const pubKey = keyring.addFromUri(mnemonic).publicKey;
   return {
-    public_key: pubKey, // this is the public key linked to the did
-    identity: IDENTIFIER_PREFIX + identifier, // this is the actual did
-    metadata,
+    "private": {
+      public_key: pubKey,// this is the public key linked to the did
+      identity: IDENTIFIER_PREFIX + identifier, // this is the actual did
+      metadata,
+    }
   };
 };
 
@@ -59,14 +61,16 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 
 
 
-function storeDIDOnChain(DID: { public_key: Uint8Array; identity: string; metadata: string; }, signingKeypair: { address: string; }, api?: ApiPromise) {
+function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: { address: string; }, api?: ApiPromise) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local')) as ApiPromise;
       const tx = provider.tx.validatorCommittee.execute(
-        provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata), 1000
+        provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
       );
-      // const tx = provider.tx.did.createPrivate(DID.public_key, sanitiseDid(DID.identity), DID.metadata);
+      console.log(DID.private.identity);
+      console.log(await getDIDDetails(DID.private.identity, provider));
+      // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       const signedTx = await tx.signAsync(signingKeypair.address, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
@@ -100,17 +104,33 @@ function storeDIDOnChain(DID: { public_key: Uint8Array; identity: string; metada
  * @param {String} identifier DID Identifier
  * @returns {JSON}
  */
-async function getDIDDetails(identifier: string, api: any = false) {
+async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJson> {
   try {
     const provider = api;
+    if (!provider) {
+      throw new Error('Not connected to blockchain');
+    }
     const did_hex = sanitiseDid(identifier);
     const data = (await provider.query.did.diDs(did_hex)).toJSON();
-    return {
-      identifier: data[0].identifier,
-      public_key: data[0].public_key,
-      metadata: data[0].metadata,
-      added_block: data[1],
-    };
+    if (data == null) {
+      console.log('DID not found');
+      return null;
+    }
+    if (data[0].private.identifier) {
+      return {
+        identifier: data[0].private.identifier,
+        public_key: data[0].private.publicKey,
+        metadata: data[0].private.metadata,
+        added_block: data[1],
+      };
+    } else {
+      return {
+        identifier: data[0].public.identifier,
+        public_key: data[0].public.publicKey,
+        metadata: data[0].public.metadata,
+        added_block: data[1],
+      };
+    }
   } catch (error) {
     throw Error('Failed to fetch details: ' + error);
   }
@@ -132,7 +152,8 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise | false =
   if (!blockNumber && blockNumber !== 0) {
     return (await provider.query.did.lookup(did_hex)).toHuman();
   }
-  const didDetails = await getDIDDetails(identifier, provider);
+  const didDetails: AnyJson = await getDIDDetails(identifier, provider);
+  if (didDetails == null) return null;
   if (blockNumber >= didDetails.added_block) {
     return (await provider.query.did.lookup(did_hex)).toHuman();
   }

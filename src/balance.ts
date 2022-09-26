@@ -2,14 +2,9 @@ import { ApiPromise } from '@polkadot/api';
 import { buildConnection } from './connection';
 import { sanitiseDid } from './did';
 
-/**
- * Get account balance(Highest Form) based on the did supplied.
- * @param {String} did Identifier of the user
- * @param {ApiPromse=} api Api Object from Build Connection
- * @returns {String} Balance In Highest Form
- * @example await getBalanceFromDID(did, api)
- */
-const getBalance = async (did: string, api?: ApiPromise) => {
+// Get account balance(Highest Form) based on the did supplied.
+
+const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
   // Resolve the did to get account ID
   try {
     const provider = api || await buildConnection('local');
@@ -22,12 +17,9 @@ const getBalance = async (did: string, api?: ApiPromise) => {
     return 0;
   }
 };
-/**
- * Listen to balance changes for a DID and execute the callback.
- * @param {String} identifier DID
- * @param {Function} callback Cb function to execute with new balance in Highest Form
- * @param {ApiPromise=} api Api Object from Build Connection
- */
+
+// * Listen to balance changes for a DID and execute the callback.
+
 const subscribeToBalanceChanges = async (identifier: string, callback: (arg0: number) => void, api: any = false) => {
   try {
     const provider = api || await buildConnection('local');

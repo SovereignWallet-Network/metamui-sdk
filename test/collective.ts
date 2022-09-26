@@ -48,7 +48,7 @@ describe('Collective works correctly', () => {
         try {
           await did.storeDIDOnChain(didObjDave, sudoPair, provider);
           await did.storeDIDOnChain(didObjRocket, sudoPair, provider);
-        } catch (err) {}
+        } catch (err) { }
         let nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
         await tx.sendTransaction(sudoPair, TEST_ROCKET_DID, '5000000', provider, nonce);
         nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
@@ -92,65 +92,69 @@ describe('Collective works correctly', () => {
 
     it('should get proposals', async () => {
       const actualProposals = await collective.getProposals(provider);
-      proposalHash = actualProposals[0];
+      proposalHash = actualProposals?.[0];
       let vote = await collective.getVotes(proposalHash, provider);
-      index = vote.index;
-      assert.strictEqual(actualProposals.length > 0, true);
-    });
-
-    it('should get proposal correctly', async () => {
-      let proposalHex = await collective.getProposalOf(proposalHash, provider);
-      assert.strictEqual(proposalHex.args[0], vcHex);
-    });
-
-    it('should get proposal count correctly', async () => {
-      let proposalCount = await collective.getProposalCount(provider);
-      assert.strictEqual(proposalCount, '1');
-    });
-
-    it('should vote correctly', async () => {
-      let transaction: any = await collective.vote(proposalHash, index, true, sudoPair, provider);
-      assert.doesNotReject(transaction);
-      let otherTransaction:any = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
-      assert.doesNotReject(otherTransaction);
-    });
-
-    it('should get votes correctly', async () => {
-      let voteCount = await collective.getVotes(proposalHash, provider);
-      assert.strictEqual(voteCount.ayes.length, 2);
-      assert.strictEqual(voteCount.nays.length, 1);
-      assert.strictEqual(voteCount.ayes.includes(did.sanitiseDid(TEST_SWN_DID)), true);
-      assert.strictEqual(voteCount.ayes.includes(did.sanitiseDid(TEST_ROCKET_DID)), true);
-      assert.strictEqual(voteCount.nays.includes(did.sanitiseDid(TEST_DAVE_DID)), true);
-    });
-
-    it('should close proposal correctly', async () => {
-      let transaction: any = await collective.close(proposalHash, index, 1000, 1000, sudoPair, provider);
-      assert.doesNotReject(transaction);
-    });
-
-    // Even though call is rejected  collective execution is succesfull
-    it.skip('should not execute proposal correctly', async () => {
-      const call = provider.tx.vc.store(vcHex);
-      let transaction = collective.execute(call, 1000, sigKeypairDave, provider);
-      await assert.rejects(transaction);
-    });
-
-    it('should disapprove proposal correctly', async () => {
-      const call = provider.tx.vc.store(vcHex);
-      await collective.propose(3, call, 1000, sigKeypairBob, provider);
-      const actualProposals = await collective.getProposals(provider);
-      proposalHash = actualProposals[0];
-      let transaction: any = await collective.disapproveProposal(proposalHash, sudoPair, provider);
-      assert.doesNotReject(transaction);
-    });
-
-    after(async () => {
-      // Delete created DID (did:ssid:rocket)
-      if (constants.providerNetwork == 'local') {
-        await removeDid(TEST_ROCKET_DID, sudoPair, provider);
-        await removeDid(TEST_DAVE_DID, sudoPair, provider);
+      if (vote == null) {
+        return
       }
-    })
+      index = vote[index];
+    }
+      assert.strictEqual(actualProposals.length > 0, true);
+  });
+
+it('should get proposal correctly', async () => {
+  let proposalHex = await collective.getProposalOf(proposalHash, provider);
+  assert.strictEqual(proposalHex.args[0], vcHex);
+});
+
+it('should get proposal count correctly', async () => {
+  let proposalCount = await collective.getProposalCount(provider);
+  assert.strictEqual(proposalCount, '1');
+});
+
+it('should vote correctly', async () => {
+  let transaction: any = await collective.vote(proposalHash, index, true, sudoPair, provider);
+  assert.doesNotReject(transaction);
+  let otherTransaction: any = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
+  assert.doesNotReject(otherTransaction);
+});
+
+it('should get votes correctly', async () => {
+  let voteCount = await collective.getVotes(proposalHash, provider);
+  assert.strictEqual(voteCount.ayes.length, 2);
+  assert.strictEqual(voteCount.nays.length, 1);
+  assert.strictEqual(voteCount.ayes.includes(did.sanitiseDid(TEST_SWN_DID)), true);
+  assert.strictEqual(voteCount.ayes.includes(did.sanitiseDid(TEST_ROCKET_DID)), true);
+  assert.strictEqual(voteCount.nays.includes(did.sanitiseDid(TEST_DAVE_DID)), true);
+});
+
+it('should close proposal correctly', async () => {
+  let transaction: any = await collective.close(proposalHash, index, 1000, 1000, sudoPair, provider);
+  assert.doesNotReject(transaction);
+});
+
+// Even though call is rejected  collective execution is succesfull
+it.skip('should not execute proposal correctly', async () => {
+  const call = provider.tx.vc.store(vcHex);
+  let transaction = collective.execute(call, 1000, sigKeypairDave, provider);
+  await assert.rejects(transaction);
+});
+
+it('should disapprove proposal correctly', async () => {
+  const call = provider.tx.vc.store(vcHex);
+  await collective.propose(3, call, 1000, sigKeypairBob, provider);
+  const actualProposals = await collective.getProposals(provider);
+  proposalHash = actualProposals[0];
+  let transaction: any = await collective.disapproveProposal(proposalHash, sudoPair, provider);
+  assert.doesNotReject(transaction);
+});
+
+after(async () => {
+  // Delete created DID (did:ssid:rocket)
+  if (constants.providerNetwork == 'local') {
+    await removeDid(TEST_ROCKET_DID, sudoPair, provider);
+    await removeDid(TEST_DAVE_DID, sudoPair, provider);
+  }
+})
   }
 })

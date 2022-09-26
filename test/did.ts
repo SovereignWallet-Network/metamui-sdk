@@ -8,6 +8,7 @@ import { mnemonicValidate } from '@polkadot/util-crypto';
 import { removeDid } from './helper/helper';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { AnyJson } from '@polkadot/types/types';
 
 describe('DID Module works correctly', () => {
   const TEST_MNEMONIC =
@@ -34,9 +35,9 @@ describe('DID Module works correctly', () => {
 
   it('DID is created in correct format', async () => {
     const didObj = await did.generateDID(TEST_MNEMONIC, TEST_DID, TEST_METADATA);
-    assert.strictEqual(Buffer.from(didObj.public_key).toString('hex'), expectedPubkey);
-    assert.strictEqual(didObj.identity, 'did:ssid:rocket');
-    assert.strictEqual(didObj.metadata, TEST_METADATA);
+    assert.strictEqual(Buffer.from(didObj.private.public_key).toString('hex'), expectedPubkey);
+    assert.strictEqual(didObj.private.identity, 'did:ssid:rocket');
+    assert.strictEqual(didObj.private.metadata, TEST_METADATA);
   });
 
   it('DID details are fetched correctly - positive test', async () => {
@@ -44,25 +45,25 @@ describe('DID Module works correctly', () => {
     const data: any = await did.getDIDDetails('did:ssid:swn', provider);
     assert.strictEqual(
       data.public_key,
-      '0x48b5b5a2b56cf1558e6aa3d2df1b7877c9bd7ca512984e85892fb351bd2a912e'
+      '0x3cf26ad9ca352503a6741faeb734307ef2554261086adf586bbe86fc2b34f574'
     );
     assert.strictEqual(
       data.identifier,
       did.sanitiseDid('did:ssid:swn')
     );
-    assert.strictEqual(data.added_block, 6365621);
+    assert.strictEqual(data.added_block, 0);
   });
 
   it('Resolve DID to account works correctly', async () => {
     //  Alice is expected in the test chain
     const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
-    assert.strictEqual(data, '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A');
+    assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
   });
 
   it('Resolve AccountID to DID works correctly', async () => {
     //  Alice is expected in the test chain
     const data = await did.resolveAccountIdToDid(
-      '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A',
+      '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC',
       provider
     );
     assert.strictEqual(
@@ -81,7 +82,7 @@ describe('DID Module works correctly', () => {
   it('Resolve DID to account at block number 0 works correctly', async () => {
     const data = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
     // Alice's DID is created at block number 0
-    assert.strictEqual(data, '5Di3HRA779SPEGkjrGw1SN22bPjFX1KmqLMgtSFpYk1idV7A');
+    assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
   });
 
   it('isDidValidator works correctly', async () => {
@@ -101,9 +102,9 @@ describe('DID Module works correctly', () => {
       provider
     );
     assert.doesNotReject(data);
-    const new_data = await did.getDIDDetails('did:ssid:swn', provider);
-    assert.strictEqual(hexToString(new_data.metadata), 'TestMetadata');
-    assert.strictEqual(new_data.added_block, 0);
+    const new_data: AnyJson = await did.getDIDDetails('did:ssid:swn', provider);
+    assert.strictEqual(hexToString(new_data?.metadata), 'TestMetadata');
+    assert.strictEqual(new_data?.added_block, 0);
   });
 
   it.skip('updateMetadata throws error for unregistered DID', async () => {
@@ -134,19 +135,22 @@ describe('DID Module works correctly', () => {
 
   // These test cases should only run in local environment
   if (constants.providerNetwork == 'local') {
-    let addedDidBlockNum: any = null;
-    let updatedKeyBlockNum: any = null;
+    let addedDidBlockNum: number | null = null;
+    let updatedKeyBlockNum: number | null = null;
     let testIdentifier = 'did:ssid:rocket';
 
     it('storeDIDOnChain works correctly', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'rocket', TEST_METADATA);
+      console.log('newDidObj', newDidObj);
       if (typeof sigKeypairWithBal === 'undefined') return
       await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      const newDidDetails = await did.getDIDDetails(newDidObj.identity, provider);
-      addedDidBlockNum = newDidDetails.added_block;
-      assert.strictEqual(newDidDetails.public_key, `0x${expectedPubkey}`);
-      assert.strictEqual(newDidDetails.identifier, did.sanitiseDid(testIdentifier));
-      assert.strictEqual(hexToString(newDidDetails.metadata), 'Metadata');
+      const newDidDetails = await did.getDIDDetails(newDidObj.private.identity, provider);
+      console.log(typeof newDidDetails);
+      if (!newDidDetails) return null;
+      addedDidBlockNum = newDidDetails?.added_block;
+      assert.strictEqual(newDidDetails?.public_key, `0x${expectedPubkey}`);
+      assert.strictEqual(newDidDetails?.identifier, did.sanitiseDid(testIdentifier));
+      assert.strictEqual(hexToString(newDidDetails?.metadata), 'Metadata');
     });
 
     it('storeDIDOnChain throws error on duplicate ssid', async () => {
