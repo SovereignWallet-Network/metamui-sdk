@@ -27,4 +27,4 @@ jobs:
         uses: Borales/actions-yarn@v3
       - run: yarn
       - run: ls test/
-      - run: yarn test
+      # - run: yarn test

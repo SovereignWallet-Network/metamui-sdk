@@ -7,7 +7,7 @@ import * as did from './did';
 import * as schema from './schema';
 import * as transaction from './transaction';
 import * as utils from './utils';
-import * as vc from './vc';
+// import * as vc from './vc';
 import * as token from './token';
 import * as config from './config';
 // };
@@ -20,7 +20,7 @@ export {
   , schema
   , transaction
   , utils
-  , vc
+  // , vc
   , token
   , config
 };
