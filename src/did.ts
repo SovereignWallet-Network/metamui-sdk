@@ -1,8 +1,9 @@
-import { ApiPromise } from '@polkadot/api';
+import { ApiPromise, Keyring } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
 import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
 import { initKeyring } from './config';
 import { buildConnection } from './connection';
+import { KeyringPair } from '@polkadot/keyring/types';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -61,7 +62,7 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 
 
 
-async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: { address: string; }, api?: ApiPromise) {
+async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: KeyringPair, api?: ApiPromise) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local')) as ApiPromise;
@@ -69,9 +70,9 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
         provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
       );
       // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
-      console.log(await getDIDDetails(DID.private.identity, provider));
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      const signedTx = await tx.signAsync(signingKeypair.address, { nonce });
+      const signedTx = await tx.signAsync(signingKeypair, { nonce });
+
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
