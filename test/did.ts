@@ -103,8 +103,8 @@ describe('DID Module works correctly', () => {
     );
     assert.doesNotReject(data);
     const new_data: AnyJson = await did.getDIDDetails('did:ssid:swn', provider);
-    assert.strictEqual(hexToString(new_data?.metadata), 'TestMetadata');
-    assert.strictEqual(new_data?.added_block, 0);
+    assert.strictEqual(hexToString(new_data?.['metadata']), 'TestMetadata');
+    assert.strictEqual(new_data?.['added_block'], 0);
   });
 
   it.skip('updateMetadata throws error for unregistered DID', async () => {
@@ -141,16 +141,15 @@ describe('DID Module works correctly', () => {
 
     it('storeDIDOnChain works correctly', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'rocket', TEST_METADATA);
-      console.log('newDidObj', newDidObj);
       if (typeof sigKeypairWithBal === 'undefined') return
       await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
       const newDidDetails = await did.getDIDDetails(newDidObj.private.identity, provider);
       console.log(typeof newDidDetails);
       if (!newDidDetails) return null;
-      addedDidBlockNum = newDidDetails?.added_block;
-      assert.strictEqual(newDidDetails?.public_key, `0x${expectedPubkey}`);
-      assert.strictEqual(newDidDetails?.identifier, did.sanitiseDid(testIdentifier));
-      assert.strictEqual(hexToString(newDidDetails?.metadata), 'Metadata');
+      addedDidBlockNum = newDidDetails?.['added_block'];
+      assert.strictEqual(newDidDetails?.['public_key'], `0x${expectedPubkey}`);
+      assert.strictEqual(newDidDetails?.['identifier'], did.sanitiseDid(testIdentifier));
+      assert.strictEqual(hexToString(newDidDetails?.['metadata']), 'Metadata');
     });
 
     it('storeDIDOnChain throws error on duplicate ssid', async () => {
@@ -182,9 +181,9 @@ describe('DID Module works correctly', () => {
       const pubKey = keyring.addFromUri(NEW_MNEMONIC).publicKey;
       await did.updateDidKey(didString, pubKey, sigKeypairWithBal, provider);
       const newUpdatedDidDetails = await did.getDIDDetails(didString, provider);
-      updatedKeyBlockNum = newUpdatedDidDetails.added_block;
-      assert.strictEqual(newUpdatedDidDetails.public_key, `0x${expectedNewPubkey}`);
-      assert.strictEqual(newUpdatedDidDetails.identifier, did.sanitiseDid(testIdentifier));
+      updatedKeyBlockNum = newUpdatedDidDetails?.['added_block'];
+      assert.strictEqual(newUpdatedDidDetails?.['public_key'], `0x${expectedNewPubkey}`);
+      assert.strictEqual(newUpdatedDidDetails?.['identifier'], did.sanitiseDid(testIdentifier));
       const keyHistory = (await did.getDidKeyHistory(didString, provider));
       assert.equal(keyHistory
         && Array.isArray(keyHistory)
@@ -218,16 +217,16 @@ describe('DID Module works correctly', () => {
     it('Resolve DID to account after did created works correctly', async () => {
       // const prevAccBlockNumAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum-1);
       const creatAccBlockNumAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum);
-      const nextBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum + 1);
+      const nextBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum ? addedDidBlockNum + 1 : 0);
       // assert.strictEqual(prevAccBlockNumAcc, null);
       assert.strictEqual(creatAccBlockNumAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
       assert.strictEqual(nextBlockNumberAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
     });
 
     it('Resolve DID to account after key updated works correctly', async () => {
-      const prevBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum + (-1));
+      const prevBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum ? updatedKeyBlockNum + (-1) : 0);
       const keyUpdateBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum);
-      const nextblockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum + 1);
+      const nextblockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum ? updatedKeyBlockNum + 1 : 0);
       assert.strictEqual(prevBlockNumberAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
       assert.strictEqual(keyUpdateBlockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');
       assert.strictEqual(nextblockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');

@@ -61,16 +61,15 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 
 
 
-function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: { address: string; }, api?: ApiPromise) {
+async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: { address: string; }, api?: ApiPromise) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local')) as ApiPromise;
       const tx = provider.tx.validatorCommittee.execute(
         provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
       );
-      console.log(DID.private.identity);
-      console.log(await getDIDDetails(DID.private.identity, provider));
       // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+      console.log(await getDIDDetails(DID.private.identity, provider));
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       const signedTx = await tx.signAsync(signingKeypair.address, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {

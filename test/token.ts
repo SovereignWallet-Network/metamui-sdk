@@ -9,6 +9,7 @@ import { expect } from 'chai';
 import * as did from '../src/did';
 import { hexToString, encodeData, CURRENCY_CODE_BYTES } from '../src/utils';
 import { removeDid, sudoStoreVC, storeVCDirectly } from './helper/helper';
+import { of } from 'rxjs';
 
 describe('Token Module works correctly', () => {
   let sigKeypairRoot: any = null;
@@ -38,18 +39,22 @@ describe('Token Module works correctly', () => {
       if (constants.providerNetwork == 'local') {
         sigKeypairMeta = await keyring.addFromUri('//Bob');
         const didObj = {
-          public_key: sigKeypairMeta.publicKey, // this is the public key linked to the did
-          identity: TEST_META_DID, // this is the actual did
-          metadata: 'Metadata',
+          private: {
+            public_key: sigKeypairMeta.publicKey, // this is the public key linked to the did
+            identity: TEST_META_DID, // this is the actual did
+            metadata: 'Metadata',
+          }
         };
         try {
           await did.storeDIDOnChain(didObj, sigKeypairRoot, provider);
         } catch (err) { }
         await tx.sendTransaction(sigKeypairRoot, TEST_META_DID, '20000000', provider);
         const didObjDave = {
-          public_key: signKeypairOrgA.publicKey, // this is the public key linked to the did
-          identity: TEST_ORG_A_DID, // this is the actual did
-          metadata: 'Metadata',
+          private: {
+            public_key: signKeypairOrgA.publicKey, // this is the public key linked to the did
+            identity: TEST_ORG_A_DID, // this is the actual did
+            metadata: 'Metadata',
+          }
         };
         try {
           await did.storeDIDOnChain(didObjDave, sigKeypairRoot, provider);
@@ -138,7 +143,8 @@ describe('Token Module works correctly', () => {
 
     it('Get locks works correctly', async () => {
       let locks = await token.getLocks(TEST_META_DID, currencyCode, provider);
-      assert.strictEqual(locks?.length, 0);
+      of(typeof locks === 'number')
+      assert.strictEqual(locks, 0);
     });
 
     it('Get token issuer works correctly', async () => {

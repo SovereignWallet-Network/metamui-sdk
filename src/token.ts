@@ -324,10 +324,11 @@ async function getTokenBalance(did, currencyCode, api?: ApiPromise) {
   const did_hex = sanitiseDid(did);
   const ccode = sanitiseCCode(currencyCode);
   const tokenData = await getTokenData(ccode, provider);
+  if (provider != null) {
+    const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON()?.['data'].free / Math.pow(10, tokenData?.['decimals']);
+    return data;
+  }
 
-  // @ts-ignore
-  const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON().data.free / (Math.pow(10, tokenData.decimal));
-  return data;
 }
 
 /**
@@ -369,12 +370,12 @@ async function getDetailedTokenBalance(did, currencyCode, api?: ApiPromise) {
   const data = (await provider.query.tokens.accounts(did_hex, ccode)).toJSON()?.['data'];
 
   return {
-    // @ts-ignore
-    frozen: data.frozen / (Math.pow(10, tokenData['decimal'])),
-    // @ts-ignore
-    free: data.free / (Math.pow(10, tokenData['decimal'])),
-    // @ts-ignore
-    reserved: data.reserved / (Math.pow(10, tokenData.decimal)),
+
+    frozen: data.frozen / (Math.pow(10, tokenData?.['decimal'])),
+
+    free: data.free / (Math.pow(10, tokenData?.['decimal'])),
+
+    reserved: data.reserved / (Math.pow(10, tokenData?.['decimal'])),
   };
 }
 
@@ -395,13 +396,9 @@ const subscribeToGetDetailedTokenBalance = async (did, currencyCode, callback, a
     return provider.query.tokens.accounts(did_hex, ccode, (data) => {
       let Data = data.toJSON().data;
       callback({
-
-        // @ts-ignore
-        frozen: Data.frozen / (Math.pow(10, tokenData.decimal)),
-        // @ts-ignore
-        free: Data.free / (Math.pow(10, tokenData.decimal)),
-        // @ts-ignore
-        reserved: Data.reserved / (Math.pow(10, tokenData.decimal)),
+        frozen: Data.frozen / (Math.pow(10, tokenData?.['decimal'])),
+        free: Data.free / (Math.pow(10, tokenData?.['decimal'])),
+        reserved: Data.reserved / (Math.pow(10, tokenData?.['decimal'])),
       });
     });
   }
@@ -420,14 +417,12 @@ async function getTokenList(api?: ApiPromise) {
   const data = await provider.query.tokens.tokenData.entries();
   return data.map(([{ args: [currency_code] }, value]) => ({
 
-    // @ts-ignore
-    name: value.toHuman().token_name,
-    // @ts-ignore
-    currencyCode: value.toHuman().currency_code,
-    // @ts-ignore
-    decimal: value.toHuman().decimal,
-    // @ts-ignore
-    blockNumber: value.toHuman().block_number,
+    name: value.toHuman()?.['token_name'],
+
+    currencyCode: value.toHuman()?.['currency_code'],
+    decimal: value.toHuman()?.['decimal'],
+
+    blockNumber: value.toHuman()?.['block_number'],
   }));
 }
 
@@ -456,8 +451,10 @@ async function getTokenTotalSupply(currencyCode, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const tokenData = await getTokenData(sanitiseCCode(currencyCode), provider);
   const data = await provider.query.tokens.totalIssuance(sanitiseCCode(currencyCode));
-  // @ts-ignore
-  return data.toJSON() / (Math.pow(10, tokenData.decimal));
+  if (!data) {
+    //@ts-ignore
+    return data.toJSON() / (Math.pow(10, tokenData?.['decimal']));
+  }
 }
 
 /**
@@ -619,11 +616,11 @@ async function setBalance(
       const provider = api || (await buildConnection('local'));
       const ccode = sanitiseCCode(currencyCode);
       const tokenData = await getTokenData(ccode, provider);
-      // @ts-ignore
-      amount = amount * (Math.pow(10, tokenData.decimal));
+
+      amount = amount * (Math.pow(10, tokenData?.['decimal']));
       if (amount < 1) {
-        // @ts-ignore
-        throw new Error(`Invalid token amount, max supported decimal for this token is ${tokenData.decimal}`);
+
+        throw new Error(`Invalid token amount, max supported decimal for this token is ${tokenData?.['decimal']}`);
       }
       const tx = provider.tx.tokens.setBalance(
         sanitiseDid(dest),
@@ -694,13 +691,10 @@ async function getFormattedTokenAmount(currencyCode, tokenAmount, provider) {
     amount_decimals = tokenAmount.split('.')[1].length;
   };
   const tokenData = await getTokenData(currencyCode, provider);
-  // @ts-ignore
-  if (amount_decimals > tokenData.decimal) {
-    // @ts-ignore
-    throw new Error(`Invalid token amount, max supported decimal by ${tokenData.currency_code} is ${tokenData.decimal}`);
+  if (amount_decimals > tokenData?.['decimal']) {
+    throw new Error(`Invalid token amount, max supported decimal by ${tokenData?.['currency_code']} is ${tokenData?.['decimal']}`);
   }
-  // @ts-ignore
-  tokenAmount = Math.round(parseFloat(tokenAmount) * (Math.pow(10, tokenData.decimal)));
+  tokenAmount = Math.round(parseFloat(tokenAmount) * (Math.pow(10, tokenData?.['decimal'])));
   return tokenAmount;
 }
 

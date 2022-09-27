@@ -44,9 +44,11 @@ async function removeDid(didString, sigKeyPair, provider) {
 async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil, provider) {
   try {
     const didObjDave = {
-      public_key: sigKeypairCouncil.publicKey, // this is the public key linked to the did
-      identity: TEST_DAVE_DID, // this is the actual did
-      metadata: 'Metadata',
+      private: {
+        public_key: sigKeypairCouncil.publicKey, // this is the public key linked to the did
+        identity: TEST_DAVE_DID, // this is the actual did
+        metadata: 'Metadata',
+      }
     };
     await did.storeDIDOnChain(didObjDave, sigKeypairRoot, provider);
   } catch (err) { }
@@ -63,7 +65,7 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
   const actualProposals = await collective.getProposals(provider);
   const proposalHash = actualProposals?.[0];
   let vote = await collective.getVotes(proposalHash, provider);
-  const index = vote?.index;
+  const index = vote?.['index'];
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
   await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
