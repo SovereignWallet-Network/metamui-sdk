@@ -154,8 +154,10 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise | false =
   }
   const didDetails: AnyJson = await getDIDDetails(identifier, provider);
   if (didDetails == null) return null;
-  if (blockNumber >= didDetails.added_block) {
-    return (await provider.query.did.lookup(did_hex)).toHuman();
+  if (typeof didDetails?.['added_block'] === 'number') {
+    if (blockNumber >= didDetails?.['added_block']) {
+      return (await provider.query.did.lookup(did_hex)).toHuman();
+    }
   }
   const keyHistories = await getDidKeyHistory(identifier, provider);
   if (!keyHistories) {

@@ -98,11 +98,11 @@ async function verifyVC(vcJson, api?: ApiPromise) {
 
   // fetch the details of the DID
   const didDetails = await getDIDDetails(vcJson.verifier, provider);
-  let signerAddress = didDetails.public_key;
+  let signerAddress = didDetails?.['public_key'];
 
   // if the pubkey has been rotated, check for older versions
   // naive implementation need to reafactor later handling edge cases
-  if (didDetails.added_block > parseInt(vcJson.properties.issued_block, 10)) {
+  if (didDetails?.['added_block'] > parseInt(vcJson.properties.issued_block, 10)) {
     console.log('Signing key has been rotated, searching for previous key history!');
     const prevKeyDetails = await getDidKeyHistory(vcJson.verifier);
     if (!Array.isArray(prevKeyDetails)) return null
