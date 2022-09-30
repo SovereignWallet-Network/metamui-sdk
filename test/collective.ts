@@ -27,12 +27,12 @@ describe('Collective works correctly', () => {
     before(async () => {
       provider = await buildConnection(constants.providerNetwork);
       const keyring = await initKeyring();
-      let sigKeypairWithBal = await keyring.addFromUri(constants.mnemonicWithBalance);
+      let sigKeypairWithBal = await keyring.createFromUri(constants.mnemonicWithBalance);
 
       sudoKey = await provider.query.sudo.key();
       sudoPair = keyring.getPair(sudoKey.toString()); //Alice
-      sigKeypairBob = await keyring.addFromUri('//Bob');
-      sigKeypairDave = await keyring.addFromUri('//Dave');
+      sigKeypairBob = await keyring.createFromUri('//Bob');
+      sigKeypairDave = await keyring.createFromUri('//Dave');
 
       const didObjRocket = {
         private: {
@@ -54,9 +54,9 @@ describe('Collective works correctly', () => {
           await did.storeDIDOnChain(didObjRocket, sudoPair, provider);
         } catch (err) { }
         let nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
-        await tx.sendTransaction(sudoPair, TEST_ROCKET_DID, '5000000', provider, nonce);
+        await tx.sendTransaction(sudoPair, TEST_ROCKET_DID, 5000000, provider, nonce);
         nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
-        await tx.sendTransaction(sudoPair, TEST_DAVE_DID, '5000000', provider, nonce);
+        await tx.sendTransaction(sudoPair, TEST_DAVE_DID, 5000000, provider, nonce);
       }
     });
 

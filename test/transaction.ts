@@ -16,10 +16,10 @@ describe('Transaction works correctly', () => {
   before(async () => {
     const keyring = await initKeyring();
     const provider = await buildConnection(constants.providerNetwork);
-    sigKeypairWithBal = keyring.addFromUri(constants.mnemonicWithBalance);
-    sigKeypairWithoutBal = keyring.addFromUri('//Test123');
+    sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
+    sigKeypairWithoutBal = keyring.createFromUri('//Test123');
     if (constants.providerNetwork == 'local') {
-      let sigKeypairEve = await keyring.addFromUri('//Eve');
+      let sigKeypairEve = await keyring.createFromUri('//Eve');
       const didObj = {
         private: {
           public_key: sigKeypairEve.publicKey, // this is the public key linked to the did
@@ -27,7 +27,7 @@ describe('Transaction works correctly', () => {
           metadata: 'Metadata',
         }
       };
-      let sigKeypairDave = await keyring.addFromUri('//Dave');
+      let sigKeypairDave = await keyring.createFromUri('//Dave');
       const didObjDave = {
         private: {
           public_key: sigKeypairDave.publicKey, // this is the public key linked to the did
@@ -35,19 +35,19 @@ describe('Transaction works correctly', () => {
           metadata: 'Metadata',
         }
       };
-      // try {
-      //   await did.storeDIDOnChain(didObjDave, sigKeypairWithBal, provider);
-      // } catch (err) {
-      //   console.log(err);
-      // }
-      // try {
-      //   await did.storeDIDOnChain(didObj, sigKeypairWithBal, provider);
-      // } catch (err) {
-      //   console.log(err);
-      // }
+      try {
+        await did.storeDIDOnChain(didObjDave, sigKeypairWithBal, provider);
+      } catch (err) {
+        console.log(err);
+      }
+      try {
+        await did.storeDIDOnChain(didObj, sigKeypairWithBal, provider);
+      } catch (err) {
+        console.log(err);
+      }
     }
-    // const transfer = await tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', '1', provider);
-    // assert.doesNotReject(transfer);
+    const transfer:any= await tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
+    assert.doesNotReject(transfer);
   });
 
   it('Transaction works correctly with nonce', async () => {
@@ -69,15 +69,13 @@ describe('Transaction works correctly', () => {
     });
   });
 
-  // it('Transaction fails when sender has no balance', async () => {
-  //   const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
-  //   if (sigKeypairWithoutBal?.address) {
-  //     await tx.sendTransaction(sigKeypairWithoutBal, 'did:ssid:test1212', 1, provider).catch((err: { message: any; }) => {
-  //       assert.strictEqual(err.message, 'balances.InsufficientBalance');
-  //     }
-  //     );
-  //   }
-  // });
+  it('Transaction fails when sender has no balance', async () => {
+    const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
+      await tx.sendTransaction(sigKeypairWithoutBal, 'did:ssid:test1212', 1, provider).catch((err: { message: any; }) => {
+        assert.strictEqual(err.message, 'balances.InsufficientBalance');
+      }
+      );
+  });
 
   it('Transaction fails when recipent has no DID', async () => {
     const provider = await buildConnection(constants.providerNetwork);

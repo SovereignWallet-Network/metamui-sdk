@@ -29,7 +29,9 @@ describe('DID Module works correctly', () => {
   before(async () => {
     keyring = await initKeyring();
     provider = await buildConnection(constants.providerNetwork);
-    sigKeypairWithBal = keyring.addFromUri(constants.mnemonicWithBalance);
+    sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
+
+
   });
 
 
@@ -108,7 +110,7 @@ describe('DID Module works correctly', () => {
   });
 
   it.skip('updateMetadata throws error for unregistered DID', async () => {
-    const data = did.updateMetadata(
+    const data:any = await did.updateMetadata(
       'did:ssid:nonexistentdid',
       'TestMetadata',
       sigKeypairWithBal,
@@ -144,7 +146,7 @@ describe('DID Module works correctly', () => {
       if (typeof sigKeypairWithBal === 'undefined') return
       await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
       const newDidDetails = await did.getDIDDetails(newDidObj.private.identity, provider);
-      console.log(typeof newDidDetails);
+      console.log(newDidDetails);
       if (!newDidDetails) return null;
       addedDidBlockNum = newDidDetails?.['added_block'];
       assert.strictEqual(newDidDetails?.['public_key'], `0x${expectedPubkey}`);
@@ -153,11 +155,18 @@ describe('DID Module works correctly', () => {
     });
 
     it('storeDIDOnChain throws error on duplicate ssid', async () => {
+      console.log("Inside dup ssid Testcase")
       const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
-      const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
+      const data:any = await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
+      
+      // const newDidDetails = await did.resolveDIDToAccount(newDidObj.private.identity, provider);
+      // console.log(newDidDetails);
+      // if(newDidDetails.public_key !== newDidObj.private.public_key) {
+      //   console.log("Does not match. Testcase passed. did.DIDAlreadyExists")
+      // }
       await assert.rejects(data, (err: any) => {
-        assert.strictEqual(err.message, 'did.DIDAlreadyExists');
+        assert.equal(err.message, 'did.DIDAlreadyExists');
         return true;
       });
     });
@@ -165,7 +174,8 @@ describe('DID Module works correctly', () => {
     it('storeDIDOnChain throws error on duplicate public key', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
-      const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
+      const data:any = await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
+      console.log(data);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
@@ -178,21 +188,22 @@ describe('DID Module works correctly', () => {
       assert(typeof keyring !== 'undefined', "Keyring is undefined");
       if (typeof keyring === 'undefined') return;
 
-      const pubKey = keyring.addFromUri(NEW_MNEMONIC).publicKey;
+      const pubKey = keyring.createFromUri(NEW_MNEMONIC).publicKey;
       await did.updateDidKey(didString, pubKey, sigKeypairWithBal, provider);
-      const newUpdatedDidDetails = await did.getDIDDetails(didString, provider);
+      const newUpdatedDidDetails:any = await did.getDIDDetails(didString, provider);
+      console.log(newUpdatedDidDetails);
       updatedKeyBlockNum = newUpdatedDidDetails?.['added_block'];
       assert.strictEqual(newUpdatedDidDetails?.['public_key'], `0x${expectedNewPubkey}`);
       assert.strictEqual(newUpdatedDidDetails?.['identifier'], did.sanitiseDid(testIdentifier));
-      const keyHistory = (await did.getDidKeyHistory(didString, provider));
+      const keyHistory:any = (await did.getDidKeyHistory(didString, provider));
       assert.equal(keyHistory
         && Array.isArray(keyHistory)
         && keyHistory.map(data => data?.[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
     })
 
     it('updateDidKey throws error on using existing public key', async () => {
-      const pubKey = keyring?.addFromUri(NEW_MNEMONIC).publicKey;
-      const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
+      const pubKey = keyring?.createFromUri(NEW_MNEMONIC).publicKey;
+      const data:any = await did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
@@ -200,8 +211,8 @@ describe('DID Module works correctly', () => {
     });
 
     it('updateDidKey throws error on using non existent did', async () => {
-      const pubKey = keyring?.addFromUri(TEST_MNEMONIC).publicKey;
-      const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
+      const pubKey = keyring?.createFromUri(TEST_MNEMONIC).publicKey;
+      const data:any = await did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
       await assert.rejects(data, (err: any) => {
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');
         return true;

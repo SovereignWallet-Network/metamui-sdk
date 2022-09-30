@@ -15,7 +15,7 @@ describe('SSID VC works correctly', () => {
 
   before(async () => {
     const keyring = await initKeyring();
-    sigKeypairWithBal = await keyring.addFromUri(constants.mnemonicWithBalance);
+    sigKeypairWithBal = await keyring.createFromUri(constants.mnemonicWithBalance);
   });
 
   it('SSID VC is created in correct format', async () => {

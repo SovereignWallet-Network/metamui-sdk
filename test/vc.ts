@@ -25,12 +25,12 @@ describe('VC works correctly', () => {
 
   before(async () => {
     keyring = await initKeyring();
-    sigKeypair = await keyring.addFromUri('//Alice');
+    sigKeypair = await keyring.createFromUri('//Alice');
     provider = await buildConnection(constants.providerNetwork);
     ssidUrl = SSID_BASE_URL[constants.providerNetwork];
-    sigKeypairBob = await keyring.addFromUri('//Bob');
-    signKeypairEve = await keyring.addFromUri('//Eve');
-    signKeypairDave = await keyring.addFromUri('//Dave');
+    sigKeypairBob = await keyring.createFromUri('//Bob');
+    signKeypairEve = await keyring.createFromUri('//Eve');
+    signKeypairDave = await keyring.createFromUri('//Dave');
   });
 
   it('VC is created in correct format', async () => {
@@ -186,50 +186,60 @@ describe('VC works correctly', () => {
     before(async () => {
       if (constants.providerNetwork == 'local') {
         const didObj = {
-          public_key: sigKeypairBob.publicKey, // this is the public key linked to the did
-          identity: TEST_DID, // this is the actual did
-          metadata: 'Metadata',
+          private : {
+            public_key: sigKeypairBob.publicKey, // this is the public key linked to the did
+            identity: TEST_DID, // this is the actual did
+            metadata: 'Metadata',
+          }
         };
         try {
           await did.storeDIDOnChain(didObj, sigKeypair, provider);
         } catch (err) { }
         try {
           const didObjDave = {
-            public_key: signKeypairDave.publicKey, // this is the public key linked to the did
-            identity: TEST_DAVE_DID, // this is the actual did
-            metadata: 'Metadata',
+            private : {
+              public_key: signKeypairDave.publicKey, // this is the public key linked to the did
+              identity: TEST_DAVE_DID, // this is the actual did
+              metadata: 'Metadata',
+            }
           };
           await did.storeDIDOnChain(didObjDave, sigKeypair, provider);
         } catch (err) { }
         try {
           const didObjEve = {
-            public_key: signKeypairEve.publicKey, // this is the public key linked to the did
-            identity: EVE_DID, // this is the actual did
-            metadata: 'Metadata',
+            private : {
+              public_key: signKeypairEve.publicKey, // this is the public key linked to the did
+              identity: EVE_DID, // this is the actual did
+              metadata: 'Metadata',
+            }
           };
           await did.storeDIDOnChain(didObjEve, sigKeypair, provider);
         } catch (err) { }
 
         try {
           const didObjDave = {
-            public_key: signKeypairDave.publicKey, // this is the public key linked to the did
-            identity: TEST_DAVE_DID, // this is the actual did
-            metadata: 'Metadata',
+            private : {
+              public_key: signKeypairDave.publicKey, // this is the public key linked to the did
+              identity: TEST_DAVE_DID, // this is the actual did
+              metadata: 'Metadata',
+            }
           };
           await did.storeDIDOnChain(didObjDave, sigKeypair, provider);
         } catch (err) { }
 
         const didObjEve = {
-          public_key: signKeypairEve.publicKey, // this is the public key linked to the did
-          identity: EVE_DID, // this is the actual did
-          metadata: 'Metadata',
+          private : {
+            public_key: signKeypairEve.publicKey, // this is the public key linked to the did
+            identity: EVE_DID, // this is the actual did
+            metadata: 'Metadata',
+          }
         };
         try {
           await did.storeDIDOnChain(didObjEve, sigKeypair, provider);
         } catch (err) { }
 
         const nonce = await provider.rpc.system.accountNextIndex(sigKeypair.address);
-        await tx.sendTransaction(sigKeypair, TEST_DID, '20000000', provider, nonce);
+        await tx.sendTransaction(sigKeypair, TEST_DID, 20000000, provider, nonce);
       }
     })
 
@@ -239,7 +249,7 @@ describe('VC works correctly', () => {
     });
 
     it('Get VC Ids by DID after storing VC works correctly', async () => {
-      const vcs = await vc.getVCIdsByDID(TEST_DID, provider);
+      const vcs:any = await vc.getVCIdsByDID(TEST_DID, provider);
       vcId = vcs[vcs.length-1];
       assert.strictEqual(vcs.length > 0, true);
     });
@@ -281,7 +291,7 @@ describe('VC works correctly', () => {
     it('Update status works correctly', async () => {
       const transaction: any = await vc.updateStatus(vcId, { InActive: 1 }, sigKeypair, provider);
       assert.doesNotReject(transaction);
-      const vcs = await vc.getVCs(vcId, provider);
+      const vcs:any = await vc.getVCs(vcId, provider);
       assert.strictEqual(vcs[1], 'Inactive');
     });
 
@@ -296,12 +306,12 @@ describe('VC works correctly', () => {
       ];
       const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypair, provider, ssidUrl);
       const transaction: any = await vc.storeVC(vcHex, sigKeypairBob, provider);
-      const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
+      const vcsByDid:any = await vc.getVCIdsByDID(TEST_DID, provider);
       vcId = vcsByDid[vcsByDid.length-1];
       await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
       assert.doesNotReject(transaction);
-      let data = await vc.getGenericVCData(vcId, ssidUrl, provider);
-      let verifyData = await vc.verifyGenericVC(data.vcId, data.data, provider);
+      let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
+      let verifyData:any = await vc.verifyGenericVC(data.vcId, data.data, provider);
       assert.strictEqual(verifyData, true);
     });
 
@@ -320,9 +330,9 @@ describe('VC works correctly', () => {
       };
       actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
       await sudoStoreVC(actualHex, sigKeypair, provider);
-      const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
+      const vcsByDid:any = await vc.getVCIdsByDID(TEST_DID, provider);
       vcId = vcsByDid[vcsByDid.length-1];
-      let vcs = await vc.getVCs(vcId, provider);
+      let vcs:any = await vc.getVCs(vcId, provider);
       assert.strictEqual(vcs[1], 'Inactive');
       await vc.approveVC(vcId, signKeypairEve, provider);
       vcs = await vc.getVCs(vcId, provider);

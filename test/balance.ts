@@ -23,7 +23,7 @@ describe('Balances works correctly', () => {
     provider = await buildConnection(constants.providerNetwork);
     const keyring = await initKeyring();
     // console.log('Awaiting keyring succesfull: ', keyring);
-    sigKeypairWithBal = await keyring.addFromUri(constants.mnemonicWithBalance);
+    sigKeypairWithBal = await keyring.createFromUri(constants.mnemonicWithBalance);
   });
 
   it('getBalance works correctly', async () => {

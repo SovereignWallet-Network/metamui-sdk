@@ -53,7 +53,7 @@ async function storeVC(vcHex, sigKeypairOwner, sigKeypairRoot, sigKeypairCouncil
     await did.storeDIDOnChain(didObjDave, sigKeypairRoot, provider);
   } catch (err) { }
   let nonce = await provider.rpc.system.accountNextIndex(sigKeypairRoot.address);
-  await tx.sendTransaction(sigKeypairRoot, TEST_DAVE_DID, '5000000', provider, nonce);
+  await tx.sendTransaction(sigKeypairRoot, TEST_DAVE_DID, 5000000, provider, nonce);
   let newMembers = [
     TEST_DAVE_DID,
     TEST_DID,

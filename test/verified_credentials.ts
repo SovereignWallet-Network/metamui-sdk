@@ -23,7 +23,7 @@ describe('VC works correctly', () => {
 
   before(async () => {
     const keyring = await initKeyring();
-    sigKeypair = await keyring.addFromUri('//Alice');
+    sigKeypair = await keyring.createFromUri('//Alice');
     provider = await buildConnection('testnet');
   });
 

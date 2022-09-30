@@ -25,8 +25,8 @@ describe('Token Module works correctly', () => {
   before(async () => {
     keyring = await initKeyring();
     provider = await buildConnection(constants.providerNetwork);
-    sigKeypairRoot = await keyring.addFromUri(constants.mnemonicWithBalance);
-    signKeypairOrgA = await keyring.addFromUri("//Dave");
+    sigKeypairRoot = await keyring.createFromUri(constants.mnemonicWithBalance);
+    signKeypairOrgA = await keyring.createFromUri("//Dave");
     from = sigKeypairRoot.address;
   });
 
@@ -37,7 +37,7 @@ describe('Token Module works correctly', () => {
 
     before(async () => {
       if (constants.providerNetwork == 'local') {
-        sigKeypairMeta = await keyring.addFromUri('//Bob');
+        sigKeypairMeta = await keyring.createFromUri('//Bob');
         const didObj = {
           private: {
             public_key: sigKeypairMeta.publicKey, // this is the public key linked to the did
@@ -48,7 +48,7 @@ describe('Token Module works correctly', () => {
         try {
           await did.storeDIDOnChain(didObj, sigKeypairRoot, provider);
         } catch (err) { }
-        await tx.sendTransaction(sigKeypairRoot, TEST_META_DID, '20000000', provider);
+        await tx.sendTransaction(sigKeypairRoot, TEST_META_DID, 20000000, provider);
         const didObjDave = {
           private: {
             public_key: signKeypairOrgA.publicKey, // this is the public key linked to the did
@@ -59,7 +59,7 @@ describe('Token Module works correctly', () => {
         try {
           await did.storeDIDOnChain(didObjDave, sigKeypairRoot, provider);
         } catch (err) { }
-        await tx.sendTransaction(sigKeypairRoot, TEST_ORG_A_DID, '20000000', provider);
+        await tx.sendTransaction(sigKeypairRoot, TEST_ORG_A_DID, 20000000, provider);
 
         currencyCode = 'OTH';
         let tokenVC = {

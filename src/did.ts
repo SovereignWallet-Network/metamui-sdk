@@ -4,6 +4,8 @@ import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
 import { initKeyring } from './config';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { did } from '.';
+import { isError } from '@polkadot/util';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -42,7 +44,7 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
   ) {
     throw new Error('Invalid Identifier length');
   }
-  const pubKey = keyring.addFromUri(mnemonic).publicKey;
+  const pubKey = keyring.createFromUri(mnemonic).publicKey;
   return {
     "private": {
       public_key: pubKey,// this is the public key linked to the did
@@ -66,6 +68,15 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local')) as ApiPromise;
+      // Check if identifier is available
+      const identifier = DID.private.identity;
+      const did_hex = sanitiseDid(identifier);
+      const data = await did.resolveDIDToAccount(did_hex, provider);
+      if(data != null) {
+        //return new Error('did.DIDAlreadyExists');
+        reject(new Error('did.DIDAlreadyExists'));
+      }
+
       const tx = provider.tx.validatorCommittee.execute(
         provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
       );
@@ -73,22 +84,38 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       const signedTx = await tx.signAsync(signingKeypair, { nonce });
 
-      await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
+      const unsub = await signedTx.send( ({ status, events, dispatchError }) => {
+        //console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = provider.registry.findMetaError(dispatchError.asModule);
             const { name, section } = decoded;
             // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
+            throw new Error(`${section}.${name}`) ;
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
+            //console.log(dispatchError.toString());
+            throw new Error(dispatchError.toString());
           }
         } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
+          // events.filter(({ event }) =>
+          //   provider.events.validatorCommittee.MemberExecuted.is(event)
+          // ).forEach(({ event : { data: [result] } }) => {
+          //     console.log(result);
+          //     if (result.isError) {
+          //       let error = result.asError;
+          //       if (error.isModule) {
+          //         const decoded = provider.registry.findMetaError(error.asModule);
+          //         const { docs, name, section } = decoded;
+          //         console.log(`${section}.${name}: ${docs.join(' ')}`);
+          //       } else {
+          //         reject(error.toString());
+          //       }
+          //     }
+          //   });
+          // unsub();
+          console.log('Finalized block hash', status.asFinalized.toHex());
           resolve(signedTx.hash.toHex());
         }
       });
