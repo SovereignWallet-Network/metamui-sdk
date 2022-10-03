@@ -21,8 +21,8 @@ const TEST_SWN_DID = "did:ssid:swn";
  */
 async function removeDid(didString, sigKeyPair, provider) {
   try {
-    const tx = provider.tx.did.remove(did.sanitiseDid(didString));
-    await new Promise((resolve, reject) => tx.signAndSend(sigKeyPair, ({ status, dispatchError }) => {
+    const txn = provider.tx.did.remove(did.sanitiseDid(didString));
+    await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, ({ status, dispatchError }) => {
       if (dispatchError) {
         reject('Dispatch error');
       } else if (status.isFinalized) {
@@ -97,8 +97,8 @@ async function storeVCDirectly(vcId, currencyCode, amount, vcType, sigKeypairOwn
 
 async function sudoStoreVC(vcHex, sudoKeyPair, provider, api: any = false) {
   return new Promise(async (resolve, reject) => {
-    const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
-    await tx.signAndSend(sudoKeyPair, { nonce: -1 }, ({ status, dispatchError }) => {
+    const txn = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
+    await txn.signAndSend(sudoKeyPair, { nonce: -1 }, ({ status, dispatchError }) => {
       if (dispatchError) {
         if (dispatchError.isModule) {
           const decoded = api.registry.findMetaError(dispatchError.asModule);

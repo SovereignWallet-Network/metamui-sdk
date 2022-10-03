@@ -42,10 +42,11 @@ async function sendTransaction(
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api?.registry.findMetaError(dispatchError.asModule);
-            // const { documentation, index, error } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            // reject(new Error(`${ee}.${name}`));
-            reject(new Error(decoded?.toString()));
+            const { docs, index, section, name } = decoded;
+            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            reject(new Error(`${section}.${name}`));
+            // console.log(decoded);
+            // reject(new Error(decoded?.toString()));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             // console.log(dispatchError.toString());
