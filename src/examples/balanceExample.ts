@@ -8,7 +8,7 @@ var _require2 = require('../transaction'),
 
 async function balancetest() {
   var api = await buildConnection('dev');
-  subscribeToBalanceChanges('did:ssid:mathew', function (val: any) {
+  subscribeToBalanceChanges('did:ssid:swn', function (val: any) {
     return console.log('Balance Update', val);
   }, api);
 }

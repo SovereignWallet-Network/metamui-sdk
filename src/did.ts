@@ -1,4 +1,4 @@
-import { ApiPromise, Keyring } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
 import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
 import { initKeyring } from './config';

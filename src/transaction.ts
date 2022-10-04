@@ -1,5 +1,4 @@
 import { ApiPromise, Keyring } from '@polkadot/api';
-import { AnyJson } from '@polkadot/types/types';
 import { buildConnection } from './connection';
 import { resolveDIDToAccount, sanitiseDid } from './did';
 import { KeyringPair } from '@polkadot/keyring/types';

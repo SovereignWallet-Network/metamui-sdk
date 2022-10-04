@@ -1,5 +1,4 @@
 import assert from 'assert';
-import { expect } from 'chai';
 import * as tx from '../src/transaction';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
