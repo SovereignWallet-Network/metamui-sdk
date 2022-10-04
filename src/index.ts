@@ -1,5 +1,4 @@
 
-  import * as balance from './balance';
   import * as connection from './connection';
   import * as collective from './collective';
   import * as ssidVC from './ssid_vc';
@@ -12,8 +11,7 @@
   import * as config from './config';
 // };
 export{
-    balance
-    ,connection
+    connection
     ,collective
     ,ssidVC
     ,did

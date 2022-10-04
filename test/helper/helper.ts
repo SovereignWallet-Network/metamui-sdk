@@ -7,6 +7,7 @@ import * as vc from '../../src/vc';
 import * as did from '../../src/did';
 import * as collective from '../../src/collective';
 import * as tx from '../../src/transaction';
+import { buildConnection } from '../../src/connection';
 
 
 const TEST_DID = 'did:ssid:rocket';
@@ -21,7 +22,10 @@ const TEST_SWN_DID = "did:ssid:swn";
  */
 async function removeDid(didString, sigKeyPair, provider) {
   try {
-    const txn = provider.tx.did.remove(did.sanitiseDid(didString));
+    const api = provider || (await buildConnection('local'));
+    const txn = api.tx.validatorCommittee.execute(
+      api.tx.did.remove(did.sanitiseDid(didString)
+    ),1000);
     await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, ({ status, dispatchError }) => {
       if (dispatchError) {
         reject('Dispatch error');

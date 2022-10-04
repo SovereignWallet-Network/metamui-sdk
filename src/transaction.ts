@@ -1,8 +1,42 @@
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
 import { buildConnection } from './connection';
-import { resolveDIDToAccount } from './did';
+import { resolveDIDToAccount, sanitiseDid } from './did';
 import { KeyringPair } from '@polkadot/keyring/types';
+
+
+/** Get account balance(Highest Form) based on the did supplied.
+* @param {String} did
+*/
+const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
+  // Resolve the did to get account ID
+  try {
+    const provider = api || await buildConnection('local');
+    const did_hex = sanitiseDid(did);
+    const accountInfo = await provider.query.mui.account(did_hex);
+    const data = accountInfo.toJSON()?.['data'];
+    return data.free / 1e6;
+  } catch (err) {
+    // console.log(err);
+    return 0;
+  }
+};
+
+/** Listen to balance changes for a DID and execute the callback.
+* @param {String} identifier
+*/
+const subscribeToBalanceChanges = async (identifier: string, callback: (arg0: number) => void, api: any = false) => {
+  try {
+    const provider = api || await buildConnection('local');
+    const did_hex = sanitiseDid(identifier);
+    return provider.query.mui.account(did_hex, ({ data: { free: currentBalance } }) => {
+      callback(currentBalance.toNumber() / 1e6);
+    });
+  } catch (err) {
+    return null;
+  }
+};
+
 
 /**
  * The function will perform a metamui transfer operation from the account of senderAccount to the
@@ -20,7 +54,7 @@ async function sendTransaction(
   senderAccountKeyPair: KeyringPair,
   receiverDID: string,
   amount: number,
-  api: ApiPromise | null = null,
+  api: ApiPromise,
   nonce: any = false,
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
@@ -39,9 +73,10 @@ async function sendTransaction(
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
+          // console.log(JSON.stringify(dispatchError.toHuman()));
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
-            const decoded = api?.registry.findMetaError(dispatchError.asModule);
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { docs, index, section, name } = decoded;
             console.log(`${section}.${name}: ${docs.join(' ')}`);
             reject(new Error(`${section}.${name}`));
@@ -80,9 +115,9 @@ async function transfer(
   receiverDID: string,
   amount: number,
   memo: string,
-  api: ApiPromise | null = null,
+  api: ApiPromise,
   nonce: any = false,
-) {
+): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local'));
@@ -98,13 +133,13 @@ async function transfer(
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
+          // console.log(JSON.stringify(dispatchError.toHuman()));
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
-            const decoded = api?.registry.findMetaError(dispatchError.asModule);
-            // const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            // reject(new Error(`${section}.${name}`));
-            reject(new Error(decoded?.toString()));
+            const decoded = api.registry.findMetaError(dispatchError.asModule);
+            const { docs, index, section, name } = decoded;
+            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             // console.log(dispatchError.toString());
@@ -123,6 +158,8 @@ async function transfer(
 }
 
 export {
+  getBalance,
+  subscribeToBalanceChanges,
   sendTransaction,
   transfer
 };

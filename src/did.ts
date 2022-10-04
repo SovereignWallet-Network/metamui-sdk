@@ -5,7 +5,6 @@ import { initKeyring } from './config';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
-import { isError } from '@polkadot/util';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -84,14 +83,14 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       const signedTx = await tx.signAsync(signingKeypair, { nonce });
 
-      const unsub = await signedTx.send( ({ status, events, dispatchError }) => {
+      await signedTx.send( ({ status, events, dispatchError }) => {
         //console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = provider.registry.findMetaError(dispatchError.asModule);
-            const { name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
+            const { docs, index, name, section } = decoded;
+            console.log(`${section}.${name}: ${docs.join(' ')}`);
             throw new Error(`${section}.${name}`) ;
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
@@ -99,24 +98,24 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
             throw new Error(dispatchError.toString());
           }
         } else if (status.isFinalized) {
-          // events.filter(({ event }) =>
-          //   provider.events.validatorCommittee.MemberExecuted.is(event)
-          // ).forEach(({ event : { data: [result] } }) => {
-          //     console.log(result);
-          //     if (result.isError) {
-          //       let error = result.asError;
-          //       if (error.isModule) {
-          //         const decoded = provider.registry.findMetaError(error.asModule);
-          //         const { docs, name, section } = decoded;
-          //         console.log(`${section}.${name}: ${docs.join(' ')}`);
-          //       } else {
-          //         reject(error.toString());
-          //       }
-          //     }
-          //   });
-          // unsub();
           console.log('Finalized block hash', status.asFinalized.toHex());
           resolve(signedTx.hash.toHex());
+          // events.filter(({ event }) =>
+          //   provider.events.validatorCommittee.MemberExecuted.is(event)
+          // ).forEach(({ event }) => {
+          //   console.log(event.toHuman());
+          //     // const error:any = data.toHuman();
+          //     // const mod = error["result"]["Err"]["Module"];
+          //     // const find = {
+          //     //   error: new BN(0x04000000),
+          //     //   index: new BN(0),
+          //     // }
+          //     const decoded = provider.registry.findMetaError(event.toU8a());
+          //     // const deco2 = provider.registry.findMetaCall(event.toU8a());
+          //     console.log(decoded);
+          //     const { name, section } = decoded;
+          //     console.log(`${section}.${name}: `);
+          // });
         }
       });
     } catch (err) {
@@ -230,17 +229,17 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
 
       const did_hex = sanitiseDid(identifier);
       // call the rotateKey extrinsinc
-      const tx = provider.tx.did.rotateKey(did_hex, newKey);
+      const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, { nonce });
+      let signedTx = await tx.signAsync(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
+            const { docs, name, section } = decoded;
+            console.log(`${section}.${name}: ${docs.join(' ')}`);
             reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
@@ -330,9 +329,9 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
     try {
       const provider = api || (await buildConnection('local'));
       const did_hex = sanitiseDid(identifier);
-      const tx = provider.tx.did.updateMetadata(did_hex, metadata);
+      const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = tx.sign(signingKeypair, { nonce });
+      let signedTx = await tx.signAsync(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
         if (dispatchError) {
