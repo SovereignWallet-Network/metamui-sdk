@@ -1,13 +1,13 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
+# main, release, development
 name: Integration Test
 
 on:
   push:
-    branches: [main, release, development]
+    branches: []
   pull_request:
-    branches: [main, release, development]
+    branches: []
 
 jobs:
   build:
