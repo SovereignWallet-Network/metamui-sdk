@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { buildConnection } from '../src/connection';
 import * as sinon from 'sinon';
-import { providerNetwork } from './test_constants';
+import { providerNetwork } from './helper/constants';
 
 // This test file should always run first, else will give errors
 describe('Connection module works correctly', () => {

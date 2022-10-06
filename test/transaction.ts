@@ -3,7 +3,7 @@ import * as tx from '../src/transaction';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
-import * as constants from './test_constants';
+import * as constants from './helper/constants';
 import { removeDid } from './helper/helper';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
