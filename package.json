@@ -10,7 +10,6 @@
         "test-win": "ts-mocha -p ./tsconfig.json ./test/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
         "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md",
-        "dummytest": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/did.ts --no-timeouts --exit",
         "events": "npx ts-node test.ts"
     },
     "repository": {
