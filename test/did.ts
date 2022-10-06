@@ -2,10 +2,10 @@ import assert from 'assert';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
-import * as constants from './helper/constants';
+import * as constants from './common/constants';
 import { hexToString } from '../src/utils';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { removeDid } from './helper/helper';
+import { removeDid } from './common/helper';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { AnyJson } from '@polkadot/types/types';
@@ -22,9 +22,9 @@ describe('DID Module works correctly', () => {
   const expectedNewPubkey =
     '04249359400f54ceb6ecf51edfeb1c02c8233e8ca563492df998a5d91266fa64';
 
-  let provider: ApiPromise | undefined;
-  let keyring: Keyring | undefined;
-  let sigKeypairWithBal: KeyringPair | undefined;
+  let provider: ApiPromise;
+  let keyring: Keyring;
+  let sigKeypairWithBal: KeyringPair;
 
   before(async () => {
     keyring = await initKeyring();
@@ -82,7 +82,7 @@ describe('DID Module works correctly', () => {
   });
 
   it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
+    const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
     // Alice's DID is created at block number 0
     assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
   });
@@ -137,8 +137,8 @@ describe('DID Module works correctly', () => {
 
   // These test cases should only run in local environment
   if (constants.providerNetwork == 'local') {
-    let addedDidBlockNum: number | null = null;
-    let updatedKeyBlockNum: number | null = null;
+    let addedDidBlockNum: number;
+    let updatedKeyBlockNum: number;
     let testIdentifier = 'did:ssid:rocket';
 
     it('storeDIDOnChain works correctly', async () => {

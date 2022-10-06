@@ -3,8 +3,8 @@ import * as tx from '../src/balances';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
-import * as constants from './helper/constants';
-import { removeDid } from './helper/helper';
+import * as constants from './common/constants';
+import { removeDid } from './common/helper';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { balances } from '../src';
@@ -59,7 +59,7 @@ describe('Transaction works correctly', () => {
       }
     }
     const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
-    await assert.doesNotReject(transfer);
+    assert.doesNotReject(transfer);
   });
 
   it('getBalance works correctly', async () => {
@@ -106,17 +106,17 @@ describe('Transaction works correctly', () => {
 
   it('Transaction fails when recipent has no DID', async () => {
     const provider = await buildConnection(constants.providerNetwork);
-    await tx.sendTransaction(sigKeypairWithBal, 'Bob123', 1, provider).catch((err: { message: any; }) => {
+    const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address)
+    await assert.rejects(tx.sendTransaction(sigKeypairWithBal, 'Bob123', 1, provider, nonce), (err: { message: any; }) => {
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
-    }
-    );
+      return true;
+    });
   });
 
   it('Transaction with Memo works correctly with nonce', async () => {
     const provider = await buildConnection(constants.providerNetwork);
-
-    const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal?.address);
-    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:bob', 1, 'Memo Test', provider, nonce);
+    const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
+    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1000, 'Memo Test', provider, nonce);
     await assert.doesNotReject(transfer);
   });
 
@@ -126,7 +126,7 @@ describe('Transaction works correctly', () => {
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal?.address);
     const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, 'Memo Test', provider, nonce);
     await assert.rejects(transfer, (err: { message: any; }) => {
-      console.log(err.message);
+      // console.log(err.message);
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
       return true;
     });

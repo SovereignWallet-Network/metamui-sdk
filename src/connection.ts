@@ -12,7 +12,7 @@ const NETWORK_PROVIDER = {
 };
 
 // global obj to cache ws connection
-let providerInstance: Promise<ApiPromise> | null = null;
+let providerInstance: Promise<ApiPromise>;
 
 function buildNewConnection(network = 'local'): Promise<ApiPromise> {
   if (!(network in NETWORK_PROVIDER)) throw new Error('Invalid Network!');
