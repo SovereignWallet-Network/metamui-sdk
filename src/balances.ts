@@ -41,7 +41,7 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (arg0: nu
  * The function will perform a metamui transfer operation from the account of senderAccount to the
  * receiverDID.
  * Note : balanceCheck has not been included in the checks since sender not having balance
- * is handled in extrinsic, check test/transaction.js
+ * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
  * @param {String} receiverDID
  * @param {String} amount In Lowest Form

@@ -1,5 +1,5 @@
 import assert from 'assert';
-import * as tx from '../src/transaction';
+import * as tx from '../src/balances';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
@@ -7,7 +7,7 @@ import * as constants from './helper/constants';
 import { removeDid } from './helper/helper';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { transaction } from '../src';
+import { balances } from '../src';
 
 describe('Transaction works correctly', () => {
   let sigKeypairWithBal: KeyringPair;
@@ -63,13 +63,13 @@ describe('Transaction works correctly', () => {
   });
 
   it('getBalance works correctly', async () => {
-    const balanceAmount: number = await transaction.getBalance('did:ssid:swn', provider);
+    const balanceAmount: number = await balances.getBalance('did:ssid:swn', provider);
     assert.strictEqual(Math.floor(balanceAmount) >= 0, true);
   });
 
   it('subscribeToBalanceChanges works correctly', (done) => {
     let isCallbackCalled = false;
-    transaction.subscribeToBalanceChanges('did:ssid:swn', (balanceAmount) => {
+    balances.subscribeToBalanceChanges('did:ssid:swn', (balanceAmount) => {
       console.log('Awaiting balance succesfull: ', balanceAmount);
       if (isCallbackCalled) return;
       isCallbackCalled = true;

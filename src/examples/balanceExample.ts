@@ -3,7 +3,7 @@
 var _require = require('../connection'),
     buildConnection = _require.buildConnection;
 
-var _require2 = require('../transaction'),
+var _require2 = require('../balances'),
     subscribeToBalanceChanges = _require2.subscribeToBalanceChanges;
 
 async function balancetest() {
