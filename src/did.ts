@@ -5,6 +5,7 @@ import { initKeyring } from './config';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
+import { PRIVATE_DID_TYPE } from './common/types';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -63,7 +64,7 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 
 
 
-async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identity: string; metadata: string; } }, signingKeypair: KeyringPair, api?: ApiPromise) {
+async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPair, api?: ApiPromise) {
   return new Promise(async (resolve, reject) => {
     try {
       const provider = api || (await buildConnection('local')) as ApiPromise;
@@ -90,7 +91,7 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
             // for module errors, we have the section indexed, lookup
             const decoded = provider.registry.findMetaError(dispatchError.asModule);
             const { docs, index, name, section } = decoded;
-            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            // console.log(`${section}.${name}: ${docs.join(' ')}`);
             throw new Error(`${section}.${name}`) ;
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
@@ -98,7 +99,7 @@ async function storeDIDOnChain(DID: { private: { public_key: Uint8Array; identit
             throw new Error(dispatchError.toString());
           }
         } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex());
+          // console.log('Finalized block hash', status.asFinalized.toHex());
           resolve(signedTx.hash.toHex());
           // events.filter(({ event }) =>
           //   provider.events.validatorCommittee.MemberExecuted.is(event)
@@ -166,13 +167,13 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
  * Get the accountId for a given DID
  * @param {String} identifier
  * @param {ApiPromise} api
- * @param {Number} blockNumber
+ * @param {Number} blockNumber (optional)
  * @returns {String}
  */
 
 
 
-async function resolveDIDToAccount(identifier: string, api: ApiPromise | false = false, blockNumber: number | null = null) {
+async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNumber?: number) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {
@@ -233,13 +234,13 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       let signedTx = await tx.signAsync(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
+        // console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { docs, name, section } = decoded;
-            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            // console.log(`${section}.${name}: ${docs.join(' ')}`);
             reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
@@ -333,7 +334,7 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       let signedTx = await tx.signAsync(signingKeypair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
+        // console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup

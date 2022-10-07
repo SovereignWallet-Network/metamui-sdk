@@ -18,7 +18,8 @@ async function removeDid(didString, sigKeyPair, provider) {
     const txn = api.tx.validatorCommittee.execute(
       api.tx.did.remove(did.sanitiseDid(didString)
     ),1000);
-    await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, ({ status, dispatchError }) => {
+    const nonce = await api.rpc.system.accountNextIndex(sigKeyPair.address);
+    await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, nonce, ({ status, dispatchError }) => {
       if (dispatchError) {
         reject('Dispatch error');
       } else if (status.isFinalized) {
