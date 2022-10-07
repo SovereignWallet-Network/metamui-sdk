@@ -198,7 +198,7 @@ describe('DID Module works correctly', () => {
       const pubKey = keyring?.createFromUri(NEW_MNEMONIC).publicKey;
       // const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider), (err: any) => {
-        console.log(err.message);
+        // console.log(err.message);
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
       });
@@ -208,7 +208,7 @@ describe('DID Module works correctly', () => {
       const pubKey = keyring?.createFromUri(TEST_MNEMONIC).publicKey;
       // const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider), (err: any) => {
-        console.log(err.message);
+        // console.log(err.message);
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');
         return true;
       });
@@ -216,7 +216,7 @@ describe('DID Module works correctly', () => {
 
     it('Resolve test DID to account at block number 0 works correctly', async () => {
       const data:any = await did.resolveDIDToAccount(testIdentifier, provider, 0);
-      console.log(data);
+      // console.log(data);
       assert.strictEqual(data, null);
       return true;
     });
