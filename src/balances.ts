@@ -69,10 +69,10 @@ async function sendTransaction(
       }
 
       const tx = provider.tx.balances.transfer({ Id: receiverAccountID }, amount);
-      if(nonce === undefined)
+      if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-        console.log("Nonce inside send txn", nonce);
-      
+      }
+      console.log("Nonce inside send txn", nonce);
       // console.log((await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address)));
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
@@ -97,7 +97,7 @@ async function sendTransaction(
           resolve(signedTx.hash.toHex())
         }
       });
-      // await submitTransaction(signedTx, provider);
+      // submitTransaction(signedTx, provider);
     } catch (err) {
       // console.log(err);
       reject(err);
@@ -135,10 +135,10 @@ async function transfer(
       }
       const tx = provider.tx.balances
         .transferWithMemo({ id: receiverAccountID }, amount, memo);
-      if(nonce === undefined)
+      if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-        console.log("Nonce inside transfer", nonce);
-      
+      }
+      console.log("Nonce inside transfer", nonce);
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         console.log('Transaction status:', status.type);
@@ -160,7 +160,7 @@ async function transfer(
           resolve(signedTx.hash.toHex());
         }
       });
-      // await submitTransaction(signedTx, provider);
+      // submitTransaction(signedTx, provider);
     } catch (err) {
       // console.log(err);
       return reject(err);

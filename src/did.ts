@@ -74,7 +74,7 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
       const data = await did.resolveDIDToAccount(did_hex, provider);
       if(data != null) {
         //return new Error('did.DIDAlreadyExists');
-        reject(new Error('did.DIDAlreadyExists'));
+        return reject(new Error('did.DIDAlreadyExists'));
       }
 
       const tx = provider.tx.validatorCommittee.execute(
@@ -92,15 +92,15 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
             const decoded = provider.registry.findMetaError(dispatchError.asModule);
             const { docs, index, name, section } = decoded;
             // console.log(`${section}.${name}: ${docs.join(' ')}`);
-            throw new Error(`${section}.${name}`) ;
+            return reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             //console.log(dispatchError.toString());
-            throw new Error(dispatchError.toString());
+            return reject(new Error(dispatchError.toString()));
           }
         } else if (status.isFinalized) {
           // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex());
+          return resolve(signedTx.hash.toHex());
           // events.filter(({ event }) =>
           //   provider.events.validatorCommittee.MemberExecuted.is(event)
           // ).forEach(({ event }) => {
@@ -121,7 +121,7 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
       });
     } catch (err) {
       // console.log(err);
-      reject(err);
+      return reject(err);
     }
   });
 }
@@ -241,11 +241,11 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { docs, name, section } = decoded;
             // console.log(`${section}.${name}: ${docs.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
+            return reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
+            return reject(new Error(dispatchError.toString()));
           }
         } else if (status.isFinalized) {
           // console.log('Finalized block hash', status.asFinalized.toHex());
@@ -254,7 +254,7 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
       });
     } catch (err) {
       // console.log(err);
-      reject(err);
+      return reject(err);
     }
   });
 }
@@ -341,11 +341,11 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { documentation, name, section } = decoded;
             // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
+            return reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
             // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
+            return reject(new Error(dispatchError.toString()));
           }
         } else if (status.isFinalized) {
           // console.log('Finalized block hash', status.asFinalized.toHex());
@@ -354,7 +354,7 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
       });
     } catch (err) {
       // console.log(err);
-      reject(err);
+      return reject(err);
     }
   });
 }

@@ -3,8 +3,8 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 async function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittableResult>, api:ApiPromise): Promise<any> {
-    console.log("submitTransaction");
-    return new Promise<any>((resolve, reject) => {
+    console.log("Submit Txn Called");
+    await new Promise<any>((resolve, reject) => {
         signedTx.send(function ({ status, dispatchError }) {
             console.log('Transaction status:', status.type);
             if (dispatchError) {
