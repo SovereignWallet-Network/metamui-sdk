@@ -229,6 +229,15 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
       const provider = api || (await buildConnection('local'));
 
       const did_hex = sanitiseDid(identifier);
+      const data = await did.resolveDIDToAccount(did_hex, provider);
+      if(data == null) {
+        return reject(new Error('did.DIDDoesNotExist'));
+      }
+
+      const data2 = await did.resolveAccountIdToDid(newKey, provider);
+      if(data2 != false) {
+        return reject(new Error('did.PublicKeyRegistered'));
+      }
       // call the rotateKey extrinsinc
       const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
       let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);

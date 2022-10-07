@@ -96,7 +96,7 @@ describe('DID Module works correctly', () => {
     assert.strictEqual(data2, false);
   });
 
-  it.skip('updateMetadata works correctly', async () => {
+  it('updateMetadata works correctly', async () => {
     const data: any = await did.updateMetadata(
       'did:ssid:swn',
       'TestMetadata',
@@ -109,7 +109,7 @@ describe('DID Module works correctly', () => {
     assert.strictEqual(new_data?.['added_block'], 0);
   });
 
-  it.skip('updateMetadata throws error for unregistered DID', async () => {
+  it('updateMetadata throws error for unregistered DID', async () => {
     const data:any = await did.updateMetadata(
       'did:ssid:nonexistentdid',
       'TestMetadata',
@@ -155,7 +155,7 @@ describe('DID Module works correctly', () => {
       assert.strictEqual(hexToString(newDidDetails['metadata']), 'Metadata');
     });
 
-    it.skip('storeDIDOnChain throws error on duplicate ssid', async () => {
+    it('storeDIDOnChain throws error on duplicate ssid', async () => {
       const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
       // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
@@ -194,7 +194,7 @@ describe('DID Module works correctly', () => {
         && keyHistory.map(data => data[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
     })
 
-    it.skip('updateDidKey throws error on using existing public key', async () => {
+    it('updateDidKey throws error on using existing public key', async () => {
       const pubKey = keyring?.createFromUri(NEW_MNEMONIC).publicKey;
       // const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider), (err: any) => {
@@ -204,7 +204,7 @@ describe('DID Module works correctly', () => {
       });
     });
 
-    it.skip('updateDidKey throws error on using non existent did', async () => {
+    it('updateDidKey throws error on using non existent did', async () => {
       const pubKey = keyring?.createFromUri(TEST_MNEMONIC).publicKey;
       // const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider), (err: any) => {
