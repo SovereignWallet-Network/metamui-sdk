@@ -165,7 +165,7 @@ describe('DID Module works correctly', () => {
       });
     });
 
-    it.skip('storeDIDOnChain throws error on duplicate public key', async () => {
+    it('storeDIDOnChain throws error on duplicate public key', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
       // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
