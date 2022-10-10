@@ -230,55 +230,6 @@ function tidy(s) {
   return tidy;
 }
 
-/** function that decodes hex of createTokenVC
-* @param  {String} hexValue Hex String to be decoded
-* @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
-* @returns {Object | String} Decoded Object/String
-*/
-function getVCS(hexValue, typeKey) {
-  let vcs = decodeHex(hexValue, typeKey);
-  if (Boolean(vcs.token_name))
-    vcs["token_name"] = hexToString(vcs.token_name);
-  if (Boolean(vcs.currency_code))
-    vcs["currency_code"] = hexToString(vcs.currency_code);
-  return vcs;
-}
-
-/** function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
-* @param  {String} hexValue Hex String to be decoded
-* @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
-* @returns {Object | String} Decoded Object/String
-*/
-function decodeVC(hexValue, typeKey) {
-  let vcs = decodeHex(hexValue, typeKey);
-  vcs["owner"] = hexToString(vcs.owner);
-  let issuer_did: string[] = [];
-  for (let i = 0; i < vcs.issuers.length; i++) {
-    issuer_did.push(hexToString(vcs.issuers[i]));
-  }
-  vcs["issuers"] = issuer_did;
-  switch (vcs.vc_type) {
-    case VCType.MintTokens:
-      vcs["vc_property"] = getVCS(vcs.vc_property, VCType.SlashMintTokens);
-      break;
-    case VCType.TokenVC:
-      vcs["vc_property"] = getVCS(vcs.vc_property, vcs.vc_type);
-      break;
-    case VCType.SlashTokens:
-      vcs["vc_property"] = getVCS(vcs.vc_property, VCType.SlashMintTokens);
-      break;
-    case VCType.TokenTransferVC:
-      vcs["vc_property"] = getVCS(vcs.vc_property, VCType.TokenTransferVC);
-      break;
-    case VCType.GenericVC:
-      vcs["vc_property"] = getVCS(vcs.vc_property, VCType.GenericVC);
-      break;
-    default:
-      throw new Error("Unknown Type");
-  }
-  return vcs;
-}
-
 /** Sort object by keys
  * @param  {Object} unorderedObj unordered object
  * @returns {Object} ordered object by key
@@ -319,8 +270,6 @@ export {
   decodeHex,
   vcHexToVcId,
   isUpperAndValid,
-  getVCS,
-  decodeVC,
   sortObjectByKeys,
   generateObjectHash,
 };
