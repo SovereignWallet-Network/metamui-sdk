@@ -371,4 +371,3 @@ export {
   updateMetadata,
   sanitiseDid,
 };
-export { };
