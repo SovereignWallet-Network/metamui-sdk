@@ -90,7 +90,7 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
       const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
       const signedTx = await tx.signAsync(signingKeypair, { nonce });
 
-      await signedTx.send( ({ status, events, dispatchError }) => {
+      await signedTx.send( ({ status, dispatchError }) => {
         //console.log('Transaction status:', status.type);
         if (dispatchError) {
           if (dispatchError.isModule) {
@@ -107,22 +107,6 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
         } else if (status.isFinalized) {
           // console.log('Finalized block hash', status.asFinalized.toHex());
           return resolve(signedTx.hash.toHex());
-          // events.filter(({ event }) =>
-          //   provider.events.validatorCommittee.MemberExecuted.is(event)
-          // ).forEach(({ event }) => {
-          //   console.log(event.toHuman());
-          //     // const error:any = data.toHuman();
-          //     // const mod = error["result"]["Err"]["Module"];
-          //     // const find = {
-          //     //   error: new BN(0x04000000),
-          //     //   index: new BN(0),
-          //     // }
-          //     const decoded = provider.registry.findMetaError(event.toU8a());
-          //     // const deco2 = provider.registry.findMetaCall(event.toU8a());
-          //     console.log(decoded);
-          //     const { name, section } = decoded;
-          //     console.log(`${section}.${name}: `);
-          // });
         }
       });
     } catch (err) {

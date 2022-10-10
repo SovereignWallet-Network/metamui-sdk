@@ -72,8 +72,6 @@ async function sendTransaction(
       if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
       }
-      // console.log("Nonce inside send txn", nonce);
-      // console.log((await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address)));
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         // console.log('Transaction status:', status.type);
@@ -138,7 +136,6 @@ async function transfer(
       if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
       }
-      // console.log("Nonce inside transfer", nonce);
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
         // console.log('Transaction status:', status.type);
