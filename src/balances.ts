@@ -2,7 +2,7 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { buildConnection } from './connection';
 import { resolveDIDToAccount, sanitiseDid } from './did';
 import { KeyringPair } from '@polkadot/keyring/types';
-// import { submitTransaction } from './common/helper';
+import { submitTransaction } from './common/helper';
 
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {String} did
@@ -73,29 +73,29 @@ async function transfer(
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
       }
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        // console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          // console.log(JSON.stringify(dispatchError.toHuman()));
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { docs, index, section, name } = decoded;
-            // console.log(`${section}.${name}: ${docs.join(' ')}`);
-            return reject(new Error(`${section}.${name}`));
-            // console.log(decoded);
-            // reject(new Error(decoded?.toString()));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            return reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex())
-        }
-      });
-      // submitTransaction(signedTx, provider);
+      // await signedTx.send(function ({ status, dispatchError }) {
+      //   // console.log('Transaction status:', status.type);
+      //   if (dispatchError) {
+      //     // console.log(JSON.stringify(dispatchError.toHuman()));
+      //     if (dispatchError.isModule) {
+      //       // for module errors, we have the section indexed, lookup
+      //       const decoded = api.registry.findMetaError(dispatchError.asModule);
+      //       const { docs, index, section, name } = decoded;
+      //       // console.log(`${section}.${name}: ${docs.join(' ')}`);
+      //       return reject(new Error(`${section}.${name}`));
+      //       // console.log(decoded);
+      //       // reject(new Error(decoded?.toString()));
+      //     } else {
+      //       // Other, CannotLookup, BadOrigin, no extra info
+      //       // console.log(dispatchError.toString());
+      //       return reject(new Error(dispatchError.toString()));
+      //     }
+      //   } else if (status.isFinalized) {
+      //     // console.log('Finalized block hash', status.asFinalized.toHex());
+      //     resolve(signedTx.hash.toHex())
+      //   }
+      // });
+      return submitTransaction(signedTx, provider);
     } catch (err) {
       // console.log(err);
       reject(err);
