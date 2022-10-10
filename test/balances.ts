@@ -55,7 +55,7 @@ describe('Transaction works correctly', () => {
       try {
         await did.storeDIDOnChain(didObjTest123, sigKeypairWithBal, provider);
       } catch (err) {
-        console.log(err);
+        // console.log(err);
       }
     }
     const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
@@ -79,7 +79,6 @@ describe('Transaction works correctly', () => {
   });
 
   it('Transaction works correctly with nonce', async () => {
-    console.log("Txn Nonce")
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
     const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider, nonce);
@@ -99,7 +98,7 @@ describe('Transaction works correctly', () => {
   it('Transaction fails when sender has no balance', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
       await assert.rejects(tx.sendTransaction(sigKeypairWithoutBal, 'did:ssid:alice', 1, provider), (err: {message : any;}) => {
-        console.log(err.message);
+        // console.log(err.message);
         assert.strictEqual(err.message, 'balances.InsufficientBalance');
         return true;
       });
@@ -115,10 +114,9 @@ describe('Transaction works correctly', () => {
   });
 
   it('Transaction with Memo works correctly with nonce', async () => {
-    console.log("Txn Nonce and Memo")
     const provider = await buildConnection(constants.providerNetwork);
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
-    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1000, 'Memo Test', provider, nonce);
+    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1, 'Memo Test', provider, nonce);
     await assert.doesNotReject(transfer);
   });
 

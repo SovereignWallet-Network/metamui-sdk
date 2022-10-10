@@ -72,28 +72,28 @@ async function sendTransaction(
       if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
       }
-      console.log("Nonce inside send txn", nonce);
+      // console.log("Nonce inside send txn", nonce);
       // console.log((await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address)));
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
+        // console.log('Transaction status:', status.type);
         if (dispatchError) {
-          console.log(JSON.stringify(dispatchError.toHuman()));
+          // console.log(JSON.stringify(dispatchError.toHuman()));
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { docs, index, section, name } = decoded;
-            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            // console.log(`${section}.${name}: ${docs.join(' ')}`);
             return reject(new Error(`${section}.${name}`));
             // console.log(decoded);
             // reject(new Error(decoded?.toString()));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
-            console.log(dispatchError.toString());
+            // console.log(dispatchError.toString());
             return reject(new Error(dispatchError.toString()));
           }
         } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex());
+          // console.log('Finalized block hash', status.asFinalized.toHex());
           resolve(signedTx.hash.toHex())
         }
       });
@@ -138,25 +138,25 @@ async function transfer(
       if(nonce === undefined){
         nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
       }
-      console.log("Nonce inside transfer", nonce);
+      // console.log("Nonce inside transfer", nonce);
       const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
       await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
+        // console.log('Transaction status:', status.type);
         if (dispatchError) {
-          console.log(JSON.stringify(dispatchError.toHuman()));
+          // console.log(JSON.stringify(dispatchError.toHuman()));
           if (dispatchError.isModule) {
             // for module errors, we have the section indexed, lookup
             const decoded = api.registry.findMetaError(dispatchError.asModule);
             const { docs, index, section, name } = decoded;
-            console.log(`${section}.${name}: ${docs.join(' ')}`);
+            // console.log(`${section}.${name}: ${docs.join(' ')}`);
             return reject(new Error(`${section}.${name}`));
           } else {
             // Other, CannotLookup, BadOrigin, no extra info
-            console.log(dispatchError.toString());
+            // console.log(dispatchError.toString());
             return reject(new Error(dispatchError.toString()));
           }
         } else if (status.isFinalized) {
-          console.log('Finalized block hash', status.asFinalized.toHex());
+          // console.log('Finalized block hash', status.asFinalized.toHex());
           resolve(signedTx.hash.toHex());
         }
       });
