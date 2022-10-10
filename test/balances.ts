@@ -19,22 +19,6 @@ describe('Transaction works correctly', () => {
     sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
     sigKeypairWithoutBal = keyring.createFromUri('//Test123');
     if (constants.providerNetwork == 'local') {
-      // let sigKeypairEve = await keyring.createFromUri('//Eve');
-      // const didObj = {
-      //   private: {
-      //     public_key: sigKeypairEve.publicKey, // this is the public key linked to the did
-      //     identity: 'did:ssid:eve', // this is the actual did
-      //     metadata: 'Metadata',
-      //   }
-      // };
-      // let sigKeypairDave = await keyring.createFromUri('//Dave');
-      // const didObjDave = {
-      //   private: {
-      //     public_key: sigKeypairDave.publicKey, // this is the public key linked to the did
-      //     identity: 'did:ssid:dave', // this is the actual did
-      //     metadata: 'Metadata',
-      //   }
-      // };
       const didObjTest123 = {
         private: {
           public_key: sigKeypairWithoutBal.publicKey,
@@ -42,16 +26,6 @@ describe('Transaction works correctly', () => {
           metadata: 'Metadata',
         }
       };
-      // try {
-      //   await did.storeDIDOnChain(didObjDave, sigKeypairWithBal, provider);
-      // } catch (err) {
-      //   console.log(err);
-      // }
-      // try {
-      //   await did.storeDIDOnChain(didObj, sigKeypairWithBal, provider);
-      // } catch (err) {
-      //   console.log(err);
-      // }
       try {
         await did.storeDIDOnChain(didObjTest123, sigKeypairWithBal, provider);
       } catch (err) {
@@ -136,8 +110,6 @@ describe('Transaction works correctly', () => {
   after(async () => {
     // Delete created DIDs
     if (constants.providerNetwork == 'local') {
-      // await removeDid('did:ssid:eve', sigKeypairWithBal, provider);
-      // await removeDid('did:ssid:dave', sigKeypairWithBal, provider);
       await removeDid('did:ssid:test123', sigKeypairWithBal, provider);
     }
   })
