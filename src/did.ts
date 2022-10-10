@@ -71,10 +71,16 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
       // Check if identifier is available
       const identifier = DID.private.identity;
       const did_hex = sanitiseDid(identifier);
-      const data = await did.resolveDIDToAccount(did_hex, provider);
-      if(data != null) {
+
+      const didCheck = await did.resolveDIDToAccount(did_hex, provider);
+      if(didCheck != null) {
         //return new Error('did.DIDAlreadyExists');
         return reject(new Error('did.DIDAlreadyExists'));
+      }
+
+      const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
+      if(pubkeyCheck) {
+        return reject(new Error('did.PublicKeyRegistered'));
       }
 
       const tx = provider.tx.validatorCommittee.execute(
