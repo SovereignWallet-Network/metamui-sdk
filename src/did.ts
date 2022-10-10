@@ -145,6 +145,8 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
         identifier: data[0].public.identifier,
         public_key: data[0].public.publicKey,
         metadata: data[0].public.metadata,
+        registration_number: data[0].public.registration_number,
+        company_name: data[0].public.company_name,
         added_block: data[1],
       };
     }
