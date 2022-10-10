@@ -51,7 +51,7 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
  */
-async function sendTransaction(
+async function transfer(
   senderAccountKeyPair: KeyringPair,
   receiverDID: string,
   amount: number,
@@ -114,7 +114,7 @@ async function sendTransaction(
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
  */
-async function transfer(
+async function transferWithMemo(
   senderAccountKeyPair: KeyringPair,
   receiverDID: string,
   amount: number,
@@ -168,6 +168,6 @@ async function transfer(
 export {
   getBalance,
   subscribeToBalanceChanges,
-  sendTransaction,
-  transfer
+  transfer,
+  transferWithMemo
 };

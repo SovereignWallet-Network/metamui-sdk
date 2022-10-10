@@ -32,7 +32,7 @@ describe('Transaction works correctly', () => {
         // console.log(err);
       }
     }
-    const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
+    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
     await assert.doesNotReject(transfer);
   });
 
@@ -55,14 +55,14 @@ describe('Transaction works correctly', () => {
   it('Transaction works correctly with nonce', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
-    const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:alice', 1, provider, nonce);
+    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1, provider, nonce);
     await assert.doesNotReject(transfer);
   });
 
   it('Transaction throws error for unregistered DID', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
-    const transfer = tx.sendTransaction(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, provider, nonce);
+    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, provider, nonce);
     await assert.rejects(transfer, (err: { message: any; }) => {  
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
       return true;
@@ -71,7 +71,7 @@ describe('Transaction works correctly', () => {
 
   it('Transaction fails when sender has no balance', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
-      await assert.rejects(tx.sendTransaction(sigKeypairWithoutBal, 'did:ssid:alice', 1, provider), (err: {message : any;}) => {
+      await assert.rejects(tx.transfer(sigKeypairWithoutBal, 'did:ssid:alice', 1, provider), (err: {message : any;}) => {
         // console.log(err.message);
         assert.strictEqual(err.message, 'balances.InsufficientBalance');
         return true;
@@ -81,7 +81,7 @@ describe('Transaction works correctly', () => {
   it('Transaction fails when recipent has no DID', async () => {
     const provider = await buildConnection(constants.providerNetwork);
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address)
-    await assert.rejects(tx.sendTransaction(sigKeypairWithBal, 'Bob123', 1, provider, nonce), (err: { message: any; }) => {
+    await assert.rejects(tx.transfer(sigKeypairWithBal, 'Bob123', 1, provider, nonce), (err: { message: any; }) => {
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
       return true;
     });
@@ -90,7 +90,7 @@ describe('Transaction works correctly', () => {
   it('Transaction with Memo works correctly with nonce', async () => {
     const provider = await buildConnection(constants.providerNetwork);
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
-    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1, 'Memo Test', provider, nonce);
+    const transfer = tx.transferWithMemo(sigKeypairWithBal, 'did:ssid:alice', 1, 'Memo Test', provider, nonce);
     await assert.doesNotReject(transfer);
   });
 
@@ -98,7 +98,7 @@ describe('Transaction works correctly', () => {
     const provider = await buildConnection(constants.providerNetwork);
 
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal?.address);
-    const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, 'Memo Test', provider, nonce);
+    const transfer = tx.transferWithMemo(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, 'Memo Test', provider, nonce);
     await assert.rejects(transfer, (err: { message: any; }) => {
       // console.log(err.message);
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
