@@ -32,7 +32,7 @@ async function setMembers(newMembers: String[], prime: String, oldCount: number,
  * @param  {Number} lengthCount Length of call
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function propose(threshold: number, proposal, lengthCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
+async function propose(threshold, proposal, lengthCount, signingKeypair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -46,7 +46,7 @@ async function propose(threshold: number, proposal, lengthCount: number, signing
  * @param  {Number} lengthCount Length of Call
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function execute(proposal, lengthCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
+async function execute(proposal, lengthCount, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.execute(proposal, lengthCount);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -61,7 +61,7 @@ async function execute(proposal, lengthCount: number, signingKeypair: KeyringPai
  * @param  {Boolean} approve True/false
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function vote(proposalHash: string, index: number, approve: boolean, signingKeypair: KeyringPair, api: ApiPromise) {
+async function vote(proposalHash, index, approve, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.vote(proposalHash, index, approve);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -77,7 +77,7 @@ async function vote(proposalHash: string, index: number, approve: boolean, signi
  * @param  {Number} lengthCount Length
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function close(proposalHash: String, index: number, proposalWeightBond, lengthCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
+async function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.close(proposalHash, index, proposalWeightBond, lengthCount);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -90,7 +90,7 @@ async function close(proposalHash: String, index: number, proposalWeightBond, le
  * @param  {String} proposalHash Hash
  * @param  {KeyPair} signingKeypair Key pair of sender
  */
-async function disapproveProposal(proposalHash: String, signingKeypair: KeyringPair, api: ApiPromise) {
+async function disapproveProposal(proposalHash, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.sudo.sudo(
     provider.tx.council.disapproveProposal(proposalHash)

@@ -8,7 +8,7 @@ import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
 import { removeDid } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { ApiPromise, Keyring } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 
 describe('Collective works correctly', () => {
   let provider: ApiPromise;
@@ -16,13 +16,14 @@ describe('Collective works correctly', () => {
   let proposalHash;
   let index;
   let sudoKey;
-  let sudoPair;
   const TEST_ROCKET_DID = "did:ssid:rocket";
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
   const vcHex = '0xcc090ccf4e1e6fd1325d3884479dccd50f457d35b9b239333b6d9b4a531a25d46469643a737369643a726f636b65740000000000000000000000000000000000046469643a737369643a73776e000000000000000000000000000000000000000004242043f42ef6eb8a403d49d26c5d072e3af043d27a29611ca7f00d10d9603327991cedbb45a651c19ffc6b3f9681311deb6fdf129c3b62251c4312186483be8c00007465737400000000000000000000000010270000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+  let sigKeyPairSwn: KeyringPair;
   let sigKeypairBob: KeyringPair;
   let sigKeypairDave: KeyringPair;
+  let sudoPair: KeyringPair;
 
   if (constants.providerNetwork == 'local') {
     before(async () => {
@@ -30,15 +31,10 @@ describe('Collective works correctly', () => {
       let keyring = await initKeyring();
       sudoKey = await provider.query.sudo.key();
       console.log('sudoKey: ', sudoKey.toHuman());
-      try {
-        sudoPair = keyring.getPair(sudoKey.toString()); //Alice
-      } catch (e) {
-        console.log('Error: ', e);
-        process.exit(1);
-      }
-      console.log('sudoPair: ', sudoPair.address);
-      sigKeypairBob = await keyring.addFromUri('//Rocket');
-      sigKeypairDave = await keyring.addFromUri('//Dave');
+      sudoPair = keyring.addFromUri('//Alice');
+      sigKeyPairSwn = keyring.addFromUri('//Swn');
+      sigKeypairBob = keyring.addFromUri('//Rocket');
+      sigKeypairDave = keyring.addFromUri('//Dave');
 
       const didObjRocket = {
         private: {
@@ -56,13 +52,13 @@ describe('Collective works correctly', () => {
       };
       if (constants.providerNetwork == 'local') {
         try {
-          await did.storeDIDOnChain(didObjDave, sudoPair, provider);
-          await did.storeDIDOnChain(didObjRocket, sudoPair, provider);
+          await did.storeDIDOnChain(didObjDave, sigKeyPairSwn, provider);
+          await did.storeDIDOnChain(didObjRocket, sigKeyPairSwn, provider);
         } catch (err) { }
-        let nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
-        await tx.transfer(sudoPair, TEST_ROCKET_DID, 5000000, provider, nonce);
-        nonce = await provider.rpc.system.accountNextIndex(sudoPair.address);
-        await tx.transfer(sudoPair, TEST_DAVE_DID, 5000000, provider, nonce);
+        let nonce = await provider.rpc.system.accountNextIndex(sigKeyPairSwn.address);
+        await tx.transfer(sigKeyPairSwn, TEST_ROCKET_DID, 5000000, provider, nonce);
+        nonce = await provider.rpc.system.accountNextIndex(sigKeyPairSwn.address);
+        await tx.transfer(sigKeyPairSwn, TEST_DAVE_DID, 5000000, provider, nonce);
       }
     });
 
