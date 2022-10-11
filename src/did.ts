@@ -6,6 +6,7 @@ import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
 import { PRIVATE_DID_TYPE } from './common/types';
+import { submitTransaction } from './common/helper';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -65,55 +66,29 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 
 
 async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPair, api?: ApiPromise) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const provider = api || (await buildConnection('local')) as ApiPromise;
-      // Check if identifier is available
-      const identifier = DID.private.identity;
-      const did_hex = sanitiseDid(identifier);
+  const provider = api || (await buildConnection('local')) as ApiPromise;
+  // Check if identifier is available
+  const identifier = DID.private.identity;
+  const did_hex = sanitiseDid(identifier);
 
-      const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-      if(didCheck != null) {
-        //return new Error('did.DIDAlreadyExists');
-        return reject(new Error('did.DIDAlreadyExists'));
-      }
+  const didCheck = await did.resolveDIDToAccount(did_hex, provider);
+  if(didCheck != null) {
+    //return new Error('did.DIDAlreadyExists');
+    throw(new Error('did.DIDAlreadyExists'));
+  }
 
-      const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
-      if(pubkeyCheck) {
-        return reject(new Error('did.PublicKeyRegistered'));
-      }
+  const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
+  if(pubkeyCheck) {
+    throw(new Error('did.PublicKeyRegistered'));
+  }
 
-      const tx = provider.tx.validatorCommittee.execute(
-        provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
-      );
-      // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
-      const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      const signedTx = await tx.signAsync(signingKeypair, { nonce });
-
-      await signedTx.send( ({ status, dispatchError }) => {
-        //console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = provider.registry.findMetaError(dispatchError.asModule);
-            const { docs, index, name, section } = decoded;
-            // console.log(`${section}.${name}: ${docs.join(' ')}`);
-            return reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            //console.log(dispatchError.toString());
-            return reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          return resolve(signedTx.hash.toHex());
-        }
-      });
-    } catch (err) {
-      // console.log(err);
-      return reject(err);
-    }
-  });
+  const tx = provider.tx.validatorCommittee.execute(
+    provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
+  );
+  // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+  const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  const signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
 }
 
 /**
@@ -216,48 +191,22 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
  * @param {ApiPromise} api
  */
 async function updateDidKey(identifier, newKey, signingKeypair, api) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const provider = api || (await buildConnection('local'));
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const data = await did.resolveDIDToAccount(did_hex, provider);
+  if(data == null) {
+    throw(new Error('did.DIDDoesNotExist'));
+  }
 
-      const did_hex = sanitiseDid(identifier);
-      const data = await did.resolveDIDToAccount(did_hex, provider);
-      if(data == null) {
-        return reject(new Error('did.DIDDoesNotExist'));
-      }
-
-      const data2 = await did.resolveAccountIdToDid(newKey, provider);
-      if(data2 != false) {
-        return reject(new Error('did.PublicKeyRegistered'));
-      }
-      // call the rotateKey extrinsinc
-      const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
-      let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = await tx.signAsync(signingKeypair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        // console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { docs, name, section } = decoded;
-            // console.log(`${section}.${name}: ${docs.join(' ')}`);
-            return reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            return reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex());
-        }
-      });
-    } catch (err) {
-      // console.log(err);
-      return reject(err);
-    }
-  });
+  const data2 = await did.resolveAccountIdToDid(newKey, provider);
+  if(data2 != false) {
+    throw(new Error('did.PublicKeyRegistered'));
+  }
+  // call the rotateKey extrinsinc
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
 }
 
 /**
@@ -327,37 +276,12 @@ async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
  * @param {ApiPromise} api
  */
 async function updateMetadata(identifier, metadata, signingKeypair, api: any = false) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const provider = api || (await buildConnection('local'));
-      const did_hex = sanitiseDid(identifier);
-      const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
-      let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
-      let signedTx = await tx.signAsync(signingKeypair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        // console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            return reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            return reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex())
-        }
-      });
-    } catch (err) {
-      // console.log(err);
-      return reject(err);
-    }
-  });
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
 }
 
 export {

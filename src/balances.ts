@@ -1,4 +1,4 @@
-import { ApiPromise, Keyring } from '@polkadot/api';
+import { ApiPromise } from '@polkadot/api';
 import { buildConnection } from './connection';
 import { resolveDIDToAccount, sanitiseDid } from './did';
 import { KeyringPair } from '@polkadot/keyring/types';
@@ -93,20 +93,20 @@ async function transferWithMemo(
   api: ApiPromise,
   nonce?: any,
 ): Promise<string> {
-      const provider = api || (await buildConnection('local'));
-      // check if the recipent DID is valid
-      const receiverAccountID:any = await resolveDIDToAccount(receiverDID, provider);
-      // console.log("Receiver Account ID", receiverAccountID);
-      if (!receiverAccountID) {
-        throw(new Error('balances.RecipentDIDNotRegistered'));
-      }
-      const tx = provider.tx.balances
-        .transferWithMemo({ id: receiverAccountID }, amount, memo);
-      if(nonce === undefined){
-        nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      }
-      const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
-      return submitTransaction(signedTx, provider);
+  const provider = api || (await buildConnection('local'));
+  // check if the recipent DID is valid
+  const receiverAccountID:any = await resolveDIDToAccount(receiverDID, provider);
+  // console.log("Receiver Account ID", receiverAccountID);
+  if (!receiverAccountID) {
+    throw(new Error('balances.RecipentDIDNotRegistered'));
+  }
+  const tx = provider.tx.balances
+    .transferWithMemo({ id: receiverAccountID }, amount, memo);
+  if(nonce === undefined){
+    nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+  }
+  const signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
+  return submitTransaction(signedTx, provider);
 }
 
 export {
