@@ -2,10 +2,10 @@ import assert from 'assert';
 import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
-import * as constants from './helper/constants';
+import * as constants from './common/constants';
 import { hexToString } from '../src/utils';
 import { mnemonicValidate } from '@polkadot/util-crypto';
-import { removeDid } from './helper/helper';
+import { removeDid } from './common/helper';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { AnyJson } from '@polkadot/types/types';
@@ -22,9 +22,9 @@ describe('DID Module works correctly', () => {
   const expectedNewPubkey =
     '04249359400f54ceb6ecf51edfeb1c02c8233e8ca563492df998a5d91266fa64';
 
-  let provider: ApiPromise | undefined;
-  let keyring: Keyring | undefined;
-  let sigKeypairWithBal: KeyringPair | undefined;
+  let provider: ApiPromise;
+  let keyring: Keyring;
+  let sigKeypairWithBal: KeyringPair;
 
   before(async () => {
     keyring = await initKeyring();
@@ -82,7 +82,7 @@ describe('DID Module works correctly', () => {
   });
 
   it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider, null);
+    const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
     // Alice's DID is created at block number 0
     assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
   });
@@ -96,7 +96,7 @@ describe('DID Module works correctly', () => {
     assert.strictEqual(data2, false);
   });
 
-  it.skip('updateMetadata works correctly', async () => {
+  it('updateMetadata works correctly', async () => {
     const data: any = await did.updateMetadata(
       'did:ssid:swn',
       'TestMetadata',
@@ -109,7 +109,7 @@ describe('DID Module works correctly', () => {
     assert.strictEqual(new_data?.['added_block'], 0);
   });
 
-  it.skip('updateMetadata throws error for unregistered DID', async () => {
+  it('updateMetadata throws error for unregistered DID', async () => {
     const data:any = await did.updateMetadata(
       'did:ssid:nonexistentdid',
       'TestMetadata',
@@ -137,8 +137,8 @@ describe('DID Module works correctly', () => {
 
   // These test cases should only run in local environment
   if (constants.providerNetwork == 'local') {
-    let addedDidBlockNum: number | null = null;
-    let updatedKeyBlockNum: number | null = null;
+    let addedDidBlockNum: number;
+    let updatedKeyBlockNum: number;
     let testIdentifier = 'did:ssid:rocket';
 
     it('storeDIDOnChain works correctly', async () => {
@@ -155,7 +155,7 @@ describe('DID Module works correctly', () => {
       assert.strictEqual(hexToString(newDidDetails['metadata']), 'Metadata');
     });
 
-    it.skip('storeDIDOnChain throws error on duplicate ssid', async () => {
+    it('storeDIDOnChain throws error on duplicate ssid', async () => {
       const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
       // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
@@ -165,7 +165,7 @@ describe('DID Module works correctly', () => {
       });
     });
 
-    it.skip('storeDIDOnChain throws error on duplicate public key', async () => {
+    it('storeDIDOnChain throws error on duplicate public key', async () => {
       const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
       if (typeof sigKeypairWithBal === 'undefined') return
       // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
@@ -194,21 +194,21 @@ describe('DID Module works correctly', () => {
         && keyHistory.map(data => data[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
     })
 
-    it.skip('updateDidKey throws error on using existing public key', async () => {
+    it('updateDidKey throws error on using existing public key', async () => {
       const pubKey = keyring?.createFromUri(NEW_MNEMONIC).publicKey;
       // const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider), (err: any) => {
-        console.log(err.message);
+        // console.log(err.message);
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
       });
     });
 
-    it.skip('updateDidKey throws error on using non existent did', async () => {
+    it('updateDidKey throws error on using non existent did', async () => {
       const pubKey = keyring?.createFromUri(TEST_MNEMONIC).publicKey;
       // const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
       await assert.rejects(did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider), (err: any) => {
-        console.log(err.message);
+        // console.log(err.message);
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');
         return true;
       });
@@ -216,7 +216,7 @@ describe('DID Module works correctly', () => {
 
     it('Resolve test DID to account at block number 0 works correctly', async () => {
       const data:any = await did.resolveDIDToAccount(testIdentifier, provider, 0);
-      console.log(data);
+      // console.log(data);
       assert.strictEqual(data, null);
       return true;
     });
