@@ -5,9 +5,9 @@ name: Integration Test
 
 on:
   push:
-    branches: [main, release]
+    branches: [main, release, development]
   pull_request:
-    branches: [main, release]
+    branches: [main, release, development]
 
 jobs:
   build:
@@ -25,4 +25,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: GitHub Action for Yarn
         uses: Borales/actions-yarn@v3
-      - run: yarn test
+      # - run: yarn
+      # - run: ls test/
+      # - run: yarn test
