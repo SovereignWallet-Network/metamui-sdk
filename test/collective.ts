@@ -53,6 +53,8 @@ describe('Collective works correctly', () => {
       if (constants.providerNetwork == 'local') {
         try {
           await did.storeDIDOnChain(didObjDave, sigKeyPairSwn, provider);
+        } catch (err) { }
+        try {
           await did.storeDIDOnChain(didObjRocket, sigKeyPairSwn, provider);
         } catch (err) { }
         let nonce = await provider.rpc.system.accountNextIndex(sigKeyPairSwn.address);
