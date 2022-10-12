@@ -6,7 +6,8 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { Index } from '@polkadot/types/interfaces';
 import * as tx from '../../src/balances';
 import * as vc from '../../src/vc';
-
+import * as collective from '../../src/collective';
+import { submitTransaction } from '../../src/common/helper';
 
 const TEST_DID = 'did:ssid:rocket';
 const TEST_DAVE_DID = "did:ssid:dave";
@@ -33,7 +34,7 @@ async function removeDid(didString: string, sigKeyPair: KeyringPair, provider: A
   }
 }
 
-async function storeVC(vcHex: any, sigKeypairOwner: any, sigKeypairRoot: KeyringPair, sigKeypairCouncil: { publicKey: any; }, provider: ApiPromise) {
+async function storeVC(vcHex: any, sigKeypairOwner: any, sigKeypairRoot: KeyringPair, sigKeypairCouncil: KeyringPair, provider: ApiPromise) {
   try {
     const didObjDave = {
       private: {
@@ -55,9 +56,9 @@ async function storeVC(vcHex: any, sigKeypairOwner: any, sigKeypairRoot: Keyring
   const call = provider.tx.vc.store(vcHex);
   await collective.propose(3, call, 1000, sigKeypairOwner, provider);
   const actualProposals = await collective.getProposals(provider);
-  const proposalHash = actualProposals[0];
+  const proposalHash = actualProposals?.[0];
   let vote = await collective.getVotes(proposalHash, provider);
-  const index = vote.index;
+  const index = vote?.['index'];
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
   await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
@@ -84,6 +85,7 @@ async function sudoStoreVC(vcHex: string, sudoKeyPair: KeyringPair, provider: Ap
       if (dispatchError) {
         if (dispatchError.isModule) {
           const decoded = api.registry.findMetaError(dispatchError.asModule);
+          // @ts-ignore
           const { documentation, name, section } = decoded;
           reject(new Error(`${section}.${name}`));
         } else {
