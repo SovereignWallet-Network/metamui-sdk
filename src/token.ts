@@ -88,22 +88,25 @@ async function withdrawReserved(
     api: ApiPromise,
     ) {
 
-    let to_did_hex = sanitiseDid(toDid);
-    let from_did_hex = sanitiseDid(fromDid);
-
-    let to_did_check = await resolveDIDToAccount(to_did_hex, api);
-    let from_did_check = await resolveDIDToAccount(from_did_hex, api);
-    Promise.all([to_did_check, from_did_check]).then((values) => {
-        if (!values[0]) {
-            throw new Error('token.RecipentDIDNotRegistered');
-        }
-        if (!values[1]) {
-            throw new Error('token.SenderDIDNotRegistered');
-        }
-    });
+    let [to_account_id, from_account_id] = await Promise.all([
+        resolveDIDToAccount(
+            sanitiseDid(toDid), 
+            api
+        ), 
+        resolveDIDToAccount(
+            sanitiseDid(fromDid), 
+            api
+        )
+    ]);
+    if (!to_account_id) {
+        throw new Error('token.RecipentDIDNotRegistered');
+    }
+    if (!from_account_id) {
+        throw new Error('token.SenderDIDNotRegistered');
+    }
 
     const provider = api || (await buildConnection('local'));
-    const tx = provider.tx.token.withdrawReserved(to_did_hex, from_did_hex, amount);
+    const tx = provider.tx.token.withdrawReserved(sanitiseDid(toDid), sanitiseDid(fromDid), amount);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
