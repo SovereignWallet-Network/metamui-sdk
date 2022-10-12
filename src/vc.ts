@@ -25,8 +25,8 @@ import { buildConnection } from './connection';
 import { VCType } from './utils';
 import * as did from './did';
 import * as utils from './utils';
-import { getFormattedTokenAmount } from './token';
-import { createVC, signVC, verifyVC } from './verified_credentials';
+// import { getFormattedTokenAmount } from './token';
+// import { createVC, signVC, verifyVC } from './verified_credentials';
 import { default as axios } from 'axios';
 import { hexToU8a } from '@polkadot/util';
 import { SSID_BASE_URL } from './config';
@@ -69,43 +69,43 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
 }
 
-/** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} vcProperty
- * @param  {String} vcProperty.vcId 
- * @param  {String} vcProperty.currencyCode
- * @param  {String} vcProperty.amount In Highest Form
- * @returns {String} Token VC Hex String
- */
-async function createMintSlashVC({ vcId, currencyCode, amount }, api: ApiPromise) {
-  const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
-  let vcProperty = {
-    vc_id: vcId,
-    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-    amount: utils.encodeData(tokenAmount, 'Balance'),
-  };
-  return utils.encodeData(vcProperty, VCType.SlashMintTokens)
-    .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
-}
+// /** Encodes Token VC and pads with appropriate bytes
+//  * @param  {Object} vcProperty
+//  * @param  {String} vcProperty.vcId 
+//  * @param  {String} vcProperty.currencyCode
+//  * @param  {String} vcProperty.amount In Highest Form
+//  * @returns {String} Token VC Hex String
+//  */
+// async function createMintSlashVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+//   const provider = api || (await buildConnection('local'));
+//   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+//   let vcProperty = {
+//     vc_id: vcId,
+//     currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
+//     amount: utils.encodeData(tokenAmount, 'Balance'),
+//   };
+//   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
+//     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
+// }
 
-/** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} vcProperty
- * @param  {String} vcProperty.vcId 
- * @param  {String} vcProperty.currencyCode
- * @param  {String} vcProperty.amount In Highest Form
- * @returns {String} Token VC Hex String
- */
-async function createTokenTransferVC({ vcId, currencyCode, amount }, api: ApiPromise) {
-  const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
-  let vcProperty = {
-    vc_id: vcId,
-    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-    amount: utils.encodeData(tokenAmount, 'Balance'),
-  };
-  return utils.encodeData(vcProperty, VCType.TokenTransferVC)
-    .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
-}
+// /** Encodes Token VC and pads with appropriate bytes
+//  * @param  {Object} vcProperty
+//  * @param  {String} vcProperty.vcId 
+//  * @param  {String} vcProperty.currencyCode
+//  * @param  {String} vcProperty.amount In Highest Form
+//  * @returns {String} Token VC Hex String
+//  */
+// async function createTokenTransferVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+//   const provider = api || (await buildConnection('local'));
+//   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+//   let vcProperty = {
+//     vc_id: vcId,
+//     currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
+//     amount: utils.encodeData(tokenAmount, 'Balance'),
+//   };
+//   return utils.encodeData(vcProperty, VCType.TokenTransferVC)
+//     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
+// }
 
 /** Encodes Generic VC and pads with appropriate bytes
  * @param  {Object} vcProperty
@@ -120,102 +120,102 @@ function createGenericVC({ cid }) {
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
 }
 
-/**
- * Create VC
- * @param  {Object} vcProperty
- * @param  {String} owner Did
- * @param  {String[]} issuers Array of Did
- * @param  {String} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
- * @param  {KeyPair} sigKeypair Owner Key Ring pair
- * @returns {String} VC Hex String
- */
+// /**
+//  * Create VC
+//  * @param  {Object} vcProperty
+//  * @param  {String} owner Did
+//  * @param  {String[]} issuers Array of Did
+//  * @param  {String} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
+//  * @param  {KeyPair} sigKeypair Owner Key Ring pair
+//  * @returns {String} VC Hex String
+//  */
 
-async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair: KeyringPair, api: ApiPromise, ssidUrl: string | null = null) {
-  let encodedVCProperty, encodedData, hash;
-  switch (vcType) {
-    case VCType.TokenVC:
-      encodedVCProperty = createTokenVC(vcProperty);
-      break;
-    case VCType.MintTokens:
-    case VCType.SlashTokens:
-      encodedVCProperty = await createMintSlashVC(vcProperty, api);
-      break;
-    case VCType.TokenTransferVC:
-      encodedVCProperty = await createTokenTransferVC(vcProperty, api);
-      break;
-    case VCType.GenericVC:
-      encodedVCProperty = createGenericVC(vcProperty);
-      let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
-      hash = genericVCData.hash;
-      break;
-    default:
-      throw new Error("Unknown VC Type");
-  }
-  owner = did.sanitiseDid(owner);
-  issuers = issuers.map(issuer => did.sanitiseDid(issuer));
-  if (vcType != VCType.GenericVC) {
-    encodedData = utils.encodeData({
-      vc_type: vcType,
-      vc_property: encodedVCProperty,
-      owner,
-      issuers,
-    }, "VC_HEX");
-    hash = blake2AsHex(encodedData);
-  }
-  const sign = utils.bytesToHex(sigKeypair.sign(hash));
-  let vcObject = {
-    hash,
-    owner,
-    issuers,
-    signatures: [sign],
-    is_vc_used: false,
-    vc_type: vcType,
-    vc_property: encodedVCProperty,
-  };
-  return utils.encodeData(vcObject, 'VC');
-}
+// async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair: KeyringPair, api: ApiPromise, ssidUrl: string | null = null) {
+//   let encodedVCProperty, encodedData, hash;
+//   switch (vcType) {
+//     case VCType.TokenVC:
+//       encodedVCProperty = createTokenVC(vcProperty);
+//       break;
+//     case VCType.MintTokens:
+//     case VCType.SlashTokens:
+//       encodedVCProperty = await createMintSlashVC(vcProperty, api);
+//       break;
+//     case VCType.TokenTransferVC:
+//       encodedVCProperty = await createTokenTransferVC(vcProperty, api);
+//       break;
+//     case VCType.GenericVC:
+//       encodedVCProperty = createGenericVC(vcProperty);
+//       let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
+//       hash = genericVCData.hash;
+//       break;
+//     default:
+//       throw new Error("Unknown VC Type");
+//   }
+//   owner = did.sanitiseDid(owner);
+//   issuers = issuers.map(issuer => did.sanitiseDid(issuer));
+//   if (vcType != VCType.GenericVC) {
+//     encodedData = utils.encodeData({
+//       vc_type: vcType,
+//       vc_property: encodedVCProperty,
+//       owner,
+//       issuers,
+//     }, "VC_HEX");
+//     hash = blake2AsHex(encodedData);
+//   }
+//   const sign = utils.bytesToHex(sigKeypair.sign(hash));
+//   let vcObject = {
+//     hash,
+//     owner,
+//     issuers,
+//     signatures: [sign],
+//     is_vc_used: false,
+//     vc_type: vcType,
+//     vc_property: encodedVCProperty,
+//   };
+//   return utils.encodeData(vcObject, 'VC');
+// }
 
-/**
-* Approve VC
-* @param  {Object} vcID vc_id of VC to be approved
-* @param  {KeyPair} signingKeyPair Issuer Key Ring pair
-* @param {APIPromise} api
-* @returns {String} Transaction hash or Error
-*/
-async function approveVC(vcId, signingKeyPair, api: ApiPromise, ssidUrl: string) {
-      const provider = api || (await buildConnection('local'));
+// /**
+// * Approve VC
+// * @param  {Object} vcID vc_id of VC to be approved
+// * @param  {KeyPair} signingKeyPair Issuer Key Ring pair
+// * @param {APIPromise} api
+// * @returns {String} Transaction hash or Error
+// */
+// async function approveVC(vcId, signingKeyPair, api: ApiPromise, ssidUrl: string) {
+//       const provider = api || (await buildConnection('local'));
 
-      // fetching VC from chain
-      let vc_details = await getVCs(vcId, provider);
-      if (!vc_details) {
-        throw(new Error('VC not found'));
-      }
-      const vc = vc_details?.[0];
-      let hash: string = '';
+//       // fetching VC from chain
+//       let vc_details = await getVCs(vcId, provider);
+//       if (!vc_details) {
+//         throw(new Error('VC not found'));
+//       }
+//       const vc = vc_details?.[0];
+//       let hash: string = '';
 
-      // generating the signature
-      if (vc.vc_type != VCType.GenericVC) {
-        const encodedData = utils.encodeData({
-          vc_type: vc['vc_type'],
-          vc_property: vc['vc_property'],
-          owner: vc['owner'],
-          issuers: vc['issuers']
-        }, "VC_HEX");
-        hash = blake2AsHex(encodedData);
-      } else {
-        const vcProperty = utils.getVCS(vc.vc_property, vc.vc_type);
-        let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
-        hash = genericVCData.hash;
-      }
-      const sign = utils.bytesToHex(signingKeyPair.sign(hash));
+//       // generating the signature
+//       if (vc.vc_type != VCType.GenericVC) {
+//         const encodedData = utils.encodeData({
+//           vc_type: vc['vc_type'],
+//           vc_property: vc['vc_property'],
+//           owner: vc['owner'],
+//           issuers: vc['issuers']
+//         }, "VC_HEX");
+//         hash = blake2AsHex(encodedData);
+//       } else {
+//         const vcProperty = utils.getVCS(vc.vc_property, vc.vc_type);
+//         let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
+//         hash = genericVCData.hash;
+//       }
+//       const sign = utils.bytesToHex(signingKeyPair.sign(hash));
 
-      // adding signature to the chain
-      const tx = provider.tx.vc.addSignature(vcId, sign);
+//       // adding signature to the chain
+//       const tx = provider.tx.vc.addSignature(vcId, sign);
 
-      let nonce = await provider.rpc.system.accountNextIndex(signingKeyPair.address);
-      let signedTx = await tx.signAsync(signingKeyPair, { nonce });
-      return submitTransaction(signedTx, provider);
-}
+//       let nonce = await provider.rpc.system.accountNextIndex(signingKeyPair.address);
+//       let signedTx = await tx.signAsync(signingKeyPair, { nonce });
+//       return submitTransaction(signedTx, provider);
+// }
 
 
 /**
@@ -330,19 +330,19 @@ async function getGenericVCDataByCId(cid, ssidUrl: any = false) {
   return { data: message.data, hash: message.hash };
 }
 
-/**
- * Get Generic vc data
- * @param {String} vcId
- * @param {ApiPromise} api
- * @returns {JSON} Generic VC data
- */
-async function getGenericVCData(vcId, ssidUrl = false, api: ApiPromise) {
-  const provider = api || (await buildConnection('local'));
-  const vc = await getVCs(vcId, provider);
-  const vc_property = utils.getVCS(vc?.[0].vc_property, vc?.[0].vc_type);
-  const { data, hash } = await getGenericVCDataByCId(vc_property.cid, ssidUrl);
-  return { data, hash, vcId, issuers: vc?.[0].issuers };
-}
+// /**
+//  * Get Generic vc data
+//  * @param {String} vcId
+//  * @param {ApiPromise} api
+//  * @returns {JSON} Generic VC data
+//  */
+// async function getGenericVCData(vcId, ssidUrl = false, api: ApiPromise) {
+//   const provider = api || (await buildConnection('local'));
+//   const vc = await getVCs(vcId, provider);
+//   const vc_property = utils.getVCS(vc?.[0].vc_property, vc?.[0].vc_type);
+//   const { data, hash } = await getGenericVCDataByCId(vc_property.cid, ssidUrl);
+//   return { data, hash, vcId, issuers: vc?.[0].issuers };
+// }
 
 
 /**
@@ -392,8 +392,8 @@ async function verifyGenericVC(vcId, data, api: ApiPromise) {
 
 export {
   createTokenVC,
-  generateVC,
-  approveVC,
+  // generateVC,
+  // approveVC,
   storeVC,
   updateStatus,
   getVCs,
@@ -401,10 +401,10 @@ export {
   getDIDByVCId,
   getVCHistoryByVCId,
   getVCApprovers,
-  createVC,
-  signVC,
-  verifyVC,
-  getGenericVCData,
+  // createVC,
+  // signVC,
+  // verifyVC,
+  // getGenericVCData,
   verifyGenericVC,
   getGenericVCDataByCId,
 };
