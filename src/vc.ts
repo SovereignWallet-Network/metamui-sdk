@@ -25,14 +25,15 @@ import { buildConnection } from './connection';
 import { VCType } from './utils';
 import * as did from './did';
 import * as utils from './utils';
-// import { getFormattedTokenAmount } from './token';
-// import { createVC, signVC, verifyVC } from './verified_credentials';
+import { getFormattedTokenAmount } from './token';
+import { createVC, signVC, verifyVC } from './verified_credentials';
 import { default as axios } from 'axios';
 import { hexToU8a } from '@polkadot/util';
 import { SSID_BASE_URL } from './config';
 import { ApiPromise } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
 import { KeyringPair } from '@polkadot/keyring/types';
+import { submitTransaction } from './common/helper';
 
 /** Encodes Token VC and pads with appropriate bytes
  * @param  {Object} TokenVC
@@ -75,17 +76,17 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
  * @param  {String} vcProperty.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
-// async function createMintSlashVC({ vcId, currencyCode, amount }, api = false) {
-//   const provider = api || (await buildConnection('local'));
-//   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
-//   let vcProperty = {
-//     vc_id: vcId,
-//     currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-//     amount: utils.encodeData(tokenAmount, 'Balance'),
-//   };
-//   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
-//     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
-// }
+async function createMintSlashVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+  let vcProperty = {
+    vc_id: vcId,
+    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
+    amount: utils.encodeData(tokenAmount, 'Balance'),
+  };
+  return utils.encodeData(vcProperty, VCType.SlashMintTokens)
+    .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
+}
 
 /** Encodes Token VC and pads with appropriate bytes
  * @param  {Object} vcProperty
@@ -94,17 +95,17 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
  * @param  {String} vcProperty.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
-// async function createTokenTransferVC({ vcId, currencyCode, amount }, api = false) {
-//   const provider = api || (await buildConnection('local'));
-//   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
-//   let vcProperty = {
-//     vc_id: vcId,
-//     currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-//     amount: utils.encodeData(tokenAmount, 'Balance'),
-//   };
-//   return utils.encodeData(vcProperty, VCType.TokenTransferVC)
-//     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
-// }
+async function createTokenTransferVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+  let vcProperty = {
+    vc_id: vcId,
+    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
+    amount: utils.encodeData(tokenAmount, 'Balance'),
+  };
+  return utils.encodeData(vcProperty, VCType.TokenTransferVC)
+    .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
+}
 
 /** Encodes Generic VC and pads with appropriate bytes
  * @param  {Object} vcProperty
@@ -129,50 +130,50 @@ function createGenericVC({ cid }) {
  * @returns {String} VC Hex String
  */
 
-// async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair: KeyringPair, api: ApiPromise | null = null, ssidUrl: string | null = null) {
-//   let encodedVCProperty, encodedData, hash;
-//   switch (vcType) {
-//     case VCType.TokenVC:
-//       encodedVCProperty = createTokenVC(vcProperty);
-//       break;
-//     case VCType.MintTokens:
-//     case VCType.SlashTokens:
-//       encodedVCProperty = await createMintSlashVC(vcProperty, api);
-//       break;
-//     case VCType.TokenTransferVC:
-//       encodedVCProperty = await createTokenTransferVC(vcProperty, api);
-//       break;
-//     case VCType.GenericVC:
-//       encodedVCProperty = createGenericVC(vcProperty);
-//       let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
-//       hash = genericVCData.hash;
-//       break;
-//     default:
-//       throw new Error("Unknown VC Type");
-//   }
-//   owner = did.sanitiseDid(owner);
-//   issuers = issuers.map(issuer => did.sanitiseDid(issuer));
-//   if (vcType != VCType.GenericVC) {
-//     encodedData = utils.encodeData({
-//       vc_type: vcType,
-//       vc_property: encodedVCProperty,
-//       owner,
-//       issuers,
-//     }, "VC_HEX");
-//     hash = blake2AsHex(encodedData);
-//   }
-//   const sign = utils.bytesToHex(sigKeypair.sign(hash));
-//   let vcObject = {
-//     hash,
-//     owner,
-//     issuers,
-//     signatures: [sign],
-//     is_vc_used: false,
-//     vc_type: vcType,
-//     vc_property: encodedVCProperty,
-//   };
-//   return utils.encodeData(vcObject, 'VC');
-// }
+async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair: KeyringPair, api: ApiPromise, ssidUrl: string | null = null) {
+  let encodedVCProperty, encodedData, hash;
+  switch (vcType) {
+    case VCType.TokenVC:
+      encodedVCProperty = createTokenVC(vcProperty);
+      break;
+    case VCType.MintTokens:
+    case VCType.SlashTokens:
+      encodedVCProperty = await createMintSlashVC(vcProperty, api);
+      break;
+    case VCType.TokenTransferVC:
+      encodedVCProperty = await createTokenTransferVC(vcProperty, api);
+      break;
+    case VCType.GenericVC:
+      encodedVCProperty = createGenericVC(vcProperty);
+      let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
+      hash = genericVCData.hash;
+      break;
+    default:
+      throw new Error("Unknown VC Type");
+  }
+  owner = did.sanitiseDid(owner);
+  issuers = issuers.map(issuer => did.sanitiseDid(issuer));
+  if (vcType != VCType.GenericVC) {
+    encodedData = utils.encodeData({
+      vc_type: vcType,
+      vc_property: encodedVCProperty,
+      owner,
+      issuers,
+    }, "VC_HEX");
+    hash = blake2AsHex(encodedData);
+  }
+  const sign = utils.bytesToHex(sigKeypair.sign(hash));
+  let vcObject = {
+    hash,
+    owner,
+    issuers,
+    signatures: [sign],
+    is_vc_used: false,
+    vc_type: vcType,
+    vc_property: encodedVCProperty,
+  };
+  return utils.encodeData(vcObject, 'VC');
+}
 
 /**
 * Approve VC
@@ -182,14 +183,12 @@ function createGenericVC({ cid }) {
 * @returns {String} Transaction hash or Error
 */
 async function approveVC(vcId, signingKeyPair, api: ApiPromise, ssidUrl: string) {
-  return new Promise(async (resolve, reject) => {
-    try {
       const provider = api || (await buildConnection('local'));
 
       // fetching VC from chain
       let vc_details = await getVCs(vcId, provider);
       if (!vc_details) {
-        reject(new Error('VC not found'));
+        throw(new Error('VC not found'));
       }
       const vc = vc_details?.[0];
       let hash: string = '';
@@ -214,31 +213,8 @@ async function approveVC(vcId, signingKeyPair, api: ApiPromise, ssidUrl: string)
       const tx = provider.tx.vc.addSignature(vcId, sign);
 
       let nonce = await provider.rpc.system.accountNextIndex(signingKeyPair.address);
-      let signedTx = tx.sign(signingKeyPair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            //@ts-ignore
-            const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex())
-        }
-      });
-    } catch (e) {
-      reject(e);
-    }
-  });
+      let signedTx = await tx.signAsync(signingKeyPair, { nonce });
+      return submitTransaction(signedTx, provider);
 }
 
 
@@ -253,40 +229,14 @@ async function storeVC(
   vcHex: string,
   senderAccountKeyPair: KeyringPair,
   api: ApiPromise
-) {
-  return new Promise(async (resolve, reject) => {
-    try {
+) : Promise<string> {
       const provider = api || (await buildConnection('local'));
 
       const tx = provider.tx.vc.store(vcHex);
 
-      let nonce: any = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            //@ts-ignore
-            const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex())
-        }
-      });
-    } catch (err) {
-      // console.log(err);
-      reject(err);
-    }
-  });
+      let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+      let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
+      return submitTransaction(signedTx, provider);
 }
 
 /**
@@ -301,40 +251,15 @@ async function updateStatus(
   vcId,
   vcStatus,
   senderAccountKeyPair,
-  api: any = false,
+  api: ApiPromise,
 ) {
-  return new Promise(async (resolve, reject) => {
-    try {
       const provider = api || (await buildConnection('local'));
 
       const tx = provider.tx.vc.updateStatus(vcId, vcStatus);
 
       let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
-      let signedTx = tx.sign(senderAccountKeyPair, { nonce });
-      await signedTx.send(function ({ status, dispatchError }) {
-        console.log('Transaction status:', status.type);
-        if (dispatchError) {
-          if (dispatchError.isModule) {
-            // for module errors, we have the section indexed, lookup
-            const decoded = api.registry.findMetaError(dispatchError.asModule);
-            const { documentation, name, section } = decoded;
-            // console.log(`${section}.${name}: ${documentation.join(' ')}`);
-            reject(new Error(`${section}.${name}`));
-          } else {
-            // Other, CannotLookup, BadOrigin, no extra info
-            // console.log(dispatchError.toString());
-            reject(new Error(dispatchError.toString()));
-          }
-        } else if (status.isFinalized) {
-          // console.log('Finalized block hash', status.asFinalized.toHex());
-          resolve(signedTx.hash.toHex())
-        }
-      });
-    } catch (err) {
-      // console.log(err);
-      reject(err);
-    }
-  });
+      let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
+      return submitTransaction(signedTx, provider);
 }
 
 /**
@@ -467,9 +392,8 @@ async function verifyGenericVC(vcId, data, api: ApiPromise) {
 
 export {
   createTokenVC,
-  // generateVC,
+  generateVC,
   approveVC,
-  // doesSchemaExist,
   storeVC,
   updateStatus,
   getVCs,
@@ -477,9 +401,9 @@ export {
   getDIDByVCId,
   getVCHistoryByVCId,
   getVCApprovers,
-  // createVC,
-  // signVC,
-  // verifyVC,
+  createVC,
+  signVC,
+  verifyVC,
   getGenericVCData,
   verifyGenericVC,
   getGenericVCDataByCId,
