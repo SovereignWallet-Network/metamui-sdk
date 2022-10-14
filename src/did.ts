@@ -56,19 +56,17 @@ const generateDID = async (mnemonic: string, identifier: string, metadata = '') 
 };
 
 /**
- * Store the generated DID object in blockchain
- * @param {Object} DID
- * @param {Object} signingKeypair
+ * Create Private DID and store the generated DID object in blockchain
+ * @param vc_id
+ * @param identifier
+ * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {String} txnId Txnid for storage operation.
  */
 
-
-
-async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPair, api?: ApiPromise) {
+async function createPrivateDid(vc_id, identifier, signingKeypair: KeyringPair, api?: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
   // Check if identifier is available
-  const identifier = DID.private.identity;
   const did_hex = sanitiseDid(identifier);
 
   const didCheck = await did.resolveDIDToAccount(did_hex, provider);
@@ -77,19 +75,50 @@ async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPai
     throw(new Error('did.DIDAlreadyExists'));
   }
 
-  const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
-  if(pubkeyCheck) {
-    throw(new Error('did.PublicKeyRegistered'));
-  }
+  // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
+  // if(pubkeyCheck) {
+  //   throw(new Error('did.PublicKeyRegistered'));
+  // }
 
-  const tx = provider.tx.validatorCommittee.execute(
-    provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
-  );
+  const tx = provider.tx.did.createPrivate(vc_id, did_hex);
   // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
 }
+
+/**
+ * Create Private DID and store the generated DID object in blockchain
+ * @param vc_id
+ * @param identifier
+ * @param {KeyringPair} signingKeypair
+ * @param {ApiPromise} api
+ * @returns {String} txnId Txnid for storage operation.
+ */
+
+ async function createPublicDid(vc_id, identifier, signingKeypair: KeyringPair, api?: ApiPromise) {
+  const provider = api || (await buildConnection('local')) as ApiPromise;
+  // Check if identifier is available
+  const did_hex = sanitiseDid(identifier);
+
+  const didCheck = await did.resolveDIDToAccount(did_hex, provider);
+  if(didCheck != null) {
+    //return new Error('did.DIDAlreadyExists');
+    throw(new Error('did.DIDAlreadyExists'));
+  }
+
+  // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
+  // if(pubkeyCheck) {
+  //   throw(new Error('did.PublicKeyRegistered'));
+  // }
+
+  const tx = provider.tx.did.createPublic(vc_id, did_hex);
+  // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+  const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  const signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
 
 /**
  * Get did information from accountID
@@ -287,7 +316,8 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
 export {
   generateMnemonic,
   generateDID,
-  storeDIDOnChain,
+  createPrivateDid,
+  createPublicDid,
   getDIDDetails,
   updateDidKey,
   resolveDIDToAccount,
