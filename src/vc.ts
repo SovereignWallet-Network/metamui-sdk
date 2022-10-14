@@ -3,16 +3,79 @@ import { ApiPromise } from "@polkadot/api";
 import { KeyringPair } from "@polkadot/keyring/types";
 import { submitTransaction } from "./common/helper";
 import { sanitiseDid } from "./did";
+import { signatureVerify, blake2AsHex } from "@polkadot/util-crypto";
+import { hexToU8a } from "@polkadot/util";
+import { bool } from "@polkadot/types";
+import { HexString } from "@polkadot/util/types";
+import { AnyString } from "@polkadot/types/types";
+import { utils } from ".";
+import { decodeHex, hexToString } from "./utils";
+
+
+// 
+/**
+ * Encodes Token VC and pads with appropriate bytes
+ * @param {Object} TokenVC
+ * @param {String} TokenVC.tokenName
+ * @param {String} TokenVC.reservableBalance
+ * @param {String} TokenVC.decimal
+ * @param {String} TokenVC.currencyCode
+ * @returns {HexString} Token VC Hex String
+ */
+function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
+    if(!tokenName) {
+        throw new Error('Token name is required');
+    }
+    if(tokenName.length > utils.TOKEN_NAME_BYTES) {
+        throw new Error('Token name should not exceed 16 chars');
+    }
+    if(!currencyCode) {
+        throw new Error('Currency code is required');
+    }
+    if(currencyCode.length > utils.CURRENCY_CODE_BYTES) {
+        throw new Error('Currency Code should not exceed 8 chars');
+    }
+    if(!utils.isUpperAndValid(currencyCode)){
+        throw new Error('Only Upper case characters with no space are allowed for currency code');
+    }
+    let vcProperty = {
+        token_name: utils.encodeData(tokenName.padEnd(utils.TOKEN_NAME_BYTES, '\0'), 'token_bytes'),
+        reservable_balance: utils.encodeData(reservableBalance*(Math.pow(10,decimal)), 'Balance'),
+        decimal: utils.encodeData(decimal, 'decimal'),
+        currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
+    };
+    return utils.encodeData(vcProperty, utils.VCType.TokenVC)
+        .padEnd((utils.VC_PROPERTY_BYTES * 2)+2, '0'); // *2 for hex and +2 bytes for 0x
+}
+
+
+
+
+// Common VC Functions - 
+// create_vc, 
+// sign_vc, 
+// verify_vc, 
+// decode_vc, 
+// encode_vc, 
+// encode_vc_property, 
+// decode_vc_property
+
+
+
+
+
+
+
 
 // Chain State Query Functions
 
 /**
  * Lookup a VC 
- * @param {String} did VC Owner's did
- * 
+ * @param {AnyString} did VC Owner's did
+ * @param {ApiPromise} api
  */
 async function getVCIdsByDID(
-  did, 
+  did: AnyString, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -22,12 +85,12 @@ async function getVCIdsByDID(
 
 /**
  * Reverse lookup a VC ID
- * @param {String} vcId
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {HexString} vcId
+ * @param {ApiPromise} api
+ * @returns {String}
  */
 async function getDIDByVCId(
-  vcId, 
+  vcId: HexString, 
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection('local'));
@@ -37,12 +100,12 @@ async function getDIDByVCId(
 
 /**
  * Get VCs by VC ID
- * @param {String} vcId
+ * @param {HexString} vcId
  * @param {ApiPromise} api
  * @returns {String}
  */
 async function getVCs(
-  vcId, 
+  vcId: HexString, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -52,12 +115,12 @@ async function getVCs(
 
 /**
  * Get VC Approver List from the chain
- * @param {String} vcId
- * @param {APIPromise} api
+ * @param {HexString} vcId
+ * @param {ApiPromise} api
  * @returns {String}
  */
 async function getVCApprovers(
-  vcId, 
+  vcId: HexString, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -67,12 +130,12 @@ async function getVCApprovers(
 
 /**
  * Get VC History using vcId
- * @param {String} vcId
- * @param {APIPromise} api
+ * @param {HexString} vcId
+ * @param {ApiPromise} api
  * @returns {String}
  */
 async function getVCHistoryByVCId(
-  vcId, 
+  vcId: HexString, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -83,15 +146,15 @@ async function getVCHistoryByVCId(
 
 /**
  * Add Signature to a VC ID
- * @param {String} vcId
- * @param {String} sign
+ * @param {HexString} vcId
+ * @param {HexString} sign
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {HexString}
  */
 async function addSign(
-  vcId,
-  sign,
+  vcId: HexString,
+  sign: HexString,
   senderAccountKeyPair: KeyringPair,
   api: ApiPromise,
 ) {
@@ -104,13 +167,13 @@ async function addSign(
 
 /**
  * Store VCHex to the chain
- * @param {String} vcHex
+ * @param {HexString} vcHex
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
+ * @param {ApiPromise} api
  * @returns {hexString}
  */
 async function storeVC(
-  vcHex, 
+  vcHex: HexString, 
   senderAccountKeyPair: KeyringPair, 
   api: ApiPromise
 ) {
@@ -124,14 +187,14 @@ async function storeVC(
 /**
  * Update Status of a VC ID
  * @param {String} vcId
- * @param {String} status
+ * @param {Boolean} vcStatus
  * @param {KeyringPair} senderAccountKeyPair
  * @param {APIPromise} api
  * @returns {hexString}
  */
 async function updateStatus(
-  vcId,
-  vcStatus,
+  vcId: HexString,
+  vcStatus: bool,
   senderAccountKeyPair: KeyringPair,
   api: ApiPromise,
 ) {
@@ -142,6 +205,64 @@ async function updateStatus(
     return submitTransaction(signedTx, provider);
 }
 
+// Util Functions - Encode Decode
+
+
+ /** function that decodes hex of createTokenVC
+ * @param  {String} hexValue Hex String to be decoded
+ * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | String} Decoded Object/String
+ */
+  function getVCProperty(hexValue, VCType) {
+    let vcs = decodeHex(hexValue, VCType);
+    if(Boolean(vcs.token_name))
+      vcs["token_name"] = hexToString(vcs.token_name);
+    if(Boolean(vcs.currency_code))
+      vcs["currency_code"] = hexToString(vcs.currency_code);
+    return vcs;
+   }
+  
+/** function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
+ * @param  {String} hexValue Hex String to be decoded
+ * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | String} Decoded Object/String
+ */
+function decodeVC(hexValue, VCType) {
+    let vcs = decodeHex(hexValue, VCType);
+    vcs["owner"] = hexToString(vcs.owner);
+    let issuer_did: any = [];
+    for(let i=0; i<vcs.issuers.length; i++){
+        issuer_did.push(hexToString(vcs.issuers[i]));
+    }
+    vcs["issuers"] = issuer_did;
+    switch(vcs.vc_type) {
+        case VCType.MintTokens:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.SlashMintTokens);
+        break;
+        case VCType.TokenVC:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, vcs.vc_type);
+        break;
+        case VCType.SlashTokens:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.SlashMintTokens);
+        break;
+        case VCType.TokenTransferVC:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.TokenTransferVC);
+        break;
+        case VCType.GenericVC:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.GenericVC);
+        break;
+        case VCType.PublicDidVC:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.PublicDidVC);
+        break;
+        case VCType.PrivateDidVC:
+        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.PrivateDidVC);
+        default:
+        throw new Error("Unknown Type");
+    }
+    return vcs;
+}
+
+
 export {
     getVCIdsByDID,
     getDIDByVCId,
@@ -150,5 +271,7 @@ export {
     getVCHistoryByVCId,
     addSign,
     storeVC,
-    updateStatus,    
+    updateStatus,
+    decodeVC,
+    getVCProperty,
 };
