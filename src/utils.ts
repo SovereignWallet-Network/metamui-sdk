@@ -10,6 +10,8 @@ const VCType = {
   TokenTransferVC: "TokenTransferVC",
   SlashMintTokens: "SlashMintTokens",
   GenericVC: "GenericVC",
+  PublicDidVC: "PublicDidVC",
+  PrivateDidVC: "PrivateDidVC",
 };
 Object.freeze(VCType);
 
@@ -24,17 +26,25 @@ const METABLOCKCHAIN_TYPES = {
 
   "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
   "CompanyName": "BoundedVec<u8, MaxCompNameLen>",
+  "PrivateDidVC": {
+    "public_key": "public_key",
+    "metadata": "metadata"
+  },
+  "PublicDidVC": {
+    "public_key": "public_key",
+    "metadata": "metadata",
+    "registration_number": "RegistrationNumber",
+    "company_name": "CompanyName"
+  },
   "PrivateDid": {
-    "identifier": "identifier",
     "public_key": "public_key",
     "metadata": "metadata"
   },
   "PublicDid": {
-    "identifier": "identifier",
     "public_key": "public_key",
     "metadata": "metadata",
     "registration_number": "RegistrationNumber",
-    "comapny_name": "CompanyName"
+    "company_name": "CompanyName"
   },
   "Did": "[u8;32]",
   "DIDType": {
@@ -63,6 +73,7 @@ const METABLOCKCHAIN_TYPES = {
     "issuers": "Vec<Did>",
     "signatures": "Vec<Signature>",
     "is_vc_used": "bool",
+    "is_vc_active": "bool",
     "vc_type": "VCType",
     "vc_property": "[u8;128]"
   },
@@ -72,7 +83,9 @@ const METABLOCKCHAIN_TYPES = {
       "SlashTokens",
       "MintTokens",
       "TokenTransferVC",
-      "GenericVC"
+      "GenericVC",
+      "PublicDidVC",
+      "PrivateDidVC"
     ]
   },
   "TokenVC": {
