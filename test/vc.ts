@@ -21,7 +21,7 @@ describe('VC works correctly', () => {
   let sigKeypairBob: KeyringPair;
   let signKeypairEve: KeyringPair;
   let signKeypairDave: KeyringPair;
-  let actualHex: string;
+  let actualHex: HexString;
   let ssidUrl: string;
   let eveSign: string;
   const TEST_DAVE_DID = "did:ssid:dave";
@@ -296,10 +296,23 @@ describe('VC works correctly', () => {
   //     }
   //   })
 
-  //   it('Store VC works correctly', async () => {
-  //     const transaction: any = await storeVC(actualHex, sigKeypairBob, sigKeypair, signKeypairDave, provider);
-  //     assert.doesNotReject(transaction);
-  //   });
+    it('Store VC works correctly', async () => {
+      let owner = TEST_DID;
+      let issuers = [
+        TEST_SWN_DID,
+        EVE_DID,
+        TEST_DAVE_DID
+      ];
+      let tokenVC = {
+        tokenName: 'test',
+        reservableBalance: 1000,
+        decimal: 6,
+        currencyCode: 'OTH',
+      };
+      actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
+      const transaction: any = await vc.storeVC(actualHex, sigKeypair, provider);
+      assert.doesNotReject(transaction);
+    });
 
   //   it('Get VC Ids by DID after storing VC works correctly', async () => {
   //     const vcs = await vc.getVCIdsByDID(TEST_DID, provider);

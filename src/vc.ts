@@ -422,7 +422,7 @@ async function storeVC(
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection("local"));
-    const tx = provider.tx.vc.store(vcHex);
+    const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
