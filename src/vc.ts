@@ -62,7 +62,6 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
   let vcProperty = {
     vc_id: vcId,
-    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
     amount: utils.encodeData(tokenAmount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
@@ -84,7 +83,6 @@ async function createTokenTransferVC({ vcId, currencyCode, amount }, api?: ApiPr
   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
   let vcProperty = {
     vc_id: vcId,
-    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
     amount: utils.encodeData(tokenAmount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.TokenTransferVC)
