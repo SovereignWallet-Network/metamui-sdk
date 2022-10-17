@@ -9,6 +9,7 @@ import * as utils from '../src/utils';
 import { removeDid, storeVC, sudoStoreVC } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
+import { HexString } from '@polkadot/util/types';
 
 describe('VC works correctly', () => {
   let sigKeypair: KeyringPair;
@@ -183,7 +184,7 @@ describe('VC works correctly', () => {
   // });
 
   if (constants.providerNetwork == 'local') {
-    let vcId: string = '';
+    let vcId: any = '';
 
     before(async () => {
       if (constants.providerNetwork == 'local') {
@@ -257,7 +258,7 @@ describe('VC works correctly', () => {
 
     it('Get VC Ids by DID after storing VC works correctly', async () => {
       const vcs = await vc.getVCIdsByDID(TEST_DID, provider);
-      vcId = vcs ? [vcs?.['length'] - 1];
+      vcId = vcs || [vcs?.['length'] - 1];
       assert.strictEqual(vcs?.['length'] > 0, true);
     });
 
@@ -314,10 +315,10 @@ describe('VC works correctly', () => {
       const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypair, provider, ssidUrl);
       const transaction: any = await vc.storeVC(vcHex, sigKeypairBob, provider);
       const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
-      vcId = vcsByDid ? [vcsByDid?.['length'] - 1];
+      vcId = vcsByDid || [vcsByDid?.['length'] - 1];
       await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
       assert.doesNotReject(transaction);
-      let data = await vc.getGenericVCData(vcId, ssidUrl, provider);
+      let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
       let verifyData = await vc.verifyGenericVC(data.vcId, data.data, provider);
       assert.strictEqual(verifyData, true);
     });
@@ -338,8 +339,8 @@ describe('VC works correctly', () => {
       actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
       await sudoStoreVC(actualHex, sigKeypair, provider);
       const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
-      vcId = vcsByDid ? [vcsByDid?.['length'] - 1];
-      let vcs = await vc.getVCs(vcId, provider);
+      vcId = vcsByDid || [vcsByDid?.['length'] - 1];
+      let vcs:any = await vc.getVCs(vcId, provider);
       assert.strictEqual(vcs[1], 'Inactive');
       await vc.approveVC(vcId, signKeypairEve, provider);
       vcs = await vc.getVCs(vcId, provider);

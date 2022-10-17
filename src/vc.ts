@@ -57,7 +57,7 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
- async function createMintSlashVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+ async function createMintSlashVC({ vcId, currencyCode, amount }, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
   let vcProperty = {
@@ -79,7 +79,7 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} vcProperty.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
-async function createTokenTransferVC({ vcId, currencyCode, amount }, api: ApiPromise) {
+async function createTokenTransferVC({ vcId, currencyCode, amount }, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
   let vcProperty = {
@@ -154,7 +154,7 @@ function createPrivateDidVC({ public_key, metadata }) {
  * @returns {String} VC Hex String
  */
 
- async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api: ApiPromise, ssidUrl: string) {
+ async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api?: ApiPromise, ssidUrl?: string) {
   let encodedVCProperty, encodedData, hash;
   switch (vcType) {
     case VCType.TokenVC:
@@ -293,7 +293,7 @@ async function getVCHistoryByVCId(
  * @param {ApiPromise} api
  * @returns {JSON} Generic VC data
  */
- async function getGenericVCDataByCId(cid, ssidUrl: string) {
+ async function getGenericVCDataByCId(cid, ssidUrl?: string) {
   ssidUrl = ssidUrl || SSID_BASE_URL.local;
   let body = {
     action: "get_vc",
@@ -369,28 +369,50 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
 // Extrinsics Functions
 
 /**
- * Add Signature to a VC ID
- * @param {HexString} vcId
- * @param {HexString} sign
- * @param {KeyringPair} senderAccountKeyPair
- * @param {ApiPromise} api
- * @returns {HexString}
- */
-async function addSign(
-  vcId: HexString,
-  sign: HexString,
-  senderAccountKeyPair: KeyringPair,
-  api: ApiPromise,
-) {
-    const provider = api || (await buildConnection("local"));
+* Approve VC
+* @param  {HexString} vcID vc_id of VC to be approved
+* @param  {KeyPair} senderAccountKeyPair Issuer Key Ring pair
+* @param {APIPromise} api
+* @returns {String} Transaction hash or Error
+*/
+async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api: ApiPromise, ssidUrl?: string) {
+    const provider = api || (await buildConnection('local'));
+
+    // fetching VC from chain
+    let vc_details = await getVCs(vcId, provider);
+    if (!vc_details) {
+      throw new Error('VC not found');
+    }
+
+    const vc = vc_details[0];
+    let hash: string = '';
+
+    // generating the signature
+    if (vc.vc_type != VCType.GenericVC) {
+      const encodedData = utils.encodeData({
+        vc_type: vc['vc_type'],
+        vc_property: vc['vc_property'],
+        owner: vc['owner'],
+        issuers: vc['issuers']
+      }, "VC_HEX");
+      hash = blake2AsHex(encodedData);
+    } else {
+      const vcProperty = getVCProperty(vc.vc_property, vc.vc_type);
+      let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
+      hash = genericVCData.hash;
+    }
+    const sign = utils.bytesToHex(senderAccountKeyPair.sign(hash));
+
+    // adding signature to the chain
     const tx = provider.tx.vc.addSignature(vcId, sign);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
 }
 
+
 /**
- * Store VCHex to the chain
+ * Store VC Hex in the chain
  * @param {HexString} vcHex
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
@@ -418,7 +440,7 @@ async function storeVC(
  */
 async function updateStatus(
   vcId: HexString,
-  vcStatus: bool,
+  vcStatus,
   senderAccountKeyPair: KeyringPair,
   api: ApiPromise,
 ) {
@@ -526,7 +548,7 @@ export {
     getGenericVCData,
     generateVC,
     verifyGenericVC,
-    addSign,
+    approveVC,
     storeVC,
     updateStatus,
     decodeVC,
