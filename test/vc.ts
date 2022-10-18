@@ -12,6 +12,7 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
 import { u8aToHex, u8aToString } from '@polkadot/util';
 import { VCType } from '../src/utils';
+
 describe('VC works correctly', () => {
   let sigKeypair: KeyringPair;
   const TEST_DID = 'did:ssid:rocket';
@@ -296,21 +297,22 @@ describe('VC works correctly', () => {
   //     }
   //   })
 
-    it('Store VC works correctly', async () => {
-      let owner = TEST_DID;
-      let issuers = [
-        TEST_SWN_DID,
-        EVE_DID,
-        TEST_DAVE_DID
-      ];
-      let tokenVC = {
-        tokenName: 'test',
-        reservableBalance: 1000,
-        decimal: 6,
-        currencyCode: 'OTH',
+    it.only('Store VC works correctly', async () => {
+      let owner = did.sanitiseDid("did:ssid:bob");
+      let privateDidVCObj = {
+        public_key: sigKeypairBob.publicKey,
+        metadata: "Testing Bob"
       };
-      actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
-      const transaction: any = await vc.storeVC(actualHex, sigKeypair, provider);
+      let issuers = [
+        "did:ssid:swn",
+        "did:ssid:alice"
+      ];
+      
+      let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypair);
+      const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
+      console.log("BobHex: \n", BobHex);
+      console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
+      console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
       assert.doesNotReject(transaction);
     });
 

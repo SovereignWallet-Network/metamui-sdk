@@ -115,7 +115,7 @@ function createGenericVC({ cid }) {
  */
 function createPublicDidVC({ public_key, metadata, registration_number, company_name }) {
   let vcProperty = {
-    public_key: utils.encodeData(public_key, 'public_key'),
+    public_key: utils.encodeData(public_key, 'PublicKey'),
     metadata: utils.encodeData(metadata, 'metadata'),
     registration_number: utils.encodeData(registration_number, 'RegistrationNumber'),
     company_name: utils.encodeData(company_name, 'CompanyName'),
@@ -134,7 +134,7 @@ function createPublicDidVC({ public_key, metadata, registration_number, company_
  */
 function createPrivateDidVC({ public_key, metadata }) {
   let vcProperty = {
-    public_key: utils.encodeData(public_key, 'public_key'),
+    public_key: utils.encodeData(public_key, 'PublicKey'),
     metadata: utils.encodeData(metadata, 'metadata'),
   };
   return utils.encodeData(vcProperty, VCType.PrivateDidVC)

@@ -23,8 +23,7 @@ const METABLOCKCHAIN_TYPES = {
   "identifier": "[u8;32]",
   "public_key": "[u8;32]",
   "metadata": "BoundedVec<u8, MaxMetadata>",
-  "vc_prop_len": "ConstU32<128>",
-  "vc_prop": "BoundedVec<u8, vc_prop_len>",
+  "VCProp": "[u8;160]",
 
   "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
   "CompanyName": "BoundedVec<u8, MaxCompNameLen>",
@@ -77,7 +76,7 @@ const METABLOCKCHAIN_TYPES = {
     "is_vc_used": "bool",
     "is_vc_active": "bool",
     "vc_type": "VCType",
-    "vc_property": "vc_prop"
+    "vc_property": "VCProp"
   },
   "VCType": {
     "_enum": [
@@ -162,7 +161,7 @@ const METABLOCKCHAIN_TYPES = {
 const ENCODE_TYPES = {
   "VC_HEX": {
     "vc_type": "VCType",
-    "vc_property": "vc_prop",
+    "vc_property": "VCProp",
     "owner": "Did",
     "issuers": "Vec<Did>"
   },
@@ -174,7 +173,7 @@ const ENCODE_TYPES = {
 
 const TOKEN_NAME_BYTES = 16;
 const CURRENCY_CODE_BYTES = 8;
-const VC_PROPERTY_BYTES = 128;
+const VC_PROPERTY_BYTES = 160;
 const CID_BYTES = 64;
 
 /**
