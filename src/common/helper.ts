@@ -4,8 +4,12 @@ import { ISubmittableResult } from "@polkadot/types/types";
 
 function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittableResult>, api:ApiPromise): Promise<any> {
     console.log("Submit Txn Called");
+    let returnObj:any = {
+        transactionHash: "",
+        events: [],
+    };
     return new Promise(async (resolve, reject) => {
-        await signedTx.send(function ({ status, dispatchError }) {
+        await signedTx.send(function ({ status, events, dispatchError }) {
             console.log('Transaction status:', status.type);
             if (dispatchError) {
                 if (dispatchError.isModule) {
@@ -19,8 +23,18 @@ function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittable
                     reject(new Error(dispatchError.toString()));
                 }
             } else if (status.isFinalized) {
-                console.log('Finalized block hash', status.asFinalized.toHex());
-                resolve(signedTx.hash.toHex())
+                // console.log('Finalized block hash', status.asFinalized.toHex());
+                events.forEach(({ phase, event: { data, method, section } }) => {
+                    // console.log('\t', phase.toString(), `: ${section}.${method}`, data.toHuman());
+                    returnObj.events.push({
+                        section,
+                        method,
+                        data: data.toHuman(),
+                    });
+                });
+                returnObj.transactionHash = signedTx.hash.toHex();
+                console.log(returnObj);
+                resolve(returnObj)
             }
         });
     });

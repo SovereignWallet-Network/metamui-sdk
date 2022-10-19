@@ -26,7 +26,7 @@ describe('VC works correctly', () => {
   let signKeypairFenn: KeyringPair;
   let actualHex: HexString;
   let ssidUrl: string;
-  let eveSign: string;
+  let swnSign: any;
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
 
@@ -43,7 +43,6 @@ describe('VC works correctly', () => {
   });
 
   it('VC is created in correct format', async () => {
-    console.log("///  Test Case 1 /// TokenVC Creation");
     let tokenVC = {
       tokenName: 'test',
       reservableBalance: 1000,
@@ -56,9 +55,9 @@ describe('VC works correctly', () => {
       EVE_DID,
     ];
     actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
-    console.log("Generated TokenVC Hex: \n", actualHex);
+    // console.log("Generated TokenVC Hex: \n", actualHex);
     let actualObject = utils.decodeHex(actualHex, 'VC');
-    console.log("Decoded TokenVC Object: \n", actualObject);
+    // console.log("Decoded TokenVC Object: \n", actualObject);
     let expectedObject = {
       hash: '0x1bfef48398ef3adcc90370f64c22d520ed45280455f6ef7df369005dd51989c7',
       owner: did.sanitiseDid(TEST_DID),
@@ -81,7 +80,7 @@ describe('VC works correctly', () => {
   });
 
   it('Mint Token VC is created correctly', async () => {
-    console.log("///  Test Case 2 /// Mint TokenVC Creation");
+    // console.log("///  Test Case 2 /// Mint TokenVC Creation");
     let vc_property = {
       vc_id: '0x33abedba92bb1acd284419f93e687590af928c268b633786e61b2f2c5635662d',
       currency_code: utils.encodeData('OTH'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
@@ -94,46 +93,46 @@ describe('VC works correctly', () => {
     assert.strictEqual(vc_property.amount, actual_vc_property.amount);
   });
 
-  it('PublicDidVC is created in correct format', async () => {
-    console.log("///  Test Case 3 /// PublicDidVC Creation");
-    let vc_property = {
-      public_key: sigKeypair.publicKey,
-      metadata: 'test metadata',
-      registration_number: "123456",
-      company_name: 'Alice and Co', 
-    };
-    let owner = TEST_DID; // did:ssid:rocket
-    let issuers = [
-      TEST_SWN_DID, // did:ssid:swn
-      EVE_DID, // did:ssid:eve
-    ];
-    const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypair);
-    console.log("Generated PublicDidVC Hex: \n", publicDidObj);
-    const actualObject = utils.decodeHex(publicDidObj, "VC");
-    console.log("Decoded PublicDidVC Object: \n", actualObject);
-    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
-  });
+  // it('PublicDidVC is created in correct format', async () => {
+  //   console.log("///  Test Case 3 /// PublicDidVC Creation");
+  //   let vc_property = {
+  //     public_key: sigKeypair.publicKey,
+  //     did: 'did:ssid:alice',
+  //     registration_number: "123456",
+  //     company_name: 'Alice and Co', 
+  //   };
+  //   let owner = TEST_DID; // did:ssid:rocket
+  //   let issuers = [
+  //     TEST_SWN_DID, // did:ssid:swn
+  //     EVE_DID, // did:ssid:eve
+  //   ];
+  //   const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
+  //   console.log("Generated PublicDidVC Hex: \n", publicDidObj);
+  //   const actualObject = utils.decodeHex(publicDidObj, "VC");
+  //   console.log("Decoded PublicDidVC Object: \n", actualObject);
+  //   assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
+  //   console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
+  // });
 
-  it('PrivateDidVC is created in correct format', async () => {
-    console.log("///  Test Case 4 /// PrivateDidVC Creation");
-    let vc_property = {
-      public_key: signKeypairDave.publicKey,
-      metadata: 'dave metadata',
-    };
-    let owner = TEST_DAVE_DID; // did:ssid:dave
-    let issuers = [
-      TEST_SWN_DID, // did:ssid:swn
-    ];
-    const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, signKeypairDave);
-    console.log("Generated PrivateDidVC Hex: \n", privateDidObj);
-    const actualObject = utils.decodeHex(privateDidObj, "VC");
-    console.log("Decoded PrivateDidVC Object: \n", actualObject);
-    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    console.log("decoded private did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
-  });
+  // it('PrivateDidVC is created in correct format', async () => {
+  //   console.log("///  Test Case 4 /// PrivateDidVC Creation");
+  //   let owner = did.sanitiseDid(TEST_DAVE_DID); // did:ssid:dave
+  //   let vc_property = {
+  //     public_key: signKeypairDave.publicKey,
+  //     did: 'did:ssid:dave',
+  //   };
+  //   let issuers = [
+  //     TEST_SWN_DID, // did:ssid:swn
+  //   ];
+  //   const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, sigKeypairValidator);
+  //   console.log("Generated PrivateDidVC Hex: \n", privateDidObj);
+  //   const actualObject = utils.decodeHex(privateDidObj, "VC");
+  //   console.log("Decoded PrivateDidVC Object: \n", actualObject);
+  //   assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
+  //   console.log("decoded private did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
+  // });
 
-  it.only('Store VC works correctly', async () => {
+  it('Store PrivateDidVC works correctly', async () => {
     let owner = did.sanitiseDid("did:ssid:bob");
     let privateDidVCObj = {
       public_key: signKeypairFenn.publicKey,
@@ -148,177 +147,103 @@ describe('VC works correctly', () => {
     console.log("BobHex: \n", BobHex);
     console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
     console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
-    const transaction: any = await vc.storeVC(BobHex, sigKeypairValidator, provider);
+    const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
     assert.doesNotReject(transaction);
   });
 
-  // it('VC creation fails token name is not given', async () => {
-  //   let tokenVC = {
-  //     reservableBalance: 1000,
-  //   };
-  //   let owner = TEST_DID;
-  //   let issuers = [
-  //     TEST_SWN_DID,
-  //     EVE_DID,
-  //   ];
-  //   try {
-  //     await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairBob);
-  //   } catch (e) {
-  //     assert.strictEqual(e.message, "Token name is required");
-  //   }
-  // });
+  it('VC creation fails token name is not given', async () => {
+    let tokenVC = {
+      reservableBalance: 1000,
+    };
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+    try {
+      await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    } catch (e) {
+      assert.strictEqual(e.message, "Token name is required");
+    }
+  });
 
-  // it('VC creation fails when token name length exceeds limit', async () => {
-  //   let tokenVC = {
-  //     tokenName: 'abcdefghijlkmnopq',
-  //     reservableBalance: 1000,
-  //     decimal: 6,
-  //     currencyCode: 'OTH',
-  //   };
-  //   let owner = TEST_DID;
-  //   let issuers = [
-  //     TEST_SWN_DID,
-  //     EVE_DID,
-  //   ];
-  //   try {
-  //     await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairBob);
-  //   } catch (e) {
-  //     assert.strictEqual(e.message, "Token name should not exceed 16 chars");
-  //   }
-  // });
+  it('VC creation fails when token name length exceeds limit', async () => {
+    let tokenVC = {
+      tokenName: 'abcdefghijlkmnopq',
+      reservableBalance: 1000,
+      decimal: 6,
+      currencyCode: 'OTH',
+    };
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+    try {
+      await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    } catch (e) {
+      assert.strictEqual(e.message, "Token name should not exceed 16 chars");
+    }
+  });
 
-  // it('VC creation fails when currency code is not valid', async () => {
-  //   let tokenVC = {
-  //     tokenName: 'test',
-  //     reservableBalance: 1000,
-  //     currencyCode: 'abc'
-  //   };
-  //   let owner = TEST_DID;
-  //   let issuers = [
-  //     TEST_SWN_DID,
-  //     EVE_DID,
-  //   ];
-  //   try {
-  //     await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairBob);
-  //   } catch (e) {
-  //     assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
-  //   }
-  //   tokenVC.currencyCode = 'ABC12';
-  //   try {
-  //     await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairBob);
-  //   } catch (e) {
-  //     assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
-  //   }
-  //   tokenVC.currencyCode = 'AB C ';
-  //   try {
-  //     await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairBob);
-  //   } catch (e) {
-  //     assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
-  //   }
-  // });
+  it('VC creation fails when currency code is not valid', async () => {
+    let tokenVC = {
+      tokenName: 'test',
+      reservableBalance: 1000,
+      decimal: 6,
+      currencyCode: 'abc'
+    };
+    let owner = TEST_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+    try {
+      await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    } catch (e) {
+      assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
+    }
+    tokenVC.currencyCode = 'ABC12';
+    try {
+      await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    } catch (e) {
+      assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
+    }
+    tokenVC.currencyCode = 'AB C ';
+    try {
+      await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    } catch (e) {
+      assert.strictEqual(e.message, "Only Upper case characters with no space are allowed for currency code");
+    }
+  });
 
   // Note: Since we are not generating the signature independtly any more, no need to test the signature generation sperately
   // appoveVC is test is enough to test the signature generation 
-  // it('VC is signed in correct format', async () => {
-  //   let tokenVC = {
-  //     tokenName: 'test',
-  //     reservableBalance: 1000,
-  //     decimal: 6,
-  //     currencyCode: 'OTH',
-  //   };
+  it('VC is signed in correct format', async () => {
+    let tokenVC = {
+      tokenName: 'test',
+      reservableBalance: 1000,
+      decimal: 6,
+      currencyCode: 'OTH',
+    };
 
-  //   let owner = TEST_DID;
-  //   let issuers = [
-  //     TEST_SWN_DID,
-  //     EVE_DID,
-  //   ];
-  //   const toSign = {
-  //     vcType: "TokenVC",
-  //     vcProperty: tokenVC,
-  //     owner,
-  //     issuers,
-  //   }
-  //   eveSign = vc.approveVC(toSign, signKeypairEve);
-  //   owner = did.sanitiseDid(owner);
-  //   issuers = issuers.map(issuer => did.sanitiseDid(issuer));
-  //   const encodedData = utils.encodeData({
-  //     vc_type: "TokenVC",
-  //     vc_property: vc.createTokenVC(tokenVC),
-  //     owner,
-  //     issuers,
-  //   }, "VC_HEX");
-  //   const hash = blake2AsHex(encodedData);
-  //   let isSignValid = signatureVerify(hash, hexToU8a(eveSign), signKeypairEve.publicKey).isValid;
-  //   assert.strictEqual(isSignValid, true);
-  // });
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+
+    let tokenHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
+    let vcIdToApprove = await vc.storeVC(tokenHex, sigKeypair, provider);
+
+    //let transaction = await vc.approveVC(vcIdToApprove, sigKeypairValidator, provider);
+
+    assert.doesNotReject(vcIdToApprove);
+    // assert.doesNotReject(transaction);
+  });
 
   // if (constants.providerNetwork == 'local') {
   //   let vcId: any = '';
-
-  //   before(async () => {
-  //     if (constants.providerNetwork == 'local') {
-  //       const didObj = {
-  //         private:
-  //         {
-  //           public_key: sigKeypairBob?.publicKey, // this is the public key linked to the did
-  //           identity: TEST_DID, // this is the actual did
-  //           metadata: 'Metadata',
-  //         }
-  //       };
-  //       try {
-  //         await did.storeDIDOnChain(didObj, sigKeypair, provider);
-  //       } catch (err) { }
-  //       try {
-  //         const didObjDave = {
-  //           private:
-  //           {
-  //             public_key: signKeypairDave?.publicKey, // this is the public key linked to the did
-  //             identity: TEST_DAVE_DID, // this is the actual did
-  //             metadata: 'Metadata',
-  //           }
-  //         };
-  //         await did.storeDIDOnChain(didObjDave, sigKeypair, provider);
-  //       } catch (err) { }
-  //       try {
-  //         const didObjEve = {
-  //           private:
-  //           {
-  //             public_key: signKeypairEve?.publicKey, // this is the public key linked to the did
-  //             identity: EVE_DID, // this is the actual did
-  //             metadata: 'Metadata',
-  //           }
-  //         };
-  //         await did.storeDIDOnChain(didObjEve, sigKeypair, provider);
-  //       } catch (err) { }
-
-  //       try {
-  //         const didObjDave = {
-  //           private:
-  //           {
-  //             public_key: signKeypairDave?.publicKey, // this is the public key linked to the did
-  //             identity: TEST_DAVE_DID, // this is the actual did
-  //             metadata: 'Metadata',
-  //           }
-  //         };
-  //         await did.storeDIDOnChain(didObjDave, sigKeypair, provider);
-  //       } catch (err) { }
-
-  //       const didObjEve = {
-  //         private:
-  //         {
-  //           public_key: signKeypairEve?.publicKey, // this is the public key linked to the did
-  //           identity: EVE_DID, // this is the actual did
-  //           metadata: 'Metadata',
-  //         }
-  //       };
-  //       try {
-  //         await did.storeDIDOnChain(didObjEve, sigKeypair, provider);
-  //       } catch (err) { }
-
-  //       const nonce = await provider.rpc.system.accountNextIndex(sigKeypair.address);
-  //       await tx.transfer(sigKeypair, TEST_DID, 20000000, provider, nonce);
-  //     }
-  //   })
 
   //   it('Get VC Ids by DID after storing VC works correctly', async () => {
   //     const vcs = await vc.getVCIdsByDID(TEST_DID, provider);
