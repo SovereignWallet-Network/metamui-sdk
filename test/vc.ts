@@ -19,9 +19,11 @@ describe('VC works correctly', () => {
   const EVE_DID = 'did:ssid:eve';
   var provider: ApiPromise;
   let keyring: Keyring;
+  let sigKeypairValidator: KeyringPair;
   let sigKeypairBob: KeyringPair;
   let signKeypairEve: KeyringPair;
   let signKeypairDave: KeyringPair;
+  let signKeypairFenn: KeyringPair;
   let actualHex: HexString;
   let ssidUrl: string;
   let eveSign: string;
@@ -31,11 +33,13 @@ describe('VC works correctly', () => {
   before(async () => {
     keyring = await initKeyring();
     sigKeypair = keyring.addFromUri('//Alice');
+    sigKeypairValidator = keyring.addFromUri('//Swn');
     provider = await buildConnection(constants.providerNetwork);
     ssidUrl = SSID_BASE_URL[constants.providerNetwork];
     sigKeypairBob = keyring.addFromUri('//Bob');
     signKeypairEve = keyring.addFromUri('//Eve');
     signKeypairDave = keyring.addFromUri('//Dave');
+    signKeypairFenn = keyring.addFromUri('//Fenn');
   });
 
   it('VC is created in correct format', async () => {
@@ -132,19 +136,19 @@ describe('VC works correctly', () => {
   it.only('Store VC works correctly', async () => {
     let owner = did.sanitiseDid("did:ssid:bob");
     let privateDidVCObj = {
-      public_key: sigKeypairBob.publicKey,
-      metadata: "Testing Bob"
+      public_key: signKeypairFenn.publicKey,
+      did: "did:ssid:fenn"
     };
     let issuers = [
       "did:ssid:swn",
       "did:ssid:alice"
     ];
     
-    let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypair);
-    const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
+    let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator);
     console.log("BobHex: \n", BobHex);
     console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
     console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
+    const transaction: any = await vc.storeVC(BobHex, sigKeypairValidator, provider);
     assert.doesNotReject(transaction);
   });
 

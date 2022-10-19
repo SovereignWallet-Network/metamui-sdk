@@ -108,15 +108,15 @@ function createGenericVC({ cid }) {
  * Create Public Did VC
  * @param {Object} publicDidVC
  * @param {String} publicDidVC.public_key
- * @param {String} publicDidVC.metadata
+ * @param {String} publicDidVC.did
  * @param {String} publicDidVC.registration_number
  * @param {String} publicDidVC.company_name
  * @returns {HexString} Public Did VC Hex String
  */
-function createPublicDidVC({ public_key, metadata, registration_number, company_name }) {
+function createPublicDidVC({ public_key, did, registration_number, company_name }) {
   let vcProperty = {
     public_key: utils.encodeData(public_key, 'PublicKey'),
-    metadata: utils.encodeData(metadata, 'metadata'),
+    did: sanitiseDid(did),
     registration_number: utils.encodeData(registration_number, 'RegistrationNumber'),
     company_name: utils.encodeData(company_name, 'CompanyName'),
   };
@@ -129,13 +129,13 @@ function createPublicDidVC({ public_key, metadata, registration_number, company_
  * Create Private Did VC
  * @param {Object} privateDidVC
  * @param {String} privateDidVC.public_key
- * @param {String} privateDidVC.metadata
+ * @param {String} privateDidVC.did
  * @returns {HexString} Private Did VC Hex String
  */
-function createPrivateDidVC({ public_key, metadata }) {
+function createPrivateDidVC({ public_key, did }) {
   let vcProperty = {
     public_key: utils.encodeData(public_key, 'PublicKey'),
-    metadata: utils.encodeData(metadata, 'metadata'),
+    did: sanitiseDid(did),
   };
   return utils.encodeData(vcProperty, VCType.PrivateDidVC)
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
@@ -422,7 +422,10 @@ async function storeVC(
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection("local"));
-    const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
+    const tx =
+    //  provider.tx.sudo.sudo(
+      provider.tx.vc.store(vcHex);
+      // );
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
