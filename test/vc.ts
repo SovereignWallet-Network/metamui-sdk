@@ -129,6 +129,25 @@ describe('VC works correctly', () => {
     console.log("decoded private did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
   });
 
+  it.only('Store VC works correctly', async () => {
+    let owner = did.sanitiseDid("did:ssid:bob");
+    let privateDidVCObj = {
+      public_key: sigKeypairBob.publicKey,
+      metadata: "Testing Bob"
+    };
+    let issuers = [
+      "did:ssid:swn",
+      "did:ssid:alice"
+    ];
+    
+    let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypair);
+    const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
+    console.log("BobHex: \n", BobHex);
+    console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
+    console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
+    assert.doesNotReject(transaction);
+  });
+
   // it('VC creation fails token name is not given', async () => {
   //   let tokenVC = {
   //     reservableBalance: 1000,
@@ -296,25 +315,6 @@ describe('VC works correctly', () => {
   //       await tx.transfer(sigKeypair, TEST_DID, 20000000, provider, nonce);
   //     }
   //   })
-
-    it.only('Store VC works correctly', async () => {
-      let owner = did.sanitiseDid("did:ssid:bob");
-      let privateDidVCObj = {
-        public_key: sigKeypairBob.publicKey,
-        metadata: "Testing Bob"
-      };
-      let issuers = [
-        "did:ssid:swn",
-        "did:ssid:alice"
-      ];
-      
-      let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypair);
-      const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
-      console.log("BobHex: \n", BobHex);
-      console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
-      console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
-      assert.doesNotReject(transaction);
-    });
 
   //   it('Get VC Ids by DID after storing VC works correctly', async () => {
   //     const vcs = await vc.getVCIdsByDID(TEST_DID, provider);
