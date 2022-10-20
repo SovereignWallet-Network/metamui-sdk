@@ -329,10 +329,10 @@ describe('VC works correctly', () => {
   //     assert.notStrictEqual(vcs, null);
   //   });
 
-  it.only('Update status works correctly', async () => {
-    const transaction: any = await vc.updateStatus("0x67b7421e24a1019a7e9a8869fcf60e33a2c26fe6f97245b99126007e189b6dc1", false, signKeypairEve, provider);
+  it('Update status works correctly', async () => {
+    const transaction: any = await vc.updateStatus(vc_id, false, signKeypairEve, provider);
     assert.doesNotReject(transaction);
-    const vcs: any = await vc.getVCs("0x67b7421e24a1019a7e9a8869fcf60e33a2c26fe6f97245b99126007e189b6dc1", provider);
+    const vcs: any = await vc.getVCs(vc_id, provider);
     // console.log(vcs);
     assert.strictEqual(vcs.isVcActive, false);
   });
