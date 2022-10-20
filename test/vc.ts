@@ -32,6 +32,8 @@ describe('VC works correctly', () => {
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
 
+  let vc_id: HexString;
+
   before(async () => {
     keyring = await initKeyring();
     sigKeypair = keyring.addFromUri('//Alice');
@@ -44,6 +46,7 @@ describe('VC works correctly', () => {
     signKeypairFenn = keyring.addFromUri('//Fenn');
     signKeypairPublic = keyring.addFromUri('//Public');
     signKeypairPrivate = keyring.addFromUri('//Private');
+    vc_id = '0x';
   });
 
   it('VC is created in correct format', async () => {
@@ -98,7 +101,7 @@ describe('VC works correctly', () => {
   });
 
   it.skip('PublicDidVC is created in correct format', async () => {
-    console.log("///  Test Case 3 /// PublicDidVC Creation");
+    // console.log("///  Test Case 3 /// PublicDidVC Creation");
     let vc_property = {
       public_key: signKeypairPublic.publicKey,
       registration_number: "123456",
@@ -111,15 +114,15 @@ describe('VC works correctly', () => {
       EVE_DID, // did:ssid:eve
     ];
     const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
-    console.log("Generated PublicDidVC Hex: \n", publicDidObj);
+    // console.log("Generated PublicDidVC Hex: \n", publicDidObj);
     const actualObject = utils.decodeHex(publicDidObj, "VC");
-    console.log("Decoded PublicDidVC Object: \n", actualObject);
+    // console.log("Decoded PublicDidVC Object: \n", actualObject);
     assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
+    // console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
   });
 
   it.skip('PrivateDidVC is created in correct format', async () => {
-    console.log("///  Test Case 4 /// PrivateDidVC Creation");
+    // console.log("///  Test Case 4 /// PrivateDidVC Creation");
     let owner = did.sanitiseDid(TEST_DAVE_DID); // did:ssid:dave
     let vc_property = {
       public_key: signKeypairPrivate.publicKey,
@@ -129,11 +132,11 @@ describe('VC works correctly', () => {
       TEST_SWN_DID, // did:ssid:swn
     ];
     const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, sigKeypairValidator);
-    console.log("Generated PrivateDidVC Hex: \n", privateDidObj);
+    // console.log("Generated PrivateDidVC Hex: \n", privateDidObj);
     const actualObject = utils.decodeHex(privateDidObj, "VC");
-    console.log("Decoded PrivateDidVC Object: \n", actualObject);
+    // console.log("Decoded PrivateDidVC Object: \n", actualObject);
     assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    console.log("decoded private did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
+    // console.log("decoded private did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
   });
 
   it.skip('Store PrivateDidVC works correctly', async () => {
@@ -148,9 +151,9 @@ describe('VC works correctly', () => {
     ];
     
     let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator = Swn
-    console.log("BobHex: \n", BobHex);
-    console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
-    console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
+    // console.log("BobHex: \n", BobHex);
+    // console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
+    // console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
     const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
     assert.doesNotReject(transaction);
   });
@@ -246,7 +249,7 @@ describe('VC works correctly', () => {
   
 
 
-  it.only('Public VC is approved', async () => {
+  it('Public VC is approved', async () => {
     // let tokenVC = {
     //   tokenName: 'test',
     //   reservableBalance: 1000,
@@ -271,13 +274,14 @@ describe('VC works correctly', () => {
       EVE_DID, // did:ssid:eve
     ];
     const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
-    console.log("Decoded VC Property of PublicDidObj : \n", utils.decodeHex(publicDidObj, "VC"));
+    // console.log("Decoded VC Property of PublicDidObj : \n", utils.decodeHex(publicDidObj, "VC"));
     // let tokenHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypairValidator);
     let txnData = await vc.storeVC(publicDidObj, sigKeypairValidator, provider);
-    console.log("txnData: \n", txnData);
-    console.log("VC ID: ", txnData.events.vc.VCValidated.vcid);
+    // console.log("txnData: \n", txnData);
+    // console.log("VC ID: ", txnData.events.vc.VCValidated.vcid);
+    vc_id = txnData.events.vc.VCValidated.vcid;
     let signVCTxn = await vc.approveVC(txnData.events.vc.VCValidated.vcid, signKeypairEve, provider);
-    console.log("Transaction: ", signVCTxn);
+    // console.log("Transaction: ", signVCTxn);
     assert.doesNotReject(txnData);
     assert.doesNotReject(signVCTxn);
   });
@@ -285,26 +289,26 @@ describe('VC works correctly', () => {
   // if (constants.providerNetwork == 'local') {
   //   let vcId: any = '';
 
-  //   it('Get VC Ids by DID after storing VC works correctly', async () => {
-  //     const vcs = await vc.getVCIdsByDID(TEST_DID, provider);
-  //     vcId = vcs || [vcs?.['length'] - 1];
-  //     assert.strictEqual(vcs?.['length'] > 0, true);
-  //   });
+  it('Get VC Ids by DID after storing VC works correctly', async () => {
+    const vcs = await vc.getVCIdsByDID(TEST_DAVE_DID, provider);
+    let vcList = vcs || [vcs?.['length'] - 1];
+    assert.strictEqual(vcs?.['length'] > 0, true);
+  });
 
-  //   it('Get VCs works correctly', async () => {
-  //     const vcs = await vc.getVCs(vcId, provider);
-  //     assert.notStrictEqual(vcs, null);
-  //   });
+  it('Get VCs works correctly', async () => {
+    const vcs = await vc.getVCs(vc_id, provider);
+    assert.notStrictEqual(vcs, null);
+  });
 
-  //   it('Get DID by VC Id works correctly', async () => {
-  //     const identifier = await vc.getDIDByVCId(vcId, provider);
-  //     assert.strictEqual(identifier, did.sanitiseDid(TEST_DID));
-  //   });
+  it('Get DID by VC Id works correctly', async () => {
+    const identifier = await vc.getDIDByVCId(vc_id, provider);
+    assert.strictEqual(identifier, did.sanitiseDid(TEST_DAVE_DID));
+  });
 
-  //   it('Get VC history by VC ID works correctly', async () => {
-  //     const vcHistory = await vc.getVCHistoryByVCId(vcId, provider);
-  //     assert.notStrictEqual(vcHistory, null);
-  //   });
+  it('Get VC history by VC ID works correctly', async () => {
+    const vcHistory = await vc.getVCHistoryByVCId(vc_id, provider);
+    assert.notStrictEqual(vcHistory, null);
+  });
 
   //   // This test case is not needed any more
   //   // it('Sign VC works correctly', async () => {
@@ -325,12 +329,13 @@ describe('VC works correctly', () => {
   //     assert.notStrictEqual(vcs, null);
   //   });
 
-  //   it('Update status works correctly', async () => {
-  //     const transaction: any = await vc.updateStatus(vcId, { InActive: 1 }, sigKeypair, provider);
-  //     assert.doesNotReject(transaction);
-  //     const vcs = await vc.getVCs(vcId, provider);
-  //     assert.strictEqual(vcs?.[1], 'Inactive');
-  //   });
+  it.only('Update status works correctly', async () => {
+    const transaction: any = await vc.updateStatus("0x67b7421e24a1019a7e9a8869fcf60e33a2c26fe6f97245b99126007e189b6dc1", false, signKeypairEve, provider);
+    assert.doesNotReject(transaction);
+    const vcs: any = await vc.getVCs("0x67b7421e24a1019a7e9a8869fcf60e33a2c26fe6f97245b99126007e189b6dc1", provider);
+    // console.log(vcs);
+    assert.strictEqual(vcs.isVcActive, false);
+  });
 
   //   it('Store Generic VC works correctly', async () => {
   //     let genericVC = {

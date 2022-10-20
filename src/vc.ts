@@ -396,8 +396,8 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
     // generating the signature
     if (vc.vc_type != VCType.GenericVC) {
       const encodedData = utils.encodeData({
-        vc_type: vc.vc_type,
-        vc_property: vc.vc_property,
+        vc_type: vc.vcType,
+        vc_property: vc.vcProperty,
         owner: vc.owner,
         issuers: vc.issuers
       }, "VC_HEX");
@@ -447,7 +447,7 @@ async function storeVC(
  */
 async function updateStatus(
   vcId: HexString,
-  vcStatus,
+  vcStatus: boolean,
   senderAccountKeyPair: KeyringPair,
   api: ApiPromise,
 ) {
