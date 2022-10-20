@@ -33,9 +33,9 @@ const METABLOCKCHAIN_TYPES = {
   },
   "PublicDidVC": {
     "public_key": "public_key",
-    "did": "identifier",
     "registration_number": "RegistrationNumber",
-    "company_name": "CompanyName"
+    "company_name": "CompanyName",
+    "did": "identifier",
   },
   "PrivateDid": {
     "identifier": "Did",

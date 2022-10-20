@@ -6,7 +6,7 @@ function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittable
     console.log("Submit Txn Called");
     let returnObj:any = {
         transactionHash: "",
-        events: [],
+        events: {},
     };
     return new Promise(async (resolve, reject) => {
         await signedTx.send(function ({ status, events, dispatchError }) {
@@ -26,14 +26,13 @@ function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittable
                 // console.log('Finalized block hash', status.asFinalized.toHex());
                 events.forEach(({ phase, event: { data, method, section } }) => {
                     // console.log('\t', phase.toString(), `: ${section}.${method}`, data.toHuman());
-                    returnObj.events.push({
-                        section,
-                        method,
-                        data: data.toHuman(),
-                    });
+                    let eventObj:any = { };
+                    eventObj[section] = { };
+                    eventObj[section][method] = data.toHuman();
+                    returnObj.events = {...returnObj.events, ...eventObj};
                 });
                 returnObj.transactionHash = signedTx.hash.toHex();
-                console.log(returnObj);
+                // console.log(returnObj);
                 resolve(returnObj)
             }
         });

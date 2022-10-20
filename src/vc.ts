@@ -120,12 +120,12 @@ function createGenericVC({ cid }) {
  * @param {String} publicDidVC.company_name
  * @returns {HexString} Public Did VC Hex String
  */
-function createPublicDidVC({ public_key, did, registration_number, company_name }) {
+function createPublicDidVC({ public_key, registration_number, company_name, did }) {
   let vcProperty = {
     public_key: utils.encodeData(public_key, 'PublicKey'),
-    did: sanitiseDid(did),
     registration_number: utils.encodeData(registration_number, 'RegistrationNumber'),
     company_name: utils.encodeData(company_name, 'CompanyName'),
+    did: sanitiseDid(did),
   };
   return utils.encodeData(vcProperty, VCType.PublicDidVC)
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
@@ -192,8 +192,8 @@ function createPrivateDidVC({ public_key, did }) {
     encodedData = utils.encodeData({
       vc_type: vcType,
       vc_property: encodedVCProperty,
-      owner,
-      issuers,
+      owner: owner,
+      issuers: issuers,
     }, "VC_HEX");
     hash = blake2AsHex(encodedData);
   }
@@ -385,20 +385,21 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
 
     // fetching VC from chain
     let vc_details = await getVCs(vcId, provider);
+    console.log(vc_details);
     if (!vc_details) {
       throw new Error('VC not found');
     }
 
-    const vc = vc_details[0];
-    let hash: string = '';
+    const vc:any = vc_details;
+    let hash;
 
     // generating the signature
     if (vc.vc_type != VCType.GenericVC) {
       const encodedData = utils.encodeData({
-        vc_type: vc['vc_type'],
-        vc_property: vc['vc_property'],
-        owner: vc['owner'],
-        issuers: vc['issuers']
+        vc_type: vc.vc_type,
+        vc_property: vc.vc_property,
+        owner: vc.owner,
+        issuers: vc.issuers
       }, "VC_HEX");
       hash = blake2AsHex(encodedData);
     } else {
@@ -407,7 +408,8 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
       hash = genericVCData.hash;
     }
     const sign = utils.bytesToHex(senderAccountKeyPair.sign(hash));
-
+    // const sign = "0x3e2fd58e00218d71e9344058eaf71180d232ef985f0760ddd34b92f9d7a1fe60a4bd350e18e686af40b22467433f2238587a049c680d20b58b1ada2d0afdf483";
+    console.log("Sign", sign);
     // adding signature to the chain
     const tx = provider.tx.vc.addSignature(vcId, sign);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
@@ -429,10 +431,7 @@ async function storeVC(
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection("local"));
-    const tx =
-    //  provider.tx.sudo.sudo(
-      provider.tx.vc.store(vcHex);
-      // );
+    const tx = provider.tx.vc.store(vcHex);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
