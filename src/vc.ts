@@ -316,11 +316,11 @@ async function getVCHistoryByVCId(
  */
 async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise<AnyJson> {
   const provider = await api || (await buildConnection('local'));
-  const vc = await getVCs(vcId, provider);
+  const vc:any = await getVCs(vcId, provider);
   if (!vc) return null
-  const vc_property = getVCProperty(vc[0].vc_property, vc[0].vc_type);
+  const vc_property = getVCProperty(vc.vcProperty, vc.vcType);
   const { data, hash } = await getGenericVCDataByCId(vc_property.cid, ssidUrl);
-  return { data, hash, vcId, issuers: vc[0].issuers };
+  return { data, hash, vcId, issuers: vc.issuers };
 }
 
 
@@ -334,8 +334,9 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
  async function verifyGenericVC(vcId, data, api: ApiPromise) {
   try {
     const provider = api || (await buildConnection('local'));
-    const vc = (await getVCProperty(vcId, provider))?.[0];
-
+    const vc_data:any = await getVCs(vcId, provider);
+    const vc = (await getVCProperty(vc_data, VCType.GenericVC));
+    console.log(vc.hash);
     // Verify Hash
     const generateHash = utils.generateObjectHash(data);
     if (vc.hash !== generateHash) {
@@ -385,7 +386,7 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
 
     // fetching VC from chain
     let vc_details = await getVCs(vcId, provider);
-    console.log(vc_details);
+    // console.log(vc_details);
     if (!vc_details) {
       throw new Error('VC not found');
     }
@@ -394,7 +395,7 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
     let hash;
 
     // generating the signature
-    if (vc.vc_type != VCType.GenericVC) {
+    if (vc.vcType != VCType.GenericVC) {
       const encodedData = utils.encodeData({
         vc_type: vc.vcType,
         vc_property: vc.vcProperty,
@@ -403,13 +404,12 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
       }, "VC_HEX");
       hash = blake2AsHex(encodedData);
     } else {
-      const vcProperty = getVCProperty(vc.vc_property, vc.vc_type);
+      const vcProperty = getVCProperty(vc.vcProperty, vc.vcType);
       let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
       hash = genericVCData.hash;
     }
     const sign = utils.bytesToHex(senderAccountKeyPair.sign(hash));
-    // const sign = "0x3e2fd58e00218d71e9344058eaf71180d232ef985f0760ddd34b92f9d7a1fe60a4bd350e18e686af40b22467433f2238587a049c680d20b58b1ada2d0afdf483";
-    console.log("Sign", sign);
+    // console.log("Sign", sign);
     // adding signature to the chain
     const tx = provider.tx.vc.addSignature(vcId, sign);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);

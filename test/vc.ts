@@ -337,25 +337,28 @@ describe('VC works correctly', () => {
     assert.strictEqual(vcs.isVcActive, false);
   });
 
-  //   it('Store Generic VC works correctly', async () => {
-  //     let genericVC = {
-  //       cid: 'yD5HYVIgzl3_3Ze3fMgc',
-  //     };
-  //     let owner = TEST_DID;
-  //     let issuers = [
-  //       TEST_SWN_DID,
-  //       EVE_DID,
-  //     ];
-  //     const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypair, provider, ssidUrl);
-  //     const transaction: any = await vc.storeVC(vcHex, sigKeypairBob, provider);
-  //     const vcsByDid = await vc.getVCIdsByDID(TEST_DID, provider);
-  //     vcId = vcsByDid || [vcsByDid?.['length'] - 1];
-  //     await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
-  //     assert.doesNotReject(transaction);
-  //     let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
-  //     let verifyData = await vc.verifyGenericVC(data.vcId, data.data, provider);
-  //     assert.strictEqual(verifyData, true);
-  //   });
+  it.only('Store Generic VC works correctly', async () => {
+    let genericVC = {
+      cid: 'yD5HYVIgzl3_3Ze3fMgc',
+    };
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+    const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypairValidator, provider, ssidUrl);
+    const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+    let vcId = transaction.events.vc.VCValidated.vcid;
+    console.log("VC ID: ", vcId);
+    let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
+    assert.doesNotReject(transaction);
+    assert.doesNotReject(apTxn);
+    console.log("Approve Txn : ", apTxn);
+    let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
+    console.log(data);
+    let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
+    assert.strictEqual(verifyData, true);
+  });
 
   //   it('Auto Active VC Status on sign works correctly', async () => {
   //     let owner = TEST_DID;
