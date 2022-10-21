@@ -228,7 +228,7 @@ async function getVCIdsByDID(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.lookup(sanitiseDid(did))).toHuman();
+    return await (await provider.query.vc.lookup(sanitiseDid(did))).toJSON();
 }
 
 
@@ -243,7 +243,7 @@ async function getDIDByVCId(
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.rLookup(vcId)).toHuman();
+    return await (await provider.query.vc.rLookup(vcId)).toJSON();
 }
 
 
@@ -258,7 +258,7 @@ async function getVCs(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.vCs(vcId)).toHuman();
+    return (await provider.query.vc.vCs(vcId)).toJSON();
 }
 
 
@@ -273,7 +273,7 @@ async function getVCApprovers(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.vcApproverList(vcId)).toHuman();
+    return (await provider.query.vc.vcApproverList(vcId)).toJSON();
 }
 
 
@@ -288,7 +288,7 @@ async function getVCHistoryByVCId(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.vcHistory(vcId)).toHuman();
+    return await (await provider.query.vc.vcHistory(vcId)).toJSON();
 }
 
 
@@ -334,9 +334,8 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
  async function verifyGenericVC(vcId, data, api: ApiPromise) {
   try {
     const provider = api || (await buildConnection('local'));
-    const vc_data:any = await getVCs(vcId, provider);
-    const vc = (await getVCProperty(vc_data, VCType.GenericVC));
-    console.log(vc.hash);
+    const vc:any = await getVCs(vcId, provider);
+    console.log(vc);
     // Verify Hash
     const generateHash = utils.generateObjectHash(data);
     if (vc.hash !== generateHash) {
@@ -344,6 +343,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
     }
 
     const history = await getVCHistoryByVCId(vcId, provider);
+    console.log("VC History : ", history);
     if (!history) return false
 
     // Get public keys
@@ -386,7 +386,7 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
 
     // fetching VC from chain
     let vc_details = await getVCs(vcId, provider);
-    // console.log(vc_details);
+    console.log("VC DETAILS in APPROVE", vc_details);
     if (!vc_details) {
       throw new Error('VC not found');
     }

@@ -12,6 +12,7 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
 import { u8aToHex, u8aToString } from '@polkadot/util';
 import { VCType } from '../src/utils';
+import { Codec } from '@polkadot/types/types';
 
 describe('VC works correctly', () => {
   let sigKeypair: KeyringPair;
@@ -350,12 +351,16 @@ describe('VC works correctly', () => {
     const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
     let vcId = transaction.events.vc.VCValidated.vcid;
     console.log("VC ID: ", vcId);
+    let getVCData:any = await vc.getVCs(vcId, provider);
+    console.log("VC Details toJSON: ", getVCData.toJSON());
+    console.log("VC Details toHuman: ", getVCData.toHuman());
+    process.exit(0);
     let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
     assert.doesNotReject(transaction);
     assert.doesNotReject(apTxn);
-    console.log("Approve Txn : ", apTxn);
+    // console.log("Approve Txn : ", apTxn);
     let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
-    console.log(data);
+    console.log("Data from getGenericVCData : ", data);
     let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
     assert.strictEqual(verifyData, true);
   });
