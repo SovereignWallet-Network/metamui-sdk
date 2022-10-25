@@ -335,7 +335,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
   try {
     const provider = api || (await buildConnection('local'));
     const vc:any = await getVCs(vcId, provider);
-    console.log(vc);
+    // console.log(vc);
     // Verify Hash
     const generateHash = utils.generateObjectHash(data);
     if (vc.hash !== generateHash) {
@@ -343,7 +343,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
     }
 
     const history = await getVCHistoryByVCId(vcId, provider);
-    console.log("VC History : ", history);
+    // console.log("VC History : ", history);
     if (!history) return false
 
     // Get public keys
@@ -386,7 +386,6 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
 
     // fetching VC from chain
     let vc_details = await getVCs(vcId, provider);
-    console.log("VC DETAILS in APPROVE", vc_details);
     if (!vc_details) {
       throw new Error('VC not found');
     }
