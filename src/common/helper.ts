@@ -31,7 +31,7 @@ function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittable
                 });
                 returnObj.transactionHash = signedTx.hash.toHex();
                 // console.log(returnObj);
-                resolve(returnObj)
+                resolve(returnObj);
             }
         });
     });

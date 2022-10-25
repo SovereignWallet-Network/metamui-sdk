@@ -16,13 +16,13 @@ describe('Collective works correctly', () => {
   let proposalHash;
   let index;
   let sudoKey;
-  const TEST_ROCKET_DID = "did:ssid:rocket";
+  const TEST_EVE_DID = "did:ssid:eve";
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
-  const vcHex = '0xcc090ccf4e1e6fd1325d3884479dccd50f457d35b9b239333b6d9b4a531a25d46469643a737369643a726f636b65740000000000000000000000000000000000046469643a737369643a73776e000000000000000000000000000000000000000004242043f42ef6eb8a403d49d26c5d072e3af043d27a29611ca7f00d10d9603327991cedbb45a651c19ffc6b3f9681311deb6fdf129c3b62251c4312186483be8c00007465737400000000000000000000000010270000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
+  const vcHex = '0x5b8a94cff2bda887fe464cb77ac57059d410b4cc99a78d66ea8d768ca3ab8b956469643a737369643a6461766500000000000000000000000000000000000000086469643a737369643a73776e00000000000000000000000000000000000000006469643a737369643a6576650000000000000000000000000000000000000000044203e97dc9c9e0d0f7ffae32e253f72403a3fc97df9e9f43e1af02cb6893ce505355e7fed4b6db7f21a84851b87480e64f5f4ae691153f1f540992180dffc3870000007465737400000000000000000000000000ca9a3b000000000000000000000000064f54480000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000';
   let sigKeyPairSwn: KeyringPair;
-  let sigKeypairBob: KeyringPair;
   let sigKeypairDave: KeyringPair;
+  let sigKeyPairEve: KeyringPair;
   let sudoPair: KeyringPair;
 
   if (constants.providerNetwork == 'local') {
@@ -30,44 +30,16 @@ describe('Collective works correctly', () => {
       provider = await buildConnection(constants.providerNetwork);
       let keyring = await initKeyring();
       sudoKey = await provider.query.sudo.key();
-      console.log('sudoKey: ', sudoKey.toJSON());
       sudoPair = keyring.addFromUri('//Alice');
       sigKeyPairSwn = keyring.addFromUri('//Swn');
-      sigKeypairBob = keyring.addFromUri('//Rocket');
+      sigKeyPairEve = keyring.addFromUri('//Eve');
       sigKeypairDave = keyring.addFromUri('//Dave');
-
-      const didObjRocket = {
-        private: {
-          public_key: sigKeypairBob.publicKey, // this is the public key linked to the did
-          identity: TEST_ROCKET_DID, // this is the actual did
-          metadata: 'Metadata',
-        }
-      };
-      const didObjDave = {
-        private: {
-          public_key: sigKeypairDave.publicKey, // this is the public key linked to the did
-          identity: TEST_DAVE_DID, // this is the actual did
-          metadata: 'Metadata',
-        }
-      };
-      if (constants.providerNetwork == 'local') {
-        try {
-          await did.storeDIDOnChain(didObjDave, sigKeyPairSwn, provider);
-        } catch (err) { }
-        try {
-          await did.storeDIDOnChain(didObjRocket, sigKeyPairSwn, provider);
-        } catch (err) { }
-        let nonce = await provider.rpc.system.accountNextIndex(sigKeyPairSwn.address);
-        await tx.transfer(sigKeyPairSwn, TEST_ROCKET_DID, 5000000, provider, nonce);
-        nonce = await provider.rpc.system.accountNextIndex(sigKeyPairSwn.address);
-        await tx.transfer(sigKeyPairSwn, TEST_DAVE_DID, 5000000, provider, nonce);
-      }
     });
 
     it('should set members correctly', async () => {
       newMembers = [
         TEST_DAVE_DID,
-        TEST_ROCKET_DID,
+        TEST_EVE_DID,
         TEST_SWN_DID,
       ]
       let transaction: any = await collective.setMembers(newMembers, TEST_SWN_DID, 0, sudoPair, provider);
@@ -77,7 +49,7 @@ describe('Collective works correctly', () => {
     it('should get members correctly', async () => {
       const expectedMembers = [
         did.sanitiseDid(TEST_DAVE_DID),
-        did.sanitiseDid(TEST_ROCKET_DID),
+        did.sanitiseDid(TEST_EVE_DID),
         did.sanitiseDid(TEST_SWN_DID),
       ];
       const actualMembers = await collective.getMembers(provider);
@@ -94,13 +66,13 @@ describe('Collective works correctly', () => {
 
     it('should set proposals correctly', async () => {
       const call = provider.tx.vc.store(vcHex);
-      let transaction: any = await collective.propose(3, call, 1000, sigKeypairBob, provider);
+      let transaction: any = await collective.propose(3, call, 1000, sigKeyPairEve, provider);
+      proposalHash = transaction.events.council.Proposed.proposalHash;
       assert.doesNotReject(transaction);
     });
 
     it('should get proposals', async () => {
       const actualProposals = await collective.getProposals(provider);
-      proposalHash = actualProposals?.[0];
       let vote = await collective.getVotes(proposalHash, provider);
       if (vote == null) {
         return
@@ -111,20 +83,25 @@ describe('Collective works correctly', () => {
     });
 
     it('should get proposal correctly', async () => {
-      let proposalHex = await collective.getProposalOf(proposalHash, provider);
-      assert.strictEqual(proposalHex?.['args'][0], vcHex);
+      let proposalHex: any = await collective.getProposalOf(proposalHash, provider);
+      assert.strictEqual(proposalHex.args.vc_hex, vcHex);
     });
 
     it('should get proposal count correctly', async () => {
       let proposalCount = await collective.getProposalCount(provider);
-      assert.strictEqual(proposalCount, '1');
+      assert.strictEqual(proposalCount, 1);
     });
 
     it('should vote correctly', async () => {
-      let transaction: any = await collective.vote(proposalHash, index, true, sudoPair, provider);
-      assert.doesNotReject(transaction);
-      let otherTransaction: any = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
-      assert.doesNotReject(otherTransaction);
+      let swnTransaction: any = await collective.vote(proposalHash, index, true, sigKeyPairSwn, provider);
+      assert.doesNotReject(swnTransaction);
+      
+      let eveTransaction: any = await collective.vote(proposalHash, index, true, sigKeyPairEve, provider);
+      assert.doesNotReject(eveTransaction);
+
+      let daveTransaction: any = await collective.vote(proposalHash, index, false, sigKeypairDave, provider);
+      assert.doesNotReject(daveTransaction);
+
     });
 
     it('should get votes correctly', async () => {
@@ -132,7 +109,7 @@ describe('Collective works correctly', () => {
       assert.strictEqual(voteCount?.['ayes'].length, 2);
       assert.strictEqual(voteCount?.['nays'].length, 1);
       assert.strictEqual(voteCount?.['ayes'].includes(did.sanitiseDid(TEST_SWN_DID)), true);
-      assert.strictEqual(voteCount?.['ayes'].includes(did.sanitiseDid(TEST_ROCKET_DID)), true);
+      assert.strictEqual(voteCount?.['ayes'].includes(did.sanitiseDid(TEST_EVE_DID)), true);
       assert.strictEqual(voteCount?.['nays'].includes(did.sanitiseDid(TEST_DAVE_DID)), true);
     });
 
@@ -141,18 +118,18 @@ describe('Collective works correctly', () => {
       assert.doesNotReject(transaction);
     });
 
-    // Even though call is rejected  collective execution is succesfull
+    // Even though call is rejected with Bad Origin Err, collective execution is succesfull
     it.skip('should not execute proposal correctly', async () => {
       const call = provider.tx.vc.store(vcHex);
-      let transaction = collective.execute(call, 1000, sigKeypairDave, provider);
-      await assert.rejects(transaction);
+      let transaction = await collective.execute(call, 1000, sigKeypairDave, provider);
+      console.log('transaction: ', transaction);
+      assert.rejects(transaction);
     });
 
     it('should disapprove proposal correctly', async () => {
       const call = provider.tx.vc.store(vcHex);
-      await collective.propose(3, call, 1000, sigKeypairBob, provider);
-      const actualProposals = await collective.getProposals(provider);
-      proposalHash = actualProposals?.[0];
+      let proposal = await collective.propose(3, call, 1000, sigKeyPairEve, provider);
+      proposalHash = proposal.events.council.Proposed.proposalHash;
       let transaction: any = await collective.disapproveProposal(proposalHash, sudoPair, provider);
       assert.doesNotReject(transaction);
     });
@@ -160,9 +137,9 @@ describe('Collective works correctly', () => {
     after(async () => {
       // Delete created DID (did:ssid:rocket)
       if (constants.providerNetwork == 'local') {
-        await removeDid(TEST_ROCKET_DID, sudoPair, provider);
-        await removeDid(TEST_DAVE_DID, sudoPair, provider);
+        // await removeDid(TEST_ROCKET_DID, sudoPair, provider);
+        // await removeDid(TEST_DAVE_DID, sudoPair, provider);
       }
     })
   }
-})
+});
