@@ -13,7 +13,7 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
     try {
       const provider = api || await buildConnection('local');
       const did_hex = sanitiseDid(did);
-      const accountInfo = await provider.query.mui.account(did_hex);
+      const accountInfo = await provider.query.token.account(did_hex);
       const data = accountInfo.toJSON()?.['data'];
       resolve(data.free / 1e6);
     } catch (err) {
@@ -30,7 +30,7 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
-    return await provider.query.mui.account(did_hex, ({ data: { free: currentBalance } }) => {
+    return await provider.query.token.account(did_hex, ({ data: { free: currentBalance } }) => {
       callback(currentBalance.toNumber() / 1e6);
     });
   } catch (err) {

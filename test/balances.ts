@@ -9,7 +9,7 @@ import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { balances } from '../src';
 
-describe('Transaction works correctly', () => {
+describe('Balances works correctly', () => {
   let sigKeypairWithBal: KeyringPair;
   let sigKeypairWithoutBal: KeyringPair;
   let provider: ApiPromise;
@@ -17,7 +17,8 @@ describe('Transaction works correctly', () => {
     const keyring = await initKeyring();
     const provider = await buildConnection(constants.providerNetwork);
     sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
-    sigKeypairWithoutBal = keyring.createFromUri('//Test123');
+    // Empty dave account by sending to swn before running this test case
+    sigKeypairWithoutBal = keyring.createFromUri('//Dave');
     if (constants.providerNetwork == 'local') {
       const didObjTest123 = {
         private: {
@@ -27,7 +28,7 @@ describe('Transaction works correctly', () => {
         }
       };
       try {
-        await did.storeDIDOnChain(didObjTest123, sigKeypairWithBal, provider);
+        // await did.storeDIDOnChain(didObjTest123, sigKeypairWithBal, provider);
       } catch (err) {
         // console.log(err);
       }
@@ -110,7 +111,7 @@ describe('Transaction works correctly', () => {
   after(async () => {
     // Delete created DIDs
     if (constants.providerNetwork == 'local') {
-      await removeDid('did:ssid:test123', sigKeypairWithBal, provider);
+      // await removeDid('did:ssid:test123', sigKeypairWithBal, provider);
     }
   })
 
