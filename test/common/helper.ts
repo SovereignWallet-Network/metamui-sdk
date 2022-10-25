@@ -3,13 +3,12 @@ import { buildConnection } from '../../src/connection';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import * as tx from '../../src/balances';
-import * as vc from '../../src/vc';
 import * as collective from '../../src/collective';
 import { submitTransaction } from '../../src/common/helper';
 
-const TEST_DID = 'did:ssid:rocket';
 const TEST_DAVE_DID = "did:ssid:dave";
 const TEST_SWN_DID = "did:ssid:swn";
+const TEST_ROOT_DID = 'did:ssid:alice';
 
 // To remove DID after testing
 
@@ -38,34 +37,22 @@ async function councilStoreVC(vcHex: any, sigKeypairOwner: any, sigKeypairRoot: 
   await tx.transfer(sigKeypairRoot, TEST_DAVE_DID, 5000000, provider, nonce);
   let newMembers = [
     TEST_DAVE_DID,
-    TEST_DID,
+    TEST_ROOT_DID,
     TEST_SWN_DID,
   ];
   await collective.setMembers(newMembers, TEST_SWN_DID, 0, sigKeypairRoot, provider);
   const call = provider.tx.vc.store(vcHex);
-  await collective.propose(3, call, 1000, sigKeypairOwner, provider);
-  const actualProposals = await collective.getProposals(provider);
-  const proposalHash = actualProposals?.[0];
+  const propose = await collective.propose(3, call, 1000, sigKeypairOwner, provider);
+  const proposal = propose.events.council.Proposed;
+  // console.log("Proposal: ", proposal);
+  const proposalHash = proposal.proposalHash;
   let vote = await collective.getVotes(proposalHash, provider);
   const index = vote?.['index'];
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
-  await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
+  await collective.vote(proposalHash, index, true, sigKeypairOwner, provider);
+  return await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
 }
-
-// async function storeVCDirectly(vcId: number, currencyCode: any, amount: number, vcType: any, sigKeypairOwner: KeyringPair, provider: ApiPromise) {
-//   let vcProperty = {
-//     vcId,
-//     currencyCode,
-//     amount,
-//   };
-//   let owner = TEST_DAVE_DID;
-//   let issuers = [
-//     TEST_DAVE_DID,
-//   ];
-//   let vcHex = await vc.generateVC(vcProperty, owner, issuers, vcType, sigKeypairOwner, provider);
-//   await vc.storeVC(vcHex, sigKeypairOwner, provider)
-// }
 
 async function sudoStoreVC(vcHex: string, sudoKeyPair: KeyringPair, provider: ApiPromise) {
     const tx = provider.tx.sudo.sudo(provider.tx.vc.store(vcHex));
@@ -77,6 +64,5 @@ async function sudoStoreVC(vcHex: string, sudoKeyPair: KeyringPair, provider: Ap
 export {
   removeDid,
   councilStoreVC,
-  // storeVCDirectly,
   sudoStoreVC,
 }

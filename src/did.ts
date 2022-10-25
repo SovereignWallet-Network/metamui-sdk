@@ -173,13 +173,13 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {
-    return (await provider.query.did.lookup(did_hex)).toHuman();
+    return (await provider.query.did.lookup(did_hex)).toJSON();
   }
   const didDetails: AnyJson = await getDIDDetails(identifier, provider);
   if (didDetails == null) return null;
   if (typeof didDetails?.['added_block'] === 'number') {
     if (blockNumber >= didDetails?.['added_block']) {
-      return (await provider.query.did.lookup(did_hex)).toHuman();
+      return (await provider.query.did.lookup(did_hex)).toJSON();
     }
   }
   const keyHistories = await getDidKeyHistory(identifier, provider);
@@ -202,7 +202,7 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
  */
 async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | boolean> {
   const provider = api || (await buildConnection('local'));
-  const data = (await provider.query.did.rLookup(accountId)).toHuman();
+  const data = (await provider.query.did.rLookup(accountId)).toJSON();
   // return false if empty
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     return false;
@@ -294,7 +294,7 @@ async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
 async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  return (await provider.query.did.prevKeys(did_hex)).toHuman();
+  return (await provider.query.did.prevKeys(did_hex)).toJSON();
 }
 
 /**

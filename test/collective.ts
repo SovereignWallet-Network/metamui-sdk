@@ -30,7 +30,7 @@ describe('Collective works correctly', () => {
       provider = await buildConnection(constants.providerNetwork);
       let keyring = await initKeyring();
       sudoKey = await provider.query.sudo.key();
-      console.log('sudoKey: ', sudoKey.toHuman());
+      console.log('sudoKey: ', sudoKey.toJSON());
       sudoPair = keyring.addFromUri('//Alice');
       sigKeyPairSwn = keyring.addFromUri('//Swn');
       sigKeypairBob = keyring.addFromUri('//Rocket');

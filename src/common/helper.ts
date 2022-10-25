@@ -3,14 +3,12 @@ import { SubmittableExtrinsic } from "@polkadot/api/types";
 import { ISubmittableResult } from "@polkadot/types/types";
 
 function submitTransaction(signedTx:SubmittableExtrinsic<"promise", ISubmittableResult>, api:ApiPromise): Promise<any> {
-    console.log("Submit Txn Called");
     let returnObj:any = {
         transactionHash: "",
         events: {},
     };
     return new Promise(async (resolve, reject) => {
         await signedTx.send(function ({ status, events, dispatchError }) {
-            console.log('Transaction status:', status.type);
             if (dispatchError) {
                 if (dispatchError.isModule) {
                     // for module errors, we have the section indexed, lookup

@@ -105,7 +105,7 @@ async function disapproveProposal(proposalHash, signingKeypair: KeyringPair, api
  */
 async function getMembers(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.members()).toHuman();
+  return (await provider.query.council.members()).toJSON();
 }
 /**
  * Get Prime of Council
@@ -113,7 +113,7 @@ async function getMembers(api?: ApiPromise) {
  */
 async function getPrime(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.prime()).toHuman();
+  return (await provider.query.council.prime()).toJSON();
 }
 /**
  * Get All Proposals
@@ -121,7 +121,7 @@ async function getPrime(api?: ApiPromise) {
  */
 async function getProposals(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.proposals()).toHuman();
+  return (await provider.query.council.proposals()).toJSON();
 }
 /**
  * Get Proposal of given hash
@@ -130,7 +130,7 @@ async function getProposals(api?: ApiPromise) {
  */
 async function getProposalOf(proposalHash: String, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.proposalOf(proposalHash)).toHuman();
+  return (await provider.query.council.proposalOf(proposalHash)).toJSON();
 }
 /**
  * Get Votes of given proposal hash
@@ -139,7 +139,7 @@ async function getProposalOf(proposalHash: String, api?: ApiPromise) {
  */
 async function getVotes(proposalHash: String, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.voting(proposalHash)).toHuman();
+  return (await provider.query.council.voting(proposalHash)).toJSON();
 }
 /**
  * Get Total proposals count
@@ -147,7 +147,7 @@ async function getVotes(proposalHash: String, api?: ApiPromise) {
  */
 async function getProposalCount(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  return (await provider.query.council.proposalCount()).toHuman();
+  return (await provider.query.council.proposalCount()).toJSON();
 }
 
 export {
