@@ -5,11 +5,10 @@ import { initKeyring, SSID_BASE_URL } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
 import * as utils from '../src/utils';
-import { removeDid, councilStoreVC, sudoStoreVC } from './common/helper';
+import { removeDid, councilStoreVC} from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
-import { u8aToHex, u8aToString } from '@polkadot/util';
 import { VCType } from '../src/utils';
 
 describe('VC works correctly', () => {
@@ -22,9 +21,6 @@ describe('VC works correctly', () => {
   let sigKeypairBob: KeyringPair;
   let signKeypairEve: KeyringPair;
   let signKeypairDave: KeyringPair;
-  let signKeypairFenn: KeyringPair;
-  let signKeypairPublic: KeyringPair;
-  let signKeypairPrivate: KeyringPair;
 
   let actualHex: HexString;
   let ssidUrl: string;
@@ -42,9 +38,6 @@ describe('VC works correctly', () => {
     sigKeypairBob = keyring.addFromUri('//Bob');
     signKeypairEve = keyring.addFromUri('//Eve');
     signKeypairDave = keyring.addFromUri('//Dave');
-    signKeypairFenn = keyring.addFromUri('//Fenn');
-    signKeypairPublic = keyring.addFromUri('//Public');
-    signKeypairPrivate = keyring.addFromUri('//Private');
     vc_id = '0x';
   });
 
@@ -260,79 +253,6 @@ describe('VC works correctly', () => {
     assert.doesNotReject(transaction);
     const vcs: any = await vc.getVCs(vc_id, provider);
     assert.strictEqual(vcs.isVcActive, false);
-  });
-
-  it.skip('PublicDidVC is created in correct format', async () => {
-    let vc_property = {
-      public_key: signKeypairPublic.publicKey,
-      registration_number: "123456",
-      company_name: 'Public Company',
-      did: 'did:ssid:publicdid',
-    };
-    let owner = TEST_DAVE_DID; // did:ssid:dave
-    let issuers = [
-      TEST_SWN_DID, // did:ssid:swn
-      EVE_DID, // did:ssid:eve
-    ];
-    const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
-    // console.log("Generated PublicDidVC Hex: \n", publicDidObj);
-    const actualObject = utils.decodeHex(publicDidObj, "VC");
-    // console.log("Decoded PublicDidVC Object: \n", actualObject);
-    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    // console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
-  });
-
-
-  it.skip('Public VC is approved', async () => {
-    let vc_property = {
-      public_key: signKeypairPublic.publicKey,
-      registration_number: "123456",
-      company_name: 'Public Company',
-      did: 'did:ssid:publicdid',
-    };
-    let owner = TEST_DAVE_DID;
-    let issuers = [
-      TEST_SWN_DID,
-      EVE_DID,
-    ];
-    const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
-    let txnData = await vc.storeVC(publicDidObj, sigKeypairValidator, provider);
-    let signVCTxn = await vc.approveVC(txnData.events.vc.VCValidated.vcid, signKeypairEve, provider);
-    assert.doesNotReject(txnData);
-    assert.doesNotReject(signVCTxn);
-  });
-
-  it.skip('PrivateDidVC is created in correct format', async () => {
-    let owner = did.sanitiseDid(TEST_DAVE_DID);
-    let vc_property = {
-      public_key: signKeypairPrivate.publicKey,
-      did: 'did:ssid:privatedid',
-    };
-    let issuers = [
-      TEST_SWN_DID,
-    ];
-    const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, sigKeypairValidator);
-    const actualObject = utils.decodeHex(privateDidObj, "VC");
-    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-  });
-
-  it.skip('Store PrivateDidVC works correctly', async () => {
-    let owner = did.sanitiseDid("did:ssid:bob");
-    let privateDidVCObj = {
-      public_key: signKeypairFenn.publicKey,
-      did: "did:ssid:fenn"
-    };
-    let issuers = [
-      "did:ssid:swn",
-      "did:ssid:alice"
-    ];
-    
-    let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
-    // console.log("BobHex: \n", BobHex);
-    // console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
-    // console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
-    const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
-    assert.doesNotReject(transaction);
   });
 
   after(async () => {
