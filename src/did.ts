@@ -99,11 +99,13 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
     }
     const did_hex = sanitiseDid(identifier);
     const data = (await provider.query.did.diDs(did_hex)).toJSON();
+    // console.log('data', data);
     if (data == null) {
       console.log('DID not found');
       return null;
     }
-    if (data[0].private.identifier) {
+    
+    if (data?.[0]?.private?.identifier) {
       return {
         identifier: data[0].private.identifier,
         public_key: data[0].private.publicKey,
@@ -115,8 +117,8 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
         identifier: data[0].public.identifier,
         public_key: data[0].public.publicKey,
         metadata: data[0].public.metadata,
-        registration_number: data[0].public.registration_number,
-        company_name: data[0].public.company_name,
+        registration_number: data[0].public.registrationNumber,
+        company_name: data[0].public.companyName,
         added_block: data[1],
       };
     }
@@ -182,6 +184,7 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
  * It should only be called by validator accounts, else will fail
  * @param {String} identifier
  * @param {Uint8Array} newKey
+ * @param {KeyringPair} paraId
  * @param {KeyringObj} signingKeypair // of a validator account
  * @param {ApiPromise} api
  */

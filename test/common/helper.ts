@@ -12,12 +12,10 @@ const TEST_ROOT_DID = 'did:ssid:alice';
 
 // To remove DID after testing
 
-async function removeDid(didString: string, sigKeyPair: KeyringPair, provider: ApiPromise) {
+async function removeDid(didString: string, paraId = null, sigKeyPair: KeyringPair, provider: ApiPromise) {
   try {
     const api = provider || (await buildConnection('local'));
-    const txn = api.tx.validatorCommittee.execute(
-      api.tx.did.remove(did.sanitiseDid(didString)
-      ), 1000);
+    const txn = api.tx.sudo.sudo(api.tx.did.remove(did.sanitiseDid(didString), paraId));
     const nonce = await api.rpc.system.accountNextIndex(sigKeyPair.address);
     await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, { nonce }, ({ status, dispatchError }) => {
       if (dispatchError) {

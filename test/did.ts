@@ -13,6 +13,7 @@ import { AnyJson } from '@polkadot/types/types';
 import { utils } from '../src';
 import { u8aToHex, u8aToString } from '@polkadot/util';
 import { VCType } from '../src/utils';
+import { HexString } from '@polkadot/util/types';
 
 describe('DID Module works correctly', () => {
   const TEST_MNEMONIC =
@@ -25,39 +26,62 @@ describe('DID Module works correctly', () => {
   const expectedNewPubkey =
     '04249359400f54ceb6ecf51edfeb1c02c8233e8ca563492df998a5d91266fa64';
 
-  let sigKeypairWithBal: KeyringPair;
   let signKeypairFenn: KeyringPair;
   let signKeypairPublic: KeyringPair;
   let signKeypairPrivate: KeyringPair;
   let sigKeypair: KeyringPair;
-  const TEST_DID = 'did:ssid:rocket';
   const EVE_DID = 'did:ssid:eve';
   var provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
-  let sigKeypairBob: KeyringPair;
   let signKeypairEve: KeyringPair;
-  let signKeypairDave: KeyringPair;
-  let ssidUrl: string;
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
+  let vcId: HexString = '0x';
 
   before(async () => {
     keyring = await initKeyring();
     provider = await buildConnection(constants.providerNetwork);
-    sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
+    sigKeypair = keyring.addFromUri('//Alice');
+    sigKeypairValidator = keyring.addFromUri('//Swn');
+    signKeypairEve = keyring.addFromUri('//Eve');
     signKeypairFenn = keyring.addFromUri('//Fenn');
     signKeypairPublic = keyring.addFromUri('//Public');
     signKeypairPrivate = keyring.addFromUri('//Private');
-
   });
 
 
-  it('DID is created in correct format', async () => {
-    const didObj = await did.generateDID(TEST_MNEMONIC, TEST_DID, TEST_METADATA);
-    assert.strictEqual(Buffer.from(didObj.private.public_key).toString('hex'), expectedPubkey);
-    assert.strictEqual(didObj.private.identity, 'did:ssid:rocket');
-    assert.strictEqual(didObj.private.metadata, TEST_METADATA);
+  it('PublicDidVC is created in correct format', async () => {
+    let vc_property = {
+      public_key: signKeypairPublic.publicKey,
+      registration_number: "123456",
+      company_name: 'Public Company',
+      did: 'did:ssid:publicdid',
+    };
+    let owner = TEST_SWN_DID;
+    let issuers = [
+      TEST_SWN_DID
+    ];
+    const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
+    // console.log("Generated PublicDidVC Hex: \n", publicDidObj);
+    const actualObject = utils.decodeHex(publicDidObj, "VC");
+    // console.log("Decoded PublicDidVC Object: \n", actualObject);
+    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
+    // console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
+  });
+
+  it('PrivateDidVC is created in correct format', async () => {
+    let owner = did.sanitiseDid(TEST_SWN_DID);
+    let vc_property = {
+      public_key: signKeypairPrivate.publicKey,
+      did: 'did:ssid:privatedid',
+    };
+    let issuers = [
+      TEST_SWN_DID,
+    ];
+    const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, sigKeypairValidator);
+    const actualObject = utils.decodeHex(privateDidObj, "VC");
+    assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
   });
 
   it('DID details are fetched correctly - positive test', async () => {
@@ -118,7 +142,7 @@ describe('DID Module works correctly', () => {
     const data: any = await did.updateMetadata(
       'did:ssid:swn',
       'TestMetadata',
-      sigKeypairWithBal,
+      sigKeypairValidator,
       provider
     );
     assert.doesNotReject(data);
@@ -131,7 +155,7 @@ describe('DID Module works correctly', () => {
     const data:any = await did.updateMetadata(
       'did:ssid:nonexistentdid',
       'TestMetadata',
-      sigKeypairWithBal,
+      sigKeypairValidator,
       provider
     );
     assert.rejects(data, (err: any) => {
@@ -157,30 +181,9 @@ describe('DID Module works correctly', () => {
   if (constants.providerNetwork == 'local') {
     let addedDidBlockNum: number;
     let updatedKeyBlockNum: number;
-    let testIdentifier = 'did:ssid:rocket';
-
-    it.skip('PublicDidVC is created in correct format', async () => {
-      let vc_property = {
-        public_key: signKeypairPublic.publicKey,
-        registration_number: "123456",
-        company_name: 'Public Company',
-        did: 'did:ssid:publicdid',
-      };
-      let owner = TEST_DAVE_DID; // did:ssid:dave
-      let issuers = [
-        TEST_SWN_DID, // did:ssid:swn
-        EVE_DID, // did:ssid:eve
-      ];
-      const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
-      // console.log("Generated PublicDidVC Hex: \n", publicDidObj);
-      const actualObject = utils.decodeHex(publicDidObj, "VC");
-      // console.log("Decoded PublicDidVC Object: \n", actualObject);
-      assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-      // console.log("decoded public did: \n",utils.decodeHex(actualObject.vc_property, actualObject.vc_type));
-    });
+    let testIdentifier = 'did:ssid:fenn';
   
-  
-    it.skip('Public VC is approved', async () => {
+    it('Store PublicDid works correctly', async () => {
       let vc_property = {
         public_key: signKeypairPublic.publicKey,
         registration_number: "123456",
@@ -194,26 +197,20 @@ describe('DID Module works correctly', () => {
       ];
       const publicDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PublicDidVC, sigKeypairValidator);
       let txnData = await vc.storeVC(publicDidObj, sigKeypairValidator, provider);
-      let signVCTxn = await vc.approveVC(txnData.events.vc.VCValidated.vcid, signKeypairEve, provider);
       assert.doesNotReject(txnData);
+      let publicVcId = txnData.events.vc.VCValidated.vcid;
+      // console.log('Public DID VC Stored: ', publicVcId);
+      let signVCTxn = await vc.approveVC(txnData.events.vc.VCValidated.vcid, signKeypairEve, provider);
       assert.doesNotReject(signVCTxn);
+      let createPublicTxn = await did.createPublic(publicVcId, null, sigKeypairValidator, provider);
+      assert.doesNotReject(createPublicTxn);
+      const newDidDetails:any = await did.getDIDDetails(vc_property.did, provider);
+      if (!newDidDetails) return null;
+      assert.strictEqual(newDidDetails.public_key, u8aToHex(signKeypairPublic.publicKey));
+      assert.strictEqual(newDidDetails.identifier, did.sanitiseDid(vc_property.did));
     });
   
-    it.skip('PrivateDidVC is created in correct format', async () => {
-      let owner = did.sanitiseDid(TEST_DAVE_DID);
-      let vc_property = {
-        public_key: signKeypairPrivate.publicKey,
-        did: 'did:ssid:privatedid',
-      };
-      let issuers = [
-        TEST_SWN_DID,
-      ];
-      const privateDidObj = await vc.generateVC(vc_property, owner, issuers, VCType.PrivateDidVC, sigKeypairValidator);
-      const actualObject = utils.decodeHex(privateDidObj, "VC");
-      assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
-    });
-  
-    it.skip('Store PrivateDidVC works correctly', async () => {
+    it('Store PrivateDid works correctly', async () => {
       let owner = did.sanitiseDid("did:ssid:bob");
       let privateDidVCObj = {
         public_key: signKeypairFenn.publicKey,
@@ -224,43 +221,33 @@ describe('DID Module works correctly', () => {
         "did:ssid:alice"
       ];
       
-      let BobHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
-      // console.log("BobHex: \n", BobHex);
-      // console.log("Decoded BobHex: \n", utils.decodeHex(BobHex, "VC"));
-      // console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(BobHex, "VC").vc_property, "PrivateDidVC"));
-      const transaction: any = await vc.storeVC(BobHex, sigKeypair, provider);
+      let vcHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
+      // console.log("vcHex: \n", vcHex);
+      // console.log("Decoded vcHex: \n", utils.decodeHex(vcHex, "VC"));
+      // console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(vcHex, "VC").vc_property, "PrivateDidVC"));
+      const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
       assert.doesNotReject(transaction);
-    });
-
-    it('storeDIDOnChain works correctly', async () => {
-      const newDidObj = await did.generateDID(TEST_MNEMONIC, 'rocket', TEST_METADATA);
-      if (typeof sigKeypairWithBal === 'undefined') return
-      await did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      const newDidDetails:any = await did.getDIDDetails(newDidObj.private.identity, provider);
-      // console.log(newDidDetails);
+      vcId = transaction.events.vc.VCValidated.vcid;
+      assert.doesNotReject(await vc.approveVC(vcId, sigKeypair, provider));
+      let createPrivateTxn: any = await did.createPrivate(vcId, null, sigKeypairValidator, provider);
+      assert.doesNotReject(createPrivateTxn);
+      const newDidDetails:any = await did.getDIDDetails(privateDidVCObj.did, provider);
       if (!newDidDetails) return null;
-      addedDidBlockNum = newDidDetails['added_block'];
-      // console.log("Added DID block number: ", addedDidBlockNum);
-      assert.strictEqual(newDidDetails['public_key'], `0x${expectedPubkey}`);
-      assert.strictEqual(newDidDetails['identifier'], did.sanitiseDid(testIdentifier));
-      assert.strictEqual(hexToString(newDidDetails['metadata']), 'Metadata');
+      addedDidBlockNum = newDidDetails.added_block;
+      assert.strictEqual(newDidDetails.public_key, u8aToHex(privateDidVCObj.public_key));
+      assert.strictEqual(newDidDetails.identifier, did.sanitiseDid(privateDidVCObj.did));
     });
 
-    it('storeDIDOnChain throws error on duplicate ssid', async () => {
-      const newDidObj = await did.generateDID(NEW_MNEMONIC, 'rocket', TEST_METADATA);
-      if (typeof sigKeypairWithBal === 'undefined') return
+    it.skip('create PrivateDid throws error on duplicate ssid', async () => {
       // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      await assert.rejects(did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider), (err: any) => {
+      await assert.rejects(did.createPrivate(vcId, null, sigKeypairValidator, provider), (err: any) => {
         assert.equal(err.message, 'did.DIDAlreadyExists');
         return true;
       });
     });
 
-    it('storeDIDOnChain throws error on duplicate public key', async () => {
-      const newDidObj = await did.generateDID(TEST_MNEMONIC, 'nonexistentdid', TEST_METADATA);
-      if (typeof sigKeypairWithBal === 'undefined') return
-      // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      await assert.rejects(did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider), (err: any) => {
+    it.skip('storeDIDOnChain throws error on duplicate public key', async () => {
+      await assert.rejects(did.createPrivate(vcId, null, sigKeypairValidator, provider), (err: any) => {
         assert.equal(err.message, 'did.PublicKeyRegistered');
         return true;
       });
@@ -273,22 +260,22 @@ describe('DID Module works correctly', () => {
       if (typeof keyring === 'undefined') return;
 
       const pubKey = keyring.createFromUri(NEW_MNEMONIC).publicKey;
-      await did.updateDidKey(didString, pubKey, sigKeypairWithBal, provider);
+      await did.updateDidKey(didString, pubKey, null, sigKeypairValidator, provider);
       const newUpdatedDidDetails:any = await did.getDIDDetails(didString, provider);
       // console.log(newUpdatedDidDetails);
       updatedKeyBlockNum = newUpdatedDidDetails['added_block'];
       assert.strictEqual(newUpdatedDidDetails['public_key'], `0x${expectedNewPubkey}`);
       assert.strictEqual(newUpdatedDidDetails['identifier'], did.sanitiseDid(testIdentifier));
       const keyHistory:any = (await did.getDidKeyHistory(didString, provider));
+      // console.log(keyHistory);
       assert.equal(keyHistory
         && Array.isArray(keyHistory)
-        && keyHistory.map(data => data[0]).includes('5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2'), true);
+        && keyHistory.map(data => data[0]).includes('5Ci9MiHGw123hKFDe4BsRjwMedsekB1zdLgB5jtCrqy7ZV7u'), true);
     })
 
     it('updateDidKey throws error on using existing public key', async () => {
       const pubKey = keyring?.createFromUri(NEW_MNEMONIC).publicKey;
-      // const data = did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider);
-      await assert.rejects(did.updateDidKey(testIdentifier, pubKey, sigKeypairWithBal, provider), (err: any) => {
+      await assert.rejects(did.updateDidKey(testIdentifier, pubKey, null, sigKeypairValidator, provider), (err: any) => {
         // console.log(err.message);
         assert.strictEqual(err.message, 'did.PublicKeyRegistered');
         return true;
@@ -298,7 +285,7 @@ describe('DID Module works correctly', () => {
     it('updateDidKey throws error on using non existent did', async () => {
       const pubKey = keyring?.createFromUri(TEST_MNEMONIC).publicKey;
       // const data = did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider);
-      await assert.rejects(did.updateDidKey('did:ssid:nonexistentdid', pubKey, sigKeypairWithBal, provider), (err: any) => {
+      await assert.rejects(did.updateDidKey('did:ssid:nonexistentdid', pubKey, null, sigKeypairValidator, provider), (err: any) => {
         // console.log(err.message);
         assert.strictEqual(err.message, 'did.DIDDoesNotExist');
         return true;
@@ -317,15 +304,15 @@ describe('DID Module works correctly', () => {
       const creatAccBlockNumAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum);
       const nextBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, addedDidBlockNum ? addedDidBlockNum + 1 : 0);
       // assert.strictEqual(prevAccBlockNumAcc, null);
-      assert.strictEqual(creatAccBlockNumAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
-      assert.strictEqual(nextBlockNumberAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
+      assert.strictEqual(creatAccBlockNumAcc, '5Ci9MiHGw123hKFDe4BsRjwMedsekB1zdLgB5jtCrqy7ZV7u');
+      assert.strictEqual(nextBlockNumberAcc, '5Ci9MiHGw123hKFDe4BsRjwMedsekB1zdLgB5jtCrqy7ZV7u');
     });
 
     it('Resolve DID to account after key updated works correctly', async () => {
       const prevBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum ? updatedKeyBlockNum + (-1) : 0);
       const keyUpdateBlockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum);
       const nextblockNumberAcc = await did.resolveDIDToAccount(testIdentifier, provider, updatedKeyBlockNum ? updatedKeyBlockNum + 1 : 0);
-      assert.strictEqual(prevBlockNumberAcc, '5EhxqnrHHFy32DhcaqYrWiwC82yDiVS4xySysGxsUn462nX2');
+      assert.strictEqual(prevBlockNumberAcc, '5Ci9MiHGw123hKFDe4BsRjwMedsekB1zdLgB5jtCrqy7ZV7u');
       assert.strictEqual(keyUpdateBlockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');
       assert.strictEqual(nextblockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');
     });
@@ -335,7 +322,7 @@ describe('DID Module works correctly', () => {
   after(async () => {
     // Delete created DID (did:ssid:rocket)
     if (constants.providerNetwork == 'local') {
-      await removeDid('did:ssid:rocket', sigKeypairWithBal, provider);
+      await removeDid('did:ssid:fenn', null, sigKeypair, provider);
     }
   })
 });
