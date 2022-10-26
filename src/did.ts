@@ -1,11 +1,9 @@
 import { ApiPromise } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
-import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
-import { initKeyring } from './config';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
-import { PRIVATE_DID_TYPE } from './common/types';
 import { submitTransaction } from './common/helper';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
@@ -26,62 +24,31 @@ const checkIdentifierFormat = (identifier) => {
 };
 
 /**
- * Generate did object to be stored in blockchain.
- * @returns {Object} Object containing did structure
- */
-const generateDID = async (mnemonic: string, identifier: string, metadata = '') => {
-  const keyring = await initKeyring();
-  const isValidIdentifier = checkIdentifierFormat(identifier);
-  const isValidMnemonic = mnemonicValidate(mnemonic);
-  if (!isValidMnemonic) {
-    throw new Error('Invalid Mnemonic');
-  }
-  if (!isValidIdentifier) {
-    throw new Error('Invalid Identifier');
-  }
-  if (
-    identifier.length > IDENTIFIER_MAX_LENGTH ||
-    identifier.length < IDENTIFIER_MIN_LENGTH
-  ) {
-    throw new Error('Invalid Identifier length');
-  }
-  const pubKey = keyring.createFromUri(mnemonic).publicKey;
-  return {
-    "private": {
-      public_key: pubKey,// this is the public key linked to the did
-      identity: IDENTIFIER_PREFIX + identifier, // this is the actual did
-      metadata,
-    }
-  };
-};
-
-/**
- * Create Private DID and store the generated DID object in blockchain
- * @param vc_id
- * @param identifier
+ * Store the generated DID VC
+ * @param vcId
+ * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {String} txnId Txnid for storage operation.
  */
 
-async function createPrivateDid(vc_id, identifier, signingKeypair: KeyringPair, api?: ApiPromise) {
+async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  // Check if identifier is available
-  const did_hex = sanitiseDid(identifier);
+  // // Check if identifier is available
+  // const did_hex = sanitiseDid(identifier);
 
-  const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-  if(didCheck != null) {
-    //return new Error('did.DIDAlreadyExists');
-    throw(new Error('did.DIDAlreadyExists'));
-  }
+  // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
+  // if(didCheck != null) {
+  //   //return new Error('did.DIDAlreadyExists');
+  //   throw(new Error('did.DIDAlreadyExists'));
+  // }
 
   // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
   // if(pubkeyCheck) {
   //   throw(new Error('did.PublicKeyRegistered'));
   // }
 
-  const tx = provider.tx.did.createPrivate(vc_id, did_hex);
-  // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+  const tx = provider.tx.did.createPrivate(vcId, paraId);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -89,31 +56,30 @@ async function createPrivateDid(vc_id, identifier, signingKeypair: KeyringPair, 
 
 /**
  * Create Private DID and store the generated DID object in blockchain
- * @param vc_id
- * @param identifier
+ * @param vcId
+ * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {String} txnId Txnid for storage operation.
  */
 
- async function createPublicDid(vc_id, identifier, signingKeypair: KeyringPair, api?: ApiPromise) {
+ async function createPublic(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  // Check if identifier is available
-  const did_hex = sanitiseDid(identifier);
+  // // Check if identifier is available
+  // const did_hex = sanitiseDid(identifier);
 
-  const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-  if(didCheck != null) {
-    //return new Error('did.DIDAlreadyExists');
-    throw(new Error('did.DIDAlreadyExists'));
-  }
+  // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
+  // if(didCheck != null) {
+  //   //return new Error('did.DIDAlreadyExists');
+  //   throw(new Error('did.DIDAlreadyExists'));
+  // }
 
   // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
   // if(pubkeyCheck) {
   //   throw(new Error('did.PublicKeyRegistered'));
   // }
 
-  const tx = provider.tx.did.createPublic(vc_id, did_hex);
-  // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+  const tx = provider.tx.did.createPublic(vcId, paraId);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -219,7 +185,7 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
  * @param {KeyringObj} signingKeypair // of a validator account
  * @param {ApiPromise} api
  */
-async function updateDidKey(identifier, newKey, signingKeypair, api) {
+async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = await did.resolveDIDToAccount(did_hex, provider);
@@ -232,7 +198,7 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
     throw(new Error('did.PublicKeyRegistered'));
   }
   // call the rotateKey extrinsinc
-  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, paraId), 1000);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   let signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -304,7 +270,7 @@ async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
  * @param {KeyringObj} signingKeypair of a validator account
  * @param {ApiPromise} api
  */
-async function updateMetadata(identifier, metadata, signingKeypair, api: any = false) {
+async function updateMetadata(identifier, metadata, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
@@ -313,11 +279,42 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
   return submitTransaction(signedTx, provider);
 }
 
+/**
+ * Sync DID VC with other chains
+ * @param {String} identifier
+ * @param {String} paraId Optional
+ * @param {KeyringObj} signingKeypair of a validator account
+ * @param {ApiPromise} api
+ */
+async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, paraId), 1000);
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
+/**
+ * Remove DID VC
+ * @param {String} identifier
+ * @param {String} paraId Optional
+ * @param {KeyringObj} signingKeypair of a SUDO account
+ * @param {ApiPromise} api
+ */
+async function removeDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, paraId));
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
 export {
   generateMnemonic,
-  generateDID,
-  createPrivateDid,
-  createPublicDid,
+  createPrivate,
+  createPublic,
   getDIDDetails,
   updateDidKey,
   resolveDIDToAccount,
@@ -326,4 +323,6 @@ export {
   isDidValidator,
   updateMetadata,
   sanitiseDid,
+  syncDid,
+  removeDid
 };
