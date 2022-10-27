@@ -4,11 +4,12 @@
  import { ApiPromise } from '@polkadot/api';
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
+ import { HexString } from '@polkadot/util/types';
 
  
  /**
   * Mint token to given currency
-  * @param {String} vcId
+  * @param {HexString} vcId
   * @param {KeyringPair} senderAccountKeyPair
   * @param {APIPromise} api
   * @returns {hexString}
@@ -27,10 +28,10 @@
  
  /**
   * Slash token from given currency
-  * @param {String} vcId
+  * @param {HexString} vcId
   * @param {KeyringPair} senderAccountKeyPair
   * @param {APIPromise} api
-  * @returns {hexString}
+  * @returns {HexString}
   */
  async function slashToken(
    vcId,
@@ -46,7 +47,7 @@
  
 /**
  * Transfer tokens to a DID
- * @param {String} vcId
+ * @param {HexString} vcId
  * @param {String} toDid
  * @param {KeyringPair} senderAccountKeyPair
  * @param {APIPromise} api

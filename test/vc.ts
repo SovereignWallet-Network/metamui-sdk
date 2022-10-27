@@ -177,28 +177,6 @@ describe('VC works correctly', () => {
     }
   });
 
-  it('Store and approve Generic VC works correctly', async () => {
-    let genericVC = {
-      cid: 'yD5HYVIgzl3_3Ze3fMgc',
-    };
-    let owner = TEST_DAVE_DID;
-    let issuers = [
-      TEST_SWN_DID,
-      EVE_DID,
-    ];
-    const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypairValidator, provider, ssidUrl);
-    const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
-    let vcId = transaction.events.vc.VCValidated.vcid;
-    // console.log("VC ID: ", vcId);
-    let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
-    assert.doesNotReject(transaction);
-    assert.doesNotReject(apTxn);
-    let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
-    // console.log("Data from getGenericVCData : ", data);
-    let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
-    assert.strictEqual(verifyData, true);
-  });
-
   it("Store Token VC and approve works correctly", async () => {
     let vcData: any;
     let tokenVC = {
@@ -226,6 +204,28 @@ describe('VC works correctly', () => {
     vcData = await vc.getVCs(vc_id, provider);
     assert.strictEqual(vcData.vcType, VCType.TokenVC);
     assert.strictEqual(vcData.isVcActive, true);
+  });
+
+  it('Store and approve Generic VC works correctly', async () => {
+    let genericVC = {
+      cid: 'yD5HYVIgzl3_3Ze3fMgc',
+    };
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_SWN_DID,
+      EVE_DID,
+    ];
+    const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypairValidator, provider, ssidUrl); // SWN is also council member
+    const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+    let vcId = transaction.events.vc.VCValidated.vcid;
+    // console.log("VC ID: ", vcId);
+    let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
+    assert.doesNotReject(transaction);
+    assert.doesNotReject(apTxn);
+    let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
+    // console.log("Data from getGenericVCData : ", data);
+    let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
+    assert.strictEqual(verifyData, true);
   });
 
   it('Get VC Ids by DID after storing VC works correctly', async () => {
