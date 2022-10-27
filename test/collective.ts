@@ -15,7 +15,6 @@ describe('Collective works correctly', () => {
   let newMembers;
   let proposalHash;
   let index;
-  let sudoKey;
   const TEST_EVE_DID = "did:ssid:eve";
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
@@ -29,7 +28,6 @@ describe('Collective works correctly', () => {
     before(async () => {
       provider = await buildConnection(constants.providerNetwork);
       let keyring = await initKeyring();
-      sudoKey = await provider.query.sudo.key();
       sudoPair = keyring.addFromUri('//Alice');
       sigKeyPairSwn = keyring.addFromUri('//Swn');
       sigKeyPairEve = keyring.addFromUri('//Eve');

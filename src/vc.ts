@@ -64,11 +64,12 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
- async function createMintSlashVC({ vcId, currencyCode, amount }, api?: ApiPromise) {
+ async function createMintSlashVC({ vc_id, currency_code, amount }, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+  let tokenAmount = await getFormattedTokenAmount(currency_code, amount, provider);
   let vcProperty = {
-    vc_id: vcId,
+    vc_id: vc_id,
+    currency_code: utils.encodeData(currency_code.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     amount: utils.encodeData(tokenAmount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
@@ -85,11 +86,11 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} vcProperty.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
-async function createTokenTransferVC({ vcId, currencyCode, amount }, api?: ApiPromise) {
+async function createTokenTransferVC({ vc_id, currency_code, amount }, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currencyCode, amount, provider);
+  let tokenAmount = await getFormattedTokenAmount(currency_code, amount, provider);
   let vcProperty = {
-    vc_id: vcId,
+    vc_id: vc_id,
     amount: utils.encodeData(tokenAmount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.TokenTransferVC)
@@ -519,18 +520,19 @@ async function getFormattedTokenAmount(
   tokenAmount: string,
   api: ApiPromise
 ) {
-    const tokenData = await api.rpc.system.properties();
+    const token = await api.rpc.system.properties();
+    const tokenData: any = token.toHuman();
     let amount_decimals = 0;
 
-    if(tokenSymbol !== tokenData?.['tokenSymbol'][0]) {
+    if(hexToString(tokenSymbol) !== tokenData.tokenSymbol[0]) {
       throw new Error("Invalid token symbol");
     }
     // Check if valid number or not
     if (isNaN(Number(tokenAmount))) {
       throw new Error(`Invalid token amount!`);
     }
-    if (tokenAmount.includes('.')) {
-      amount_decimals = tokenAmount.split('.')[1].length;
+    if (String(tokenAmount).includes('.')) {
+      amount_decimals = String(tokenAmount).split('.')[1].length;
     };
     if (amount_decimals > Number(tokenData?.['tokenDecimals'][0])) {
       throw new Error(`Invalid token amount, max supported decimal by ${tokenData?.['tokenSymbol'][0]} is ${tokenData?.['tokenDecimals'][0]}`);
