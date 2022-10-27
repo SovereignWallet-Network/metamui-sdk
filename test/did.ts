@@ -35,6 +35,7 @@ describe('DID Module works correctly', () => {
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
   let signKeypairEve: KeyringPair;
+  let signKeypairTemp: KeyringPair;
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
   let vcId: HexString = '0x';
@@ -48,6 +49,7 @@ describe('DID Module works correctly', () => {
     signKeypairFenn = keyring.addFromUri('//Fenn');
     signKeypairPublic = keyring.addFromUri('//Public');
     signKeypairPrivate = keyring.addFromUri('//Private');
+    signKeypairTemp = keyring.addFromUri('//Temp');
   });
 
 
@@ -222,9 +224,6 @@ describe('DID Module works correctly', () => {
       ];
       
       let vcHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
-      // console.log("vcHex: \n", vcHex);
-      // console.log("Decoded vcHex: \n", utils.decodeHex(vcHex, "VC"));
-      // console.log("Decoded Bob Hex  VC Property: \n", utils.decodeHex(utils.decodeHex(vcHex, "VC").vc_property, "PrivateDidVC"));
       const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
       assert.doesNotReject(transaction);
       vcId = transaction.events.vc.VCValidated.vcid;
@@ -238,17 +237,37 @@ describe('DID Module works correctly', () => {
       assert.strictEqual(newDidDetails.identifier, did.sanitiseDid(privateDidVCObj.did));
     });
 
-    it.skip('create PrivateDid throws error on duplicate ssid', async () => {
-      // const data = did.storeDIDOnChain(newDidObj, sigKeypairWithBal, provider);
-      await assert.rejects(did.createPrivate(vcId, null, sigKeypairValidator, provider), (err: any) => {
+    it('create PrivateDid throws error on duplicate did', async () => {
+      let owner = did.sanitiseDid("did:ssid:ferdie");
+      let privateDidVCObj = {
+        public_key: signKeypairTemp.publicKey,
+        did: "did:ssid:fenn"
+      };
+      let issuers = [
+        "did:ssid:swn"
+      ];
+      let vcHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
+      const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+      assert.doesNotReject(transaction);
+      let tempVc = transaction.events.vc.VCValidated.vcid;
+      await assert.rejects(did.createPrivate(tempVc, null, sigKeypairValidator, provider), (err: any) => {
         assert.equal(err.message, 'did.DIDAlreadyExists');
         return true;
       });
     });
 
-    it.skip('storeDIDOnChain throws error on duplicate public key', async () => {
-      await assert.rejects(did.createPrivate(vcId, null, sigKeypairValidator, provider), (err: any) => {
-        assert.equal(err.message, 'did.PublicKeyRegistered');
+    it('storeDID VC throws error on duplicate public key', async () => {
+      let owner = did.sanitiseDid("did:ssid:ferdie");
+      let privateDidVCObj = {
+        public_key: signKeypairFenn.publicKey,
+        did: "did:ssid:tempdid"
+      };
+      let issuers = [
+        "did:ssid:swn"
+      ];
+      let vcHex = await vc.generateVC(privateDidVCObj, owner, issuers, "PrivateDidVC", sigKeypairValidator); // Validator Swn
+      await assert.rejects(vc.storeVC(vcHex, sigKeypairValidator, provider), (err: any) => {
+        assert.equal(err.message, 'vc.PublicKeyRegistered');
         return true;
       });
     });
