@@ -6,7 +6,7 @@ import { initKeyring, SSID_BASE_URL } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
 import * as utils from '../src/utils';
-import { removeDid, councilStoreVC, sudoStoreVC} from './common/helper';
+import { removeDid, councilStoreVC, sudoStoreVC } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
@@ -79,7 +79,7 @@ describe('VC works correctly', () => {
     }
     let owner = TEST_DAVE_DID;
     let issuers = [
-        TEST_DAVE_DID
+      TEST_DAVE_DID
     ];
 
     let vcHex = await vc.generateVC(vc_property, owner, issuers, VCType.MintTokens, signKeypairDave, provider);
@@ -88,6 +88,28 @@ describe('VC works correctly', () => {
     let mintToken = await token.mintToken(mint_vc_id, signKeypairDave, provider);
     assert.doesNotReject(mintToken);
   });
+
+  it('Transfer Token VC works created correctly', async () => {
+    // console.log("///  Test Case 3 /// Transfer TokenVC Creation");
+    let vc_property = {
+      vc_id,
+      currency_code: utils.encodeData('MUI'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
+      amount: 1000,
+      to: sigKeypairBob.address
+    }
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_DAVE_DID
+    ];
+
+    let vcHex = await vc.generateVC(vc_property, owner, issuers, VCType.MintTokens, signKeypairDave, provider);
+    let txn = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+    let mint_vc_id = txn.events.vc.VCValidated.vcid;
+    let transferToken = await token.transferToken(mint_vc_id, sigKeypairBob.address, signKeypairDave, provider);
+    assert.doesNotReject(transferToken);
+  });
+
+
 
   after(async () => {
     // Delete created DIDs
