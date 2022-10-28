@@ -78,7 +78,7 @@ async function councilVoteTxn(call, sigKeypairOwner: any, sigKeypairRoot: Keyrin
   await collective.vote(proposalHash, index, true, sigKeypairRoot, provider);
   await collective.vote(proposalHash, index, true, sigKeypairCouncil, provider);
   await collective.vote(proposalHash, index, true, sigKeypairOwner, provider);
-  return await collective.close(proposalHash, index, 1000, 1000, sigKeypairRoot, provider);
+  return await collective.close(proposalHash, index, 506043000, 1000, sigKeypairRoot, provider);
 }
 
 async function sudoTxn(call, sudoKeyPair: KeyringPair, provider: ApiPromise) {

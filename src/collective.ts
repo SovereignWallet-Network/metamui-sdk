@@ -35,6 +35,12 @@ async function setMembers(newMembers: String[], prime: String, oldCount: number,
 async function propose(threshold, proposal, lengthCount, signingKeypair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
+  const txnInfo = await provider.tx.council.propose(threshold, proposal, lengthCount).paymentInfo(signingKeypair);
+  console.log(`
+  class=${txnInfo.class.toString()},
+  weight=${txnInfo.weight.toString()},
+  partialFee=${txnInfo.partialFee.toHuman()}
+`);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
