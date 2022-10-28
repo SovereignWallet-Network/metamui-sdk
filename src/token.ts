@@ -63,7 +63,7 @@ async function transferToken(
     let to_did_hex = sanitiseDid(toDid);
     let to_did_check = await resolveDIDToAccount(to_did_hex, api);
     if (!to_did_check) {
-        throw new Error('token.RecipentDIDNotRegistered');
+        throw new Error('DID.RecipentDIDNotRegistered');
     }
     const provider = api || (await buildConnection('local'));
     const tx = provider.tx.token.transferToken(vcId, to_did_hex);
@@ -100,10 +100,10 @@ async function withdrawReserved(
         )
     ]);
     if (!to_account_id) {
-        throw new Error('token.RecipentDIDNotRegistered');
+        throw new Error('DID.RecipentDIDNotRegistered');
     }
     if (!from_account_id) {
-        throw new Error('token.SenderDIDNotRegistered');
+        throw new Error('DID.SenderDIDNotRegistered');
     }
 
     const provider = api || (await buildConnection('local'));
