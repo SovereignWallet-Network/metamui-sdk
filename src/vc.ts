@@ -64,13 +64,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
- async function createMintSlashVC({ vc_id, currency_code, amount }, api?: ApiPromise) {
-  const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currency_code, amount, provider);
+ async function createMintSlashVC({ vc_id, amount }) {
   let vcProperty = {
     vc_id: vc_id,
-    currency_code: utils.encodeData(currency_code.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
-    amount: utils.encodeData(tokenAmount, 'Balance'),
+    amount: utils.encodeData(amount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
@@ -86,12 +83,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} vcProperty.amount In Highest Form
  * @returns {String} Token VC Hex String
  */
-async function createTokenTransferVC({ vc_id, currency_code, amount }, api?: ApiPromise) {
-  const provider = api || (await buildConnection('local'));
-  let tokenAmount = await getFormattedTokenAmount(currency_code, amount, provider);
+async function createTokenTransferVC({ vc_id, amount }) {
   let vcProperty = {
     vc_id: vc_id,
-    amount: utils.encodeData(tokenAmount, 'Balance'),
+    amount: utils.encodeData(amount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.TokenTransferVC)
     .padEnd((utils.VC_PROPERTY_BYTES * 2) + 2, '0'); // *2 for hex and +2 bytes for 0x
@@ -168,10 +163,10 @@ function createPrivateDidVC({ public_key, did }) {
       break;
     case VCType.MintTokens:
     case VCType.SlashTokens:
-      encodedVCProperty = await createMintSlashVC(vcProperty, api);
+      encodedVCProperty = await createMintSlashVC(vcProperty);
       break;
     case VCType.TokenTransferVC:
-      encodedVCProperty = await createTokenTransferVC(vcProperty, api);
+      encodedVCProperty = await createTokenTransferVC(vcProperty);
       break;
     case VCType.GenericVC:
       encodedVCProperty = createGenericVC(vcProperty);

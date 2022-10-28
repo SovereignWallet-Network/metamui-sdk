@@ -77,21 +77,6 @@ describe('VC works correctly', () => {
     assert.deepEqual(actualObject.issuers, expectedObject.issuers);
     assert.strictEqual(actualObject.vc_property, expectedObject.vc_property);
   });
-
-  it('Mint Token VC is created correctly', async () => {
-    // console.log("///  Test Case 2 /// Mint TokenVC Creation");
-    let vc_property = {
-      vc_id: '0x33abedba92bb1acd284419f93e687590af928c268b633786e61b2f2c5635662d',
-      currency_code: utils.encodeData('OTH'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-      amount: 1000
-    }
-    const vc_property_hex = utils.encodeData(vc_property, 'SlashMintTokens');
-    const actual_vc_property = utils.decodeHex(vc_property_hex, 'SlashMintTokens');
-    assert.strictEqual(vc_property.vc_id, actual_vc_property.vc_id);
-    assert.strictEqual(vc_property.currency_code, actual_vc_property.currency_code);
-    assert.strictEqual(vc_property.amount, actual_vc_property.amount);
-  });
-
   
   it('Token VC creation fails token name is not given', async () => {
     let tokenVC = {

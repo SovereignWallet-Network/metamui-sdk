@@ -99,12 +99,10 @@ const METABLOCKCHAIN_TYPES = {
   },
   "SlashMintTokens": {
     "vc_id": "VCid",
-    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "TokenTransferVC": {
     "vc_id": "VCid",
-    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "GenericVC": {

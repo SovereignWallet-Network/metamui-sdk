@@ -26,6 +26,7 @@ describe('VC works correctly', () => {
   let ssidUrl: string;
   const TEST_DAVE_DID = "did:ssid:dave";
   const TEST_SWN_DID = "did:ssid:swn";
+  const TEST_BOB_DID = "did:ssid:bob";
 
   let vc_id: HexString;
 
@@ -61,20 +62,17 @@ describe('VC works correctly', () => {
     // console.log("///  Test Case 2 /// Mint TokenVC Creation");
     let vc_property = {
       vc_id,
-      currency_code: utils.encodeData('MUI'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
       amount: 1000
     }
     const vc_property_hex = utils.encodeData(vc_property, 'SlashMintTokens');
     const actual_vc_property = utils.decodeHex(vc_property_hex, 'SlashMintTokens');
     assert.strictEqual(vc_property.vc_id, actual_vc_property.vc_id);
-    assert.strictEqual(vc_property.currency_code, actual_vc_property.currency_code);
     assert.strictEqual(vc_property.amount, actual_vc_property.amount);
   });
 
   it('Mint Token VC is stored correctly', async () => {
     let vc_property = {
       vc_id,
-      currency_code: utils.encodeData('MUI'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
       amount: 1000
     }
     let owner = TEST_DAVE_DID;
@@ -90,22 +88,19 @@ describe('VC works correctly', () => {
   });
 
   it('Transfer Token VC works created correctly', async () => {
-    // console.log("///  Test Case 3 /// Transfer TokenVC Creation");
     let vc_property = {
       vc_id,
-      currency_code: utils.encodeData('MUI'.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'CurrencyCode'),
-      amount: 1000,
-      to: sigKeypairBob.address
+      amount: 50,
     }
     let owner = TEST_DAVE_DID;
     let issuers = [
       TEST_DAVE_DID
     ];
 
-    let vcHex = await vc.generateVC(vc_property, owner, issuers, VCType.MintTokens, signKeypairDave, provider);
+    let vcHex = await vc.generateVC(vc_property, owner, issuers, VCType.TokenTransferVC, signKeypairDave, provider);
     let txn = await vc.storeVC(vcHex, sigKeypairValidator, provider);
-    let mint_vc_id = txn.events.vc.VCValidated.vcid;
-    let transferToken = await token.transferToken(mint_vc_id, sigKeypairBob.address, signKeypairDave, provider);
+    let transfer_vc_id = txn.events.vc.VCValidated.vcid;
+    let transferToken = await token.transferToken(transfer_vc_id, TEST_BOB_DID, signKeypairDave, provider);
     assert.doesNotReject(transferToken);
   });
 
