@@ -2,7 +2,7 @@
     "name": "metamui-sdk",
     "version": "1.0.0",
     "description": "An SDK to implement function calls to the metamui-core",
-    "main": "src/index.ts",
+    "main": "dist/index.js",
     "scripts": {
         "prepare": "yarn build",
         "build": "tsc -b",
