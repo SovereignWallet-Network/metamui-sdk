@@ -6,7 +6,7 @@ import { initKeyring, SSID_BASE_URL } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
 import * as utils from '../src/utils';
-import { removeDid, councilStoreVC, sudoStoreVC } from './common/helper';
+import { sudoStoreVC, councilVoteTxn } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
@@ -104,6 +104,31 @@ describe('VC works correctly', () => {
     assert.doesNotReject(transferToken);
   });
 
+  it('Slash Token VC works created correctly', async () => {
+    let vc_property = {
+      vc_id,
+      amount: 50,
+    };
+    let owner = TEST_DAVE_DID;
+    let issuers = [
+      TEST_DAVE_DID
+    ];
+
+    let vcHex = await vc.generateVC(vc_property, owner, issuers, VCType.SlashTokens, signKeypairDave, provider);
+    let txn = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+    let slash_vc_id = txn.events.vc.VCValidated.vcid;
+    let slashToken = await token.slashToken(slash_vc_id, signKeypairDave, provider);
+    assert.doesNotReject(slashToken);
+  });
+
+  it('Withdraw reserved works correctly', async () => {
+    let toDid = "did:ssid:bob";
+    let fromDid = "did:ssid:dave";
+    let amount = 100;
+    let call = provider.tx.token.withdrawReserved(did.sanitiseDid(toDid), did.sanitiseDid(fromDid), amount);
+    let txn = await councilVoteTxn(call, signKeypairDave, sigKeypair, sigKeypairValidator, provider);
+    assert.doesNotReject(txn);
+  });
 
 
   after(async () => {
