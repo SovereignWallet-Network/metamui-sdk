@@ -15,6 +15,7 @@ const did_1 = require("./did");
 const helper_1 = require("./common/helper");
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {String} did
+* @param {APIPromise} api (optional)
 */
 const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () {
     // Resolve the did to get account ID
@@ -23,9 +24,13 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
         try {
             const provider = api || (yield (0, connection_1.buildConnection)('local'));
             const did_hex = (0, did_1.sanitiseDid)(did);
+            const token = yield provider.rpc.system.properties();
+            const tokenData = token.toHuman();
+            let decimals = tokenData === null || tokenData === void 0 ? void 0 : tokenData['tokenDecimals'][0];
+            console.log('Decimals', decimals);
             const accountInfo = yield provider.query.token.account(did_hex);
             const data = (_a = accountInfo.toJSON()) === null || _a === void 0 ? void 0 : _a['data'];
-            resolve(data.free / 1e6);
+            resolve(data.free / Math.pow(10, decimals));
         }
         catch (err) {
             // console.log(err);
@@ -41,8 +46,11 @@ const subscribeToBalanceChanges = (identifier, callback, api) => __awaiter(void 
     try {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = (0, did_1.sanitiseDid)(identifier);
+        const token = yield provider.rpc.system.properties();
+        const tokenData = token.toHuman();
+        let decimals = tokenData === null || tokenData === void 0 ? void 0 : tokenData['tokenDecimals'][0];
         return yield provider.query.token.account(did_hex, ({ data: { free: currentBalance } }) => {
-            callback(currentBalance.toNumber() / 1e6);
+            callback(currentBalance.toNumber() / Math.pow(10, decimals));
         });
     }
     catch (err) {

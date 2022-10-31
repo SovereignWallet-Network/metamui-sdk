@@ -14,7 +14,7 @@ const api_1 = require("@polkadot/api");
 const util_crypto_1 = require("@polkadot/util-crypto");
 const METABLOCKCHAIN_PROVIDER = {
     LOCAL: 'ws://127.0.0.1:9944',
-    DEV: 'wss://n3testnet.metabit.exchange',
+    DEV: 'wss://n1devnet.metabit.exchange',
     TESTNET: 'wss://n3testnet.metabit.exchange',
     DEMO: 'wss://demo.metamui.money',
     MAINNET: ['wss://n2.metamui.id', 'wss://n1.metamui.id', 'wss://n3.metamui.id', 'wss://n4.metamui.id'],
