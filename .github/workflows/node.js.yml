@@ -25,5 +25,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: GitHub Action for Yarn
         uses: Borales/actions-yarn@v3
-      - run: yarn
+      - run: sudo chmod -R 7777 /home/runner/work/metamui-sdk/metamui-sdk
+      - run: sudo yarn
       - run: yarn test:dev
