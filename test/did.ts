@@ -335,13 +335,13 @@ describe('DID Module works correctly', () => {
       assert.strictEqual(keyUpdateBlockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');
       assert.strictEqual(nextblockNumberAcc, '5CA8uxffSzq2JyXVKXBudbgC3zBkQGzH2WUUf8ogBiJzxvFJ');
     });
+
+
+    after(async () => {
+      // Delete created DID (did:ssid:rocket)
+      if (constants.providerNetwork == 'local') {
+        await removeDid('did:ssid:fenn', null, sigKeypair, provider);
+      }
+    })
   }
-
-
-  after(async () => {
-    // Delete created DID (did:ssid:rocket)
-    if (constants.providerNetwork == 'local') {
-      await removeDid('did:ssid:fenn', null, sigKeypair, provider);
-    }
-  })
 });

@@ -162,6 +162,8 @@ describe('VC works correctly', () => {
     }
   });
 
+  if (constants.providerNetwork == 'local') {
+
   it("Store Token VC and approve works correctly", async () => {
     let vcData: any;
     let tokenVC = {
@@ -239,6 +241,7 @@ describe('VC works correctly', () => {
     const vcs: any = await vc.getVCs(vc_id, provider);
     assert.strictEqual(vcs.isVcActive, false);
   });
+}
 
   after(async () => {
     // Delete created DIDs

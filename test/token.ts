@@ -30,6 +30,8 @@ describe('Token works correctly', () => {
 
   let vc_id: HexString;
 
+  if (constants.providerNetwork == 'local') {
+
   before(async () => {
     keyring = await initKeyring();
     sigKeypair = keyring.addFromUri('//Alice');
@@ -129,7 +131,7 @@ describe('Token works correctly', () => {
     let txn = await councilVoteTxn(call, signKeypairDave, sigKeypair, sigKeypairValidator, provider);
     assert.doesNotReject(txn);
   });
-
+}
 
   after(async () => {
     // Delete created DIDs
