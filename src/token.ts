@@ -11,8 +11,8 @@
   * Mint token to given currency
   * @param {HexString} vcId
   * @param {KeyringPair} senderAccountKeyPair
-  * @param {APIPromise} api
-  * @returns {hexString}
+  * @param {ApiPromise} api
+  * @returns {Object} Transaction Object
   */
   async function mintToken(
     vcId,
@@ -30,8 +30,8 @@
   * Slash token from given currency
   * @param {HexString} vcId
   * @param {KeyringPair} senderAccountKeyPair
-  * @param {APIPromise} api
-  * @returns {HexString}
+  * @param {ApiPromise} api
+  * @returns {Object} Transaction Object
   */
  async function slashToken(
    vcId,
@@ -50,8 +50,8 @@
  * @param {HexString} vcId
  * @param {String} toDid
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
 */
 async function transferToken(
     vcId,
@@ -78,8 +78,8 @@ async function transferToken(
  * @param {String} fromDid
  * @param {Number} amount
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function withdrawReserved(
     toDid,

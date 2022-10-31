@@ -18,8 +18,8 @@ const helper_1 = require("./common/helper");
  * Mint token to given currency
  * @param {HexString} vcId
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function mintToken(vcId, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -35,8 +35,8 @@ exports.mintToken = mintToken;
  * Slash token from given currency
  * @param {HexString} vcId
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {HexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function slashToken(vcId, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -53,8 +53,8 @@ exports.slashToken = slashToken;
  * @param {HexString} vcId
  * @param {String} toDid
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
 */
 function transferToken(vcId, toDid, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -77,8 +77,8 @@ exports.transferToken = transferToken;
  * @param {String} fromDid
  * @param {Number} amount
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {

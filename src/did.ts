@@ -5,6 +5,7 @@ import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
 import { submitTransaction } from './common/helper';
+import { HexString } from '@polkadot/util/types';
 
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
@@ -25,11 +26,11 @@ const checkIdentifierFormat = (identifier) => {
 
 /**
  * Store the generated DID VC
- * @param vcId
+ * @param {HexString} vcId
  * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
- * @returns {String} txnId Txnid for storage operation.
+ * @returns {Object} Transaction Object
  */
 
 async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
@@ -56,11 +57,11 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
 
 /**
  * Create Private DID and store the generated DID object in blockchain
- * @param vcId
+ * @param {HexString} vcId
  * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
- * @returns {String} txnId Txnid for storage operation.
+ * @returns {Object} Transaction Object
  */
 
  async function createPublic(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
@@ -89,7 +90,8 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
 /**
  * Get did information from accountID
  * @param {String} identifier DID Identifier
- * @returns {JSON}
+ * @param {ApiPromise} api
+ * @returns {JSON} DID Information
  */
 async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJson> {
   try {
@@ -132,10 +134,8 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
  * @param {String} identifier
  * @param {ApiPromise} api
  * @param {Number} blockNumber (optional)
- * @returns {String}
+ * @returns {JSON}
  */
-
-
 
 async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNumber?: number) {
   const provider = api || (await buildConnection('local'));
@@ -167,6 +167,7 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
  * Get the DID associated to given accountID
  * @param {String} accountId (hex/base64 version works)
  * @param {ApiPromise} api
+ * @returns {JSON}
  */
 async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | boolean> {
   const provider = api || (await buildConnection('local'));
@@ -184,9 +185,10 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
  * It should only be called by validator accounts, else will fail
  * @param {String} identifier
  * @param {Uint8Array} newKey
- * @param {KeyringPair} paraId
- * @param {KeyringObj} signingKeypair // of a validator account
+ * @param {Number} paraId
+ * @param {KeyringPair} signingKeypair // of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -243,6 +245,7 @@ const sanitiseDid = (did) => {
  * Check if the user is an approved validator
  * @param {String} identifier
  * @param {ApiPromise} api
+ * @returns {Boolean}
  */
 async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
   const provider = api || (await buildConnection('local'));
@@ -258,7 +261,7 @@ async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
  * Fetch the history of rotated keys for the specified DID
  * @param {String} identifier
  * @param {ApiPromise} api
- * @returns {Array}
+ * @returns {JSON}
  */
 async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
   const provider = api || (await buildConnection('local'));
@@ -270,8 +273,9 @@ async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
  *
  * @param {String} identifier
  * @param {String} metadata
- * @param {KeyringObj} signingKeypair of a validator account
+ * @param {Keyringpair} signingKeypair of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function updateMetadata(identifier, metadata, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -285,9 +289,10 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: ApiProm
 /**
  * Sync DID VC with other chains
  * @param {String} identifier
- * @param {String} paraId Optional
- * @param {KeyringObj} signingKeypair of a validator account
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -301,9 +306,10 @@ async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromis
 /**
  * Remove DID VC
  * @param {String} identifier
- * @param {String} paraId Optional
- * @param {KeyringObj} signingKeypair of a SUDO account
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a SUDO account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function removeDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));

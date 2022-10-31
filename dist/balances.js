@@ -41,6 +41,8 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
 exports.getBalance = getBalance;
 /** Listen to balance changes for a DID and execute the callback.
 * @param {String} identifier
+* @param {Function} callback
+* @param {APIPromise} api
 */
 const subscribeToBalanceChanges = (identifier, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -65,7 +67,7 @@ exports.subscribeToBalanceChanges = subscribeToBalanceChanges;
  * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
  * @param {String} receiverDID
- * @param {String} amount In Lowest Form
+ * @param {Number} amount In Lowest Form
  * @param {APIPromise} api (optional)
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
@@ -93,9 +95,9 @@ exports.transfer = transfer;
  *
  * @param {KeyPair} senderAccountKeyPair
  * @param {String} receiverDID
- * @param {String} amount In Lowest Form
+ * @param {Number} amount In Lowest Form
  * @param {String} memo
- * @param {APIPromise} api (optional)
+ * @param {APIPromise} api
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
  */

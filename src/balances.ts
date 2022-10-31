@@ -30,6 +30,8 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
 
 /** Listen to balance changes for a DID and execute the callback.
 * @param {String} identifier
+* @param {Function} callback
+* @param {APIPromise} api
 */
 const subscribeToBalanceChanges = async (identifier: string, callback: (balance: number) => void, api: ApiPromise) => {
   try {
@@ -54,7 +56,7 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
  * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
  * @param {String} receiverDID
- * @param {String} amount In Lowest Form
+ * @param {Number} amount In Lowest Form
  * @param {APIPromise} api (optional)
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
@@ -87,9 +89,9 @@ async function transfer(
  * 
  * @param {KeyPair} senderAccountKeyPair
  * @param {String} receiverDID
- * @param {String} amount In Lowest Form
+ * @param {Number} amount In Lowest Form
  * @param {String} memo
- * @param {APIPromise} api (optional)
+ * @param {APIPromise} api
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
  */

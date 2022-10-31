@@ -29,11 +29,11 @@ const checkIdentifierFormat = (identifier) => {
 };
 /**
  * Store the generated DID VC
- * @param vcId
+ * @param {HexString} vcId
  * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
- * @returns {String} txnId Txnid for storage operation.
+ * @returns {Object} Transaction Object
  */
 function createPrivate(vcId, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -58,11 +58,11 @@ function createPrivate(vcId, paraId = null, signingKeypair, api) {
 exports.createPrivate = createPrivate;
 /**
  * Create Private DID and store the generated DID object in blockchain
- * @param vcId
+ * @param {HexString} vcId
  * @param paraId Optional - Stores in current chain if paraId not provided
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
- * @returns {String} txnId Txnid for storage operation.
+ * @returns {Object} Transaction Object
  */
 function createPublic(vcId, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -88,7 +88,8 @@ exports.createPublic = createPublic;
 /**
  * Get did information from accountID
  * @param {String} identifier DID Identifier
- * @returns {JSON}
+ * @param {ApiPromise} api
+ * @returns {JSON} DID Information
  */
 function getDIDDetails(identifier, api) {
     var _a, _b;
@@ -135,7 +136,7 @@ exports.getDIDDetails = getDIDDetails;
  * @param {String} identifier
  * @param {ApiPromise} api
  * @param {Number} blockNumber (optional)
- * @returns {String}
+ * @returns {JSON}
  */
 function resolveDIDToAccount(identifier, api, blockNumber) {
     var _a;
@@ -171,6 +172,7 @@ exports.resolveDIDToAccount = resolveDIDToAccount;
  * Get the DID associated to given accountID
  * @param {String} accountId (hex/base64 version works)
  * @param {ApiPromise} api
+ * @returns {JSON}
  */
 function resolveAccountIdToDid(accountId, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -189,9 +191,10 @@ exports.resolveAccountIdToDid = resolveAccountIdToDid;
  * It should only be called by validator accounts, else will fail
  * @param {String} identifier
  * @param {Uint8Array} newKey
- * @param {KeyringPair} paraId
- * @param {KeyringObj} signingKeypair // of a validator account
+ * @param {Number} paraId
+ * @param {KeyringPair} signingKeypair // of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function updateDidKey(identifier, newKey, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -248,6 +251,7 @@ exports.sanitiseDid = sanitiseDid;
  * Check if the user is an approved validator
  * @param {String} identifier
  * @param {ApiPromise} api
+ * @returns {Boolean}
  */
 function isDidValidator(identifier, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -265,7 +269,7 @@ exports.isDidValidator = isDidValidator;
  * Fetch the history of rotated keys for the specified DID
  * @param {String} identifier
  * @param {ApiPromise} api
- * @returns {Array}
+ * @returns {JSON}
  */
 function getDidKeyHistory(identifier, api = false) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -279,8 +283,9 @@ exports.getDidKeyHistory = getDidKeyHistory;
  *
  * @param {String} identifier
  * @param {String} metadata
- * @param {KeyringObj} signingKeypair of a validator account
+ * @param {Keyringpair} signingKeypair of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function updateMetadata(identifier, metadata, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -296,9 +301,10 @@ exports.updateMetadata = updateMetadata;
 /**
  * Sync DID VC with other chains
  * @param {String} identifier
- * @param {String} paraId Optional
- * @param {KeyringObj} signingKeypair of a validator account
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function syncDid(identifier, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -314,9 +320,10 @@ exports.syncDid = syncDid;
 /**
  * Remove DID VC
  * @param {String} identifier
- * @param {String} paraId Optional
- * @param {KeyringObj} signingKeypair of a SUDO account
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a SUDO account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function removeDid(identifier, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {

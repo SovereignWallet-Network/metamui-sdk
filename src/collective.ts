@@ -9,8 +9,9 @@ import { submitTransaction } from './common/helper';
  * @param  {Array<String>} newMembers Array of Did
  * @param  {String} prime Did of Prime
  * @param  {Number} oldCount Old members count
- * @param  {KeyPair} signingKeypair Key pair of Sender
- * @returns {String} Hash
+ * @param  {KeyringPair} signingKeypair Key pair of Sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function setMembers(newMembers: String[], prime: String, oldCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -30,7 +31,9 @@ async function setMembers(newMembers: String[], prime: String, oldCount: number,
  * @param  {Number} threshold Threshold to successfull execution
  * @param  {Call} proposal Call to propose
  * @param  {Number} lengthCount Length of call
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function propose(threshold, proposal, lengthCount, signingKeypair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -50,7 +53,9 @@ async function propose(threshold, proposal, lengthCount, signingKeypair, api: Ap
  * To Execute a call
  * @param  {Call} proposal Call to propose
  * @param  {Number} lengthCount Length of Call
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function execute(proposal, lengthCount, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -65,7 +70,9 @@ async function execute(proposal, lengthCount, signingKeypair: KeyringPair, api: 
  * @param  {String} proposalHash Hash of proposal
  * @param  {Number} index Proposal index
  * @param  {Boolean} approve True/false
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function vote(proposalHash, index, approve, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -81,7 +88,9 @@ async function vote(proposalHash, index, approve, signingKeypair: KeyringPair, a
  * @param  {Number} index Proposal index
  * @param  {Boolean} proposalWeightBond Weight
  * @param  {Number} lengthCount Length
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -94,7 +103,9 @@ async function close(proposalHash, index, proposalWeightBond, lengthCount, signi
 /**
  * Disapprove proposal
  * @param  {String} proposalHash Hash
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 async function disapproveProposal(proposalHash, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
@@ -107,7 +118,7 @@ async function disapproveProposal(proposalHash, signingKeypair: KeyringPair, api
 }
 /**
  * Get Members of Council
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getMembers(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -115,7 +126,7 @@ async function getMembers(api?: ApiPromise) {
 }
 /**
  * Get Prime of Council
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getPrime(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -123,7 +134,7 @@ async function getPrime(api?: ApiPromise) {
 }
 /**
  * Get All Proposals
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getProposals(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -132,7 +143,7 @@ async function getProposals(api?: ApiPromise) {
 /**
  * Get Proposal of given hash
  * @param {Hash} proposalHash Hash of proposal
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getProposalOf(proposalHash: String, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -141,7 +152,7 @@ async function getProposalOf(proposalHash: String, api?: ApiPromise) {
 /**
  * Get Votes of given proposal hash
  * @param {Hash} proposalHash Hash of proposal
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getVotes(proposalHash: String, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
@@ -149,7 +160,7 @@ async function getVotes(proposalHash: String, api?: ApiPromise) {
 }
 /**
  * Get Total proposals count
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 async function getProposalCount(api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));

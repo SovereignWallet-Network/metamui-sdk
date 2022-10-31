@@ -18,7 +18,7 @@ describe('Balances works correctly', () => {
     const provider = await buildConnection(constants.providerNetwork);
     sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
     // Empty dave account by sending to swn before running this test case
-    sigKeypairWithoutBal = keyring.createFromUri('//DaveWOBal');
+    sigKeypairWithoutBal = keyring.createFromUri('//Dave');
     if (constants.providerNetwork == 'local') {
       const didObjTest123 = {
         private: {

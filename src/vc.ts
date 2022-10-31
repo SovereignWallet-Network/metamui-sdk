@@ -13,7 +13,6 @@ import { decodeHex, hexToString, VCType } from "./utils";
 import { SSID_BASE_URL } from "./config";
 import axios from "axios";
 
-// 
 /**
  * Encodes Token VC and pads with appropriate bytes
  * @param {Object} TokenVC
@@ -58,11 +57,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
 
 
 /** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} MintSlashVC
- * @param  {String} MintSlashVC.vcId
- * @param  {String} MintSlashVC.currencyCode
+ * @param  {Object} MintSlashVC VC Property
+ * @param  {String} MintSlashVC.vcId VC Id
  * @param  {String} MintSlashVC.amount In Highest Form
- * @returns {String} Token VC Hex String
+ * @returns {HexString} Token VC Hex String
  */
  async function createMintSlashVC({ vc_id, amount }) {
   let vcProperty = {
@@ -75,13 +73,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
 
 
 /** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} vcProperty
- * @param  {String} vcProperty.vcId 
- * @param  {String} vcProperty.vcId 
- * @param  {String} vcProperty.vcId 
- * @param  {String} vcProperty.currencyCode
+ * @param  {Object} vcProperty VC Property
+ * @param  {String} vcProperty.vcId VC Id
  * @param  {String} vcProperty.amount In Highest Form
- * @returns {String} Token VC Hex String
+ * @returns {HexString} Token VC Hex String
  */
 async function createTokenTransferVC({ vc_id, amount }) {
   let vcProperty = {
@@ -111,9 +106,9 @@ function createGenericVC({ cid }) {
  * Create Public Did VC
  * @param {Object} publicDidVC
  * @param {String} publicDidVC.public_key
- * @param {String} publicDidVC.did
  * @param {String} publicDidVC.registration_number
  * @param {String} publicDidVC.company_name
+ * @param {String} publicDidVC.did
  * @returns {HexString} Public Did VC Hex String
  */
 function createPublicDidVC({ public_key, registration_number, company_name, did }) {
@@ -152,6 +147,7 @@ function createPrivateDidVC({ public_key, did }) {
  * @param  {String[]} issuers Array of Did
  * @param  {String} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
  * @param  {KeyPair} sigKeypair Owner Key Ring pair
+ * @param  {ApiPromise} api (Optional)
  * @returns {String} VC Hex String
  */
 
@@ -216,11 +212,12 @@ function createPrivateDidVC({ public_key, did }) {
 
 /**
  * Lookup a VC 
- * @param {AnyString} did VC Owner's did
+ * @param {HexString} did VC Owner's did
  * @param {ApiPromise} api
+ * @returns {JSON} VC Object
  */
 async function getVCIdsByDID(
-  did: AnyString, 
+  did: HexString, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -232,7 +229,7 @@ async function getVCIdsByDID(
  * Reverse lookup a VC ID
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Object
  */
 async function getDIDByVCId(
   vcId: HexString, 
@@ -247,7 +244,7 @@ async function getDIDByVCId(
  * Get VCs by VC ID
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Object
  */
 async function getVCs(
   vcId: HexString, 
@@ -262,7 +259,7 @@ async function getVCs(
  * Get VC Approver List from the chain
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Approver List
  */
 async function getVCApprovers(
   vcId: HexString, 
@@ -277,7 +274,7 @@ async function getVCApprovers(
  * Get VC History using vcId
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC History
  */
 async function getVCHistoryByVCId(
   vcId: HexString, 
@@ -308,7 +305,7 @@ async function getVCHistoryByVCId(
  * Get Generic vc data
  * @param {String} vcId
  * @param {ApiPromise} api
- * @returns Generic VC data
+ * @returns {JSON} Generic VC data
  */
 async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise<AnyJson> {
   const provider = await api || (await buildConnection('local'));
@@ -373,9 +370,9 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
 /**
 * Approve VC
 * @param  {HexString} vcID vc_id of VC to be approved
-* @param  {KeyPair} senderAccountKeyPair Issuer Key Ring pair
+* @param  {KeyringPair} senderAccountKeyPair Issuer Key Ring pair
 * @param {APIPromise} api
-* @returns {String} Transaction hash or Error
+* @returns {Object} Transaction Object
 */
 async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api: ApiPromise, ssidUrl?: string) {
     const provider = api || (await buildConnection('local'));
@@ -418,7 +415,7 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
  * @param {HexString} vcHex
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
- * @returns {hexString}
+ * @returns {Object} Transaction Object
  */
 async function storeVC(
   vcHex: HexString, 
@@ -437,8 +434,8 @@ async function storeVC(
  * @param {String} vcId
  * @param {Boolean} vcStatus
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 async function updateStatus(
   vcId: HexString,
@@ -509,6 +506,13 @@ function decodeVC(hexValue, VCType) {
     }
     return vcs;
 }
+
+/**
+ * @param {String} tokenSymbol 
+ * @param {String} tokenAmount 
+ * @param {ApiPromise} api 
+ * @returns {String} Formatted Token Amount
+ */
 
 async function getFormattedTokenAmount(
   tokenSymbol: string,

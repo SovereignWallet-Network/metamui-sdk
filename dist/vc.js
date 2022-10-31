@@ -22,7 +22,6 @@ const _1 = require(".");
 const utils_1 = require("./utils");
 const config_1 = require("./config");
 const axios_1 = __importDefault(require("axios"));
-// 
 /**
  * Encodes Token VC and pads with appropriate bytes
  * @param {Object} TokenVC
@@ -65,11 +64,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
 }
 exports.createTokenVC = createTokenVC;
 /** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} MintSlashVC
- * @param  {String} MintSlashVC.vcId
- * @param  {String} MintSlashVC.currencyCode
+ * @param  {Object} MintSlashVC VC Property
+ * @param  {String} MintSlashVC.vcId VC Id
  * @param  {String} MintSlashVC.amount In Highest Form
- * @returns {String} Token VC Hex String
+ * @returns {HexString} Token VC Hex String
  */
 function createMintSlashVC({ vc_id, amount }) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -83,13 +81,10 @@ function createMintSlashVC({ vc_id, amount }) {
 }
 exports.createMintSlashVC = createMintSlashVC;
 /** Encodes Token VC and pads with appropriate bytes
- * @param  {Object} vcProperty
- * @param  {String} vcProperty.vcId
- * @param  {String} vcProperty.vcId
- * @param  {String} vcProperty.vcId
- * @param  {String} vcProperty.currencyCode
+ * @param  {Object} vcProperty VC Property
+ * @param  {String} vcProperty.vcId VC Id
  * @param  {String} vcProperty.amount In Highest Form
- * @returns {String} Token VC Hex String
+ * @returns {HexString} Token VC Hex String
  */
 function createTokenTransferVC({ vc_id, amount }) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -119,9 +114,9 @@ exports.createGenericVC = createGenericVC;
  * Create Public Did VC
  * @param {Object} publicDidVC
  * @param {String} publicDidVC.public_key
- * @param {String} publicDidVC.did
  * @param {String} publicDidVC.registration_number
  * @param {String} publicDidVC.company_name
+ * @param {String} publicDidVC.did
  * @returns {HexString} Public Did VC Hex String
  */
 function createPublicDidVC({ public_key, registration_number, company_name, did }) {
@@ -158,6 +153,7 @@ exports.createPrivateDidVC = createPrivateDidVC;
  * @param  {String[]} issuers Array of Did
  * @param  {String} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
  * @param  {KeyPair} sigKeypair Owner Key Ring pair
+ * @param  {ApiPromise} api (Optional)
  * @returns {String} VC Hex String
  */
 function generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api, ssidUrl) {
@@ -222,8 +218,9 @@ exports.generateVC = generateVC;
 // Chain State Query Functions
 /**
  * Lookup a VC
- * @param {AnyString} did VC Owner's did
+ * @param {HexString} did VC Owner's did
  * @param {ApiPromise} api
+ * @returns {JSON} VC Object
  */
 function getVCIdsByDID(did, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -236,7 +233,7 @@ exports.getVCIdsByDID = getVCIdsByDID;
  * Reverse lookup a VC ID
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Object
  */
 function getDIDByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -249,7 +246,7 @@ exports.getDIDByVCId = getDIDByVCId;
  * Get VCs by VC ID
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Object
  */
 function getVCs(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -262,7 +259,7 @@ exports.getVCs = getVCs;
  * Get VC Approver List from the chain
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC Approver List
  */
 function getVCApprovers(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -275,7 +272,7 @@ exports.getVCApprovers = getVCApprovers;
  * Get VC History using vcId
  * @param {HexString} vcId
  * @param {ApiPromise} api
- * @returns {String}
+ * @returns {JSON} VC History
  */
 function getVCHistoryByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -305,7 +302,7 @@ function getGenericVCDataByCId(cid, ssidUrl) {
  * Get Generic vc data
  * @param {String} vcId
  * @param {ApiPromise} api
- * @returns Generic VC data
+ * @returns {JSON} Generic VC data
  */
 function getGenericVCData(vcId, ssidUrl, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -371,9 +368,9 @@ exports.verifyGenericVC = verifyGenericVC;
 /**
 * Approve VC
 * @param  {HexString} vcID vc_id of VC to be approved
-* @param  {KeyPair} senderAccountKeyPair Issuer Key Ring pair
+* @param  {KeyringPair} senderAccountKeyPair Issuer Key Ring pair
 * @param {APIPromise} api
-* @returns {String} Transaction hash or Error
+* @returns {Object} Transaction Object
 */
 function approveVC(vcId, senderAccountKeyPair, api, ssidUrl) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -415,7 +412,7 @@ exports.approveVC = approveVC;
  * @param {HexString} vcHex
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
- * @returns {hexString}
+ * @returns {Object} Transaction Object
  */
 function storeVC(vcHex, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -432,8 +429,8 @@ exports.storeVC = storeVC;
  * @param {String} vcId
  * @param {Boolean} vcStatus
  * @param {KeyringPair} senderAccountKeyPair
- * @param {APIPromise} api
- * @returns {hexString}
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
 function updateStatus(vcId, vcStatus, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -500,6 +497,12 @@ function decodeVC(hexValue, VCType) {
     return vcs;
 }
 exports.decodeVC = decodeVC;
+/**
+ * @param {String} tokenSymbol
+ * @param {String} tokenAmount
+ * @param {ApiPromise} api
+ * @returns {String} Formatted Token Amount
+ */
 function getFormattedTokenAmount(tokenSymbol, tokenAmount, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const token = yield api.rpc.system.properties();

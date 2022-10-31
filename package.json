@@ -9,7 +9,7 @@
         "test": "ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
         "test:dev": "env PROVIDER_NETWORK=dev ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
-        "generate:docs": "jsdoc2md dist/did.js > docs/did.md",
+        "generate:docs": "node createDocs.js",
         "token": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./test/token.ts --no-timeouts --exit"
     },
     "repository": {

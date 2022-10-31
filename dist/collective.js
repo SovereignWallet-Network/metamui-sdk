@@ -41,8 +41,9 @@ const helper_1 = require("./common/helper");
  * @param  {Array<String>} newMembers Array of Did
  * @param  {String} prime Did of Prime
  * @param  {Number} oldCount Old members count
- * @param  {KeyPair} signingKeypair Key pair of Sender
- * @returns {String} Hash
+ * @param  {KeyringPair} signingKeypair Key pair of Sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function setMembers(newMembers, prime, oldCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -61,7 +62,9 @@ exports.setMembers = setMembers;
  * @param  {Number} threshold Threshold to successfull execution
  * @param  {Call} proposal Call to propose
  * @param  {Number} lengthCount Length of call
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function propose(threshold, proposal, lengthCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -83,7 +86,9 @@ exports.propose = propose;
  * To Execute a call
  * @param  {Call} proposal Call to propose
  * @param  {Number} lengthCount Length of Call
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function execute(proposal, lengthCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -100,7 +105,9 @@ exports.execute = execute;
  * @param  {String} proposalHash Hash of proposal
  * @param  {Number} index Proposal index
  * @param  {Boolean} approve True/false
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function vote(proposalHash, index, approve, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -118,7 +125,9 @@ exports.vote = vote;
  * @param  {Number} index Proposal index
  * @param  {Boolean} proposalWeightBond Weight
  * @param  {Number} lengthCount Length
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -133,7 +142,9 @@ exports.close = close;
 /**
  * Disapprove proposal
  * @param  {String} proposalHash Hash
- * @param  {KeyPair} signingKeypair Key pair of sender
+ * @param  {KeyringPair} signingKeypair Key pair of sender
+ * @param  {ApiPromise} api Network Provider
+ * @returns {Object} Transaction Object
  */
 function disapproveProposal(proposalHash, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -147,7 +158,7 @@ function disapproveProposal(proposalHash, signingKeypair, api) {
 exports.disapproveProposal = disapproveProposal;
 /**
  * Get Members of Council
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getMembers(api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -158,7 +169,7 @@ function getMembers(api) {
 exports.getMembers = getMembers;
 /**
  * Get Prime of Council
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getPrime(api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -169,7 +180,7 @@ function getPrime(api) {
 exports.getPrime = getPrime;
 /**
  * Get All Proposals
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getProposals(api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -181,7 +192,7 @@ exports.getProposals = getProposals;
 /**
  * Get Proposal of given hash
  * @param {Hash} proposalHash Hash of proposal
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getProposalOf(proposalHash, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -193,7 +204,7 @@ exports.getProposalOf = getProposalOf;
 /**
  * Get Votes of given proposal hash
  * @param {Hash} proposalHash Hash of proposal
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getVotes(proposalHash, api) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -204,7 +215,7 @@ function getVotes(proposalHash, api) {
 exports.getVotes = getVotes;
 /**
  * Get Total proposals count
- * @param  {Boolean} api Network Provider
+ * @param  {ApiPromise} api Network Provider
  */
 function getProposalCount(api) {
     return __awaiter(this, void 0, void 0, function* () {
