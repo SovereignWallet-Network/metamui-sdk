@@ -6,6 +6,7 @@ import { submitTransaction } from './common/helper';
 
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {String} did
+* @param {APIPromise} api (optional)
 */
 const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
   // Resolve the did to get account ID
@@ -13,9 +14,13 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
     try {
       const provider = api || await buildConnection('local');
       const did_hex = sanitiseDid(did);
+      const token = await provider.rpc.system.properties();
+      const tokenData: any = token.toHuman();
+      let decimals = tokenData?.['tokenDecimals'][0];
+      console.log('Decimals', decimals);
       const accountInfo = await provider.query.token.account(did_hex);
       const data = accountInfo.toJSON()?.['data'];
-      resolve(data.free / 1e6);
+      resolve(data.free / Math.pow(10, decimals));
     } catch (err) {
       // console.log(err);
       return reject(new Error("Cannot get balance"));
@@ -30,8 +35,11 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
+    const token = await provider.rpc.system.properties();
+    const tokenData: any = token.toHuman();
+    let decimals = tokenData?.['tokenDecimals'][0];
     return await provider.query.token.account(did_hex, ({ data: { free: currentBalance } }) => {
-      callback(currentBalance.toNumber() / 1e6);
+      callback(currentBalance.toNumber() / Math.pow(10, decimals));
     });
   } catch (err) {
     return null;
