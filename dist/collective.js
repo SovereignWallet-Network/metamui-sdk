@@ -67,6 +67,12 @@ function propose(threshold, proposal, lengthCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
+        const txnInfo = yield provider.tx.council.propose(threshold, proposal, lengthCount).paymentInfo(signingKeypair);
+        console.log(`
+  class=${txnInfo.class.toString()},
+  weight=${txnInfo.weight.toString()},
+  partialFee=${txnInfo.partialFee.toHuman()}
+`);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
