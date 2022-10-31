@@ -12,7 +12,7 @@ import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
 import { VCType } from '../src/utils';
 
-describe('VC works correctly', () => {
+describe('Token works correctly', () => {
   let sigKeypair: KeyringPair;
   const EVE_DID = 'did:ssid:eve';
   var provider: ApiPromise;
