@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,9 +8,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { buildConnection } from './connection';
-import { resolveDIDToAccount, sanitiseDid } from './did';
-import { submitTransaction } from './common/helper';
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.transferWithMemo = exports.transfer = exports.subscribeToBalanceChanges = exports.getBalance = void 0;
+const connection_1 = require("./connection");
+const did_1 = require("./did");
+const helper_1 = require("./common/helper");
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {String} did
 * @param {APIPromise} api (optional)
@@ -19,8 +22,8 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
         var _a;
         try {
-            const provider = api || (yield buildConnection('local'));
-            const did_hex = sanitiseDid(did);
+            const provider = api || (yield (0, connection_1.buildConnection)('local'));
+            const did_hex = (0, did_1.sanitiseDid)(did);
             const token = yield provider.rpc.system.properties();
             const tokenData = token.toHuman();
             let decimals = tokenData === null || tokenData === void 0 ? void 0 : tokenData['tokenDecimals'][0];
@@ -35,6 +38,7 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
         }
     }));
 });
+exports.getBalance = getBalance;
 /** Listen to balance changes for a DID and execute the callback.
 * @param {String} identifier
 * @param {Function} callback
@@ -42,8 +46,8 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
 */
 const subscribeToBalanceChanges = (identifier, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const provider = api || (yield buildConnection('local'));
-        const did_hex = sanitiseDid(identifier);
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
+        const did_hex = (0, did_1.sanitiseDid)(identifier);
         const token = yield provider.rpc.system.properties();
         const tokenData = token.toHuman();
         let decimals = tokenData === null || tokenData === void 0 ? void 0 : tokenData['tokenDecimals'][0];
@@ -55,6 +59,7 @@ const subscribeToBalanceChanges = (identifier, callback, api) => __awaiter(void 
         return null;
     }
 });
+exports.subscribeToBalanceChanges = subscribeToBalanceChanges;
 /**
  * The function will perform a metamui transfer operation from the account of senderAccount to the
  * receiverDID.
@@ -69,9 +74,9 @@ const subscribeToBalanceChanges = (identifier, callback, api) => __awaiter(void 
  */
 function transfer(senderAccountKeyPair, receiverDID, amount, api, nonce) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         // check if the recipent DID is valid
-        const receiverAccountID = yield resolveDIDToAccount(receiverDID, provider);
+        const receiverAccountID = yield (0, did_1.resolveDIDToAccount)(receiverDID, provider);
         // console.log("Receiver Account ID", receiverAccountID);
         if (!receiverAccountID) {
             throw new Error('balances.RecipentDIDNotRegistered');
@@ -81,9 +86,10 @@ function transfer(senderAccountKeyPair, receiverDID, amount, api, nonce) {
             nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         }
         const signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.transfer = transfer;
 /**
  * This function is similar to sendTransaction except that it provides the user to add the memo to transfer functionality.
  *
@@ -97,9 +103,9 @@ function transfer(senderAccountKeyPair, receiverDID, amount, api, nonce) {
  */
 function transferWithMemo(senderAccountKeyPair, receiverDID, amount, memo, api, nonce) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         // check if the recipent DID is valid
-        const receiverAccountID = yield resolveDIDToAccount(receiverDID, provider);
+        const receiverAccountID = yield (0, did_1.resolveDIDToAccount)(receiverDID, provider);
         // console.log("Receiver Account ID", receiverAccountID);
         if (!receiverAccountID) {
             throw (new Error('balances.RecipentDIDNotRegistered'));
@@ -110,7 +116,7 @@ function transferWithMemo(senderAccountKeyPair, receiverDID, amount, memo, api, 
             nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         }
         const signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
-export { getBalance, subscribeToBalanceChanges, transfer, transferWithMemo };
+exports.transferWithMemo = transferWithMemo;

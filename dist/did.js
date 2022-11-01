@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,10 +8,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { mnemonicGenerate } from '@polkadot/util-crypto';
-import { buildConnection } from './connection';
-import { did } from '.';
-import { submitTransaction } from './common/helper';
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeDid = exports.syncDid = exports.sanitiseDid = exports.updateMetadata = exports.isDidValidator = exports.resolveAccountIdToDid = exports.getDidKeyHistory = exports.resolveDIDToAccount = exports.updateDidKey = exports.getDIDDetails = exports.createPublic = exports.createPrivate = exports.generateMnemonic = void 0;
+const util_crypto_1 = require("@polkadot/util-crypto");
+const connection_1 = require("./connection");
+const _1 = require(".");
+const helper_1 = require("./common/helper");
 const IDENTIFIER_PREFIX = 'did:ssid:';
 const IDENTIFIER_MAX_LENGTH = 20;
 const IDENTIFIER_MIN_LENGTH = 3;
@@ -18,7 +21,8 @@ const DID_HEX_LEN = 64;
 /** Generate Mnemonic
  * @returns {String} Mnemonic
  */
-const generateMnemonic = () => mnemonicGenerate();
+const generateMnemonic = () => (0, util_crypto_1.mnemonicGenerate)();
+exports.generateMnemonic = generateMnemonic;
 const checkIdentifierFormat = (identifier) => {
     const format = /^[0-9a-zA-Z]+$/;
     return format.test(identifier);
@@ -33,7 +37,7 @@ const checkIdentifierFormat = (identifier) => {
  */
 function createPrivate(vcId, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         // // Check if identifier is available
         // const did_hex = sanitiseDid(identifier);
         // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
@@ -48,9 +52,10 @@ function createPrivate(vcId, paraId = null, signingKeypair, api) {
         const tx = provider.tx.did.createPrivate(vcId, paraId);
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.createPrivate = createPrivate;
 /**
  * Create Private DID and store the generated DID object in blockchain
  * @param {HexString} vcId
@@ -61,7 +66,7 @@ function createPrivate(vcId, paraId = null, signingKeypair, api) {
  */
 function createPublic(vcId, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         // // Check if identifier is available
         // const did_hex = sanitiseDid(identifier);
         // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
@@ -76,9 +81,10 @@ function createPublic(vcId, paraId = null, signingKeypair, api) {
         const tx = provider.tx.did.createPublic(vcId, paraId);
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.createPublic = createPublic;
 /**
  * Get did information from accountID
  * @param {String} identifier DID Identifier
@@ -124,6 +130,7 @@ function getDIDDetails(identifier, api) {
         }
     });
 }
+exports.getDIDDetails = getDIDDetails;
 /**
  * Get the accountId for a given DID
  * @param {String} identifier
@@ -134,7 +141,7 @@ function getDIDDetails(identifier, api) {
 function resolveDIDToAccount(identifier, api, blockNumber) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         if (!blockNumber && blockNumber !== 0) {
             return (yield provider.query.did.lookup(did_hex)).toJSON();
@@ -160,6 +167,7 @@ function resolveDIDToAccount(identifier, api, blockNumber) {
         return (_a = keyHistories[keyIndex]) === null || _a === void 0 ? void 0 : _a[0];
     });
 }
+exports.resolveDIDToAccount = resolveDIDToAccount;
 /**
  * Get the DID associated to given accountID
  * @param {String} accountId (hex/base64 version works)
@@ -168,7 +176,7 @@ function resolveDIDToAccount(identifier, api, blockNumber) {
  */
 function resolveAccountIdToDid(accountId, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const data = (yield provider.query.did.rLookup(accountId)).toJSON();
         // return false if empty
         if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
@@ -177,6 +185,7 @@ function resolveAccountIdToDid(accountId, api) {
         return (typeof data === 'string') ? data : false;
     });
 }
+exports.resolveAccountIdToDid = resolveAccountIdToDid;
 /**
  * This function will rotate the keys assiged to a DID
  * It should only be called by validator accounts, else will fail
@@ -189,13 +198,13 @@ function resolveAccountIdToDid(accountId, api) {
  */
 function updateDidKey(identifier, newKey, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
-        const data = yield did.resolveDIDToAccount(did_hex, provider);
+        const data = yield _1.did.resolveDIDToAccount(did_hex, provider);
         if (data == null) {
             throw (new Error('did.DIDDoesNotExist'));
         }
-        const data2 = yield did.resolveAccountIdToDid(newKey, provider);
+        const data2 = yield _1.did.resolveAccountIdToDid(newKey, provider);
         if (data2 != false) {
             throw (new Error('did.PublicKeyRegistered'));
         }
@@ -203,9 +212,10 @@ function updateDidKey(identifier, newKey, paraId = null, signingKeypair, api) {
         const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, paraId), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.updateDidKey = updateDidKey;
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
  * @param {String} data
@@ -236,6 +246,7 @@ const sanitiseDid = (did) => {
     hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
     return hex_did;
 };
+exports.sanitiseDid = sanitiseDid;
 /**
  * Check if the user is an approved validator
  * @param {String} identifier
@@ -244,7 +255,7 @@ const sanitiseDid = (did) => {
  */
 function isDidValidator(identifier, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         const vList = (yield provider.query.validatorSet.members()).toJSON();
         if (vList && Array.isArray(vList)) {
@@ -253,6 +264,7 @@ function isDidValidator(identifier, api) {
         return false;
     });
 }
+exports.isDidValidator = isDidValidator;
 /**
  * Fetch the history of rotated keys for the specified DID
  * @param {String} identifier
@@ -261,11 +273,12 @@ function isDidValidator(identifier, api) {
  */
 function getDidKeyHistory(identifier, api = false) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         return (yield provider.query.did.prevKeys(did_hex)).toJSON();
     });
 }
+exports.getDidKeyHistory = getDidKeyHistory;
 /**
  *
  * @param {String} identifier
@@ -276,14 +289,15 @@ function getDidKeyHistory(identifier, api = false) {
  */
 function updateMetadata(identifier, metadata, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.updateMetadata = updateMetadata;
 /**
  * Sync DID VC with other chains
  * @param {String} identifier
@@ -294,14 +308,15 @@ function updateMetadata(identifier, metadata, signingKeypair, api) {
  */
 function syncDid(identifier, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, paraId), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
+exports.syncDid = syncDid;
 /**
  * Remove DID VC
  * @param {String} identifier
@@ -312,12 +327,12 @@ function syncDid(identifier, paraId = null, signingKeypair, api) {
  */
 function removeDid(identifier, paraId = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield buildConnection('local'));
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, paraId));
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
-        return submitTransaction(signedTx, provider);
+        return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
-export { generateMnemonic, createPrivate, createPublic, getDIDDetails, updateDidKey, resolveDIDToAccount, getDidKeyHistory, resolveAccountIdToDid, isDidValidator, updateMetadata, sanitiseDid, syncDid, removeDid };
+exports.removeDid = removeDid;
