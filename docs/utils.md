@@ -13,16 +13,16 @@
 <dd></dd>
 <dt><a href="#vcHexToVcId">vcHexToVcId(hexString)</a></dt>
 <dd></dd>
-<dt><a href="#encodeData">encodeData(data, typeKey)</a> ⇒ <code>String</code></dt>
+<dt><a href="#encodeData">encodeData(data, typeKey)</a> ⇒ <code>string</code></dt>
 <dd><p>Encodes object/ string of given type to hex</p>
 </dd>
-<dt><a href="#decodeHex">decodeHex(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>String</code></dt>
+<dt><a href="#decodeHex">decodeHex(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>string</code></dt>
 <dd><p>Decodes hex of given type to it&#39;s corresponding object/value</p>
 </dd>
 <dt><a href="#isUpperAndValid">isUpperAndValid(str)</a> ⇒</dt>
 <dd><p>Checks if str is upper and only contains characters</p>
 </dd>
-<dt><a href="#tidy">tidy(s)</a> ⇒ <code>Object</code> | <code>String</code></dt>
+<dt><a href="#tidy">tidy(s)</a> ⇒ <code>Object</code> | <code>string</code></dt>
 <dd><p>regex to remove unwanted hex bytes</p>
 </dd>
 <dt><a href="#sortObjectByKeys">sortObjectByKeys(unorderedObj)</a> ⇒ <code>Object</code></dt>
@@ -49,7 +49,7 @@
 
 | Param | Type |
 | --- | --- |
-| inputString | <code>String</code> | 
+| inputString | <code>string</code> | 
 
 <a name="base58ToBytes"></a>
 
@@ -89,29 +89,29 @@
 
 <a name="encodeData"></a>
 
-## encodeData(data, typeKey) ⇒ <code>String</code>
+## encodeData(data, typeKey) ⇒ <code>string</code>
 Encodes object/ string of given type to hex
 
 **Kind**: global function  
-**Returns**: <code>String</code> - Encoded Hex  
+**Returns**: <code>string</code> - Encoded Hex  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| data | <code>Object</code> \| <code>String</code> | Object to be encoded |
-| typeKey | <code>String</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
+| data | <code>Object</code> \| <code>string</code> | Object to be encoded |
+| typeKey | <code>string</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
 
 <a name="decodeHex"></a>
 
-## decodeHex(hexValue, typeKey) ⇒ <code>Object</code> \| <code>String</code>
+## decodeHex(hexValue, typeKey) ⇒ <code>Object</code> \| <code>string</code>
 Decodes hex of given type to it's corresponding object/value
 
 **Kind**: global function  
-**Returns**: <code>Object</code> \| <code>String</code> - Decoded Object/String  
+**Returns**: <code>Object</code> \| <code>string</code> - Decoded Object/String  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| hexValue | <code>String</code> | Hex String to be decoded |
-| typeKey | <code>String</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
+| hexValue | <code>string</code> | Hex String to be decoded |
+| typeKey | <code>string</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
 
 <a name="isUpperAndValid"></a>
 
@@ -127,15 +127,15 @@ Checks if str is upper and only contains characters
 
 <a name="tidy"></a>
 
-## tidy(s) ⇒ <code>Object</code> \| <code>String</code>
+## tidy(s) ⇒ <code>Object</code> \| <code>string</code>
 regex to remove unwanted hex bytes
 
 **Kind**: global function  
-**Returns**: <code>Object</code> \| <code>String</code> - Decoded tidy Object/String  
+**Returns**: <code>Object</code> \| <code>string</code> - Decoded tidy Object/String  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| s | <code>String</code> | Hex String to make tidy |
+| s | <code>string</code> | Hex String to make tidy |
 
 <a name="sortObjectByKeys"></a>
 

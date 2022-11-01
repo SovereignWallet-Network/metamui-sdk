@@ -1,7 +1,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#generateMnemonic">generateMnemonic()</a> ⇒ <code>String</code></dt>
+<dt><a href="#generateMnemonic">generateMnemonic()</a> ⇒ <code>string</code></dt>
 <dd><p>Generate Mnemonic</p>
 </dd>
 <dt><a href="#createPrivate">createPrivate(vcId, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
@@ -23,10 +23,10 @@
 <dd><p>This function will rotate the keys assiged to a DID
 It should only be called by validator accounts, else will fail</p>
 </dd>
-<dt><a href="#convertFixedSizeHex">convertFixedSizeHex(data, size)</a> ⇒ <code>String</code></dt>
+<dt><a href="#convertFixedSizeHex">convertFixedSizeHex(data, size)</a> ⇒ <code>string</code></dt>
 <dd><p>Convert to hex but return fixed size always, mimics substrate storage</p>
 </dd>
-<dt><a href="#sanitiseDid">sanitiseDid(did)</a> ⇒ <code>String</code></dt>
+<dt><a href="#sanitiseDid">sanitiseDid(did)</a> ⇒ <code>string</code></dt>
 <dd><p>Checks if the given did is in hex format or not &amp; converts it into valid hex format.</p>
 <p> Note: This util function is needed since dependant module wont convert the utf did to hex anymore</p>
 </dd>
@@ -48,11 +48,11 @@ It should only be called by validator accounts, else will fail</p>
 
 <a name="generateMnemonic"></a>
 
-## generateMnemonic() ⇒ <code>String</code>
+## generateMnemonic() ⇒ <code>string</code>
 Generate Mnemonic
 
 **Kind**: global function  
-**Returns**: <code>String</code> - Mnemonic  
+**Returns**: <code>string</code> - Mnemonic  
 <a name="createPrivate"></a>
 
 ## createPrivate(vcId, paraId, signingKeypair, api) ⇒ <code>Object</code>
@@ -93,7 +93,7 @@ Get did information from accountID
 
 | Param | Type | Description |
 | --- | --- | --- |
-| identifier | <code>String</code> | DID Identifier |
+| identifier | <code>string</code> | DID Identifier |
 | api | <code>ApiPromise</code> |  |
 
 <a name="resolveDIDToAccount"></a>
@@ -105,7 +105,7 @@ Get the accountId for a given DID
 
 | Param | Type | Description |
 | --- | --- | --- |
-| identifier | <code>String</code> |  |
+| identifier | <code>string</code> |  |
 | api | <code>ApiPromise</code> |  |
 | blockNumber | <code>Number</code> | (optional) |
 
@@ -118,7 +118,7 @@ Get the DID associated to given accountID
 
 | Param | Type | Description |
 | --- | --- | --- |
-| accountId | <code>String</code> | (hex/base64 version works) |
+| accountId | <code>string</code> | (hex/base64 version works) |
 | api | <code>ApiPromise</code> |  |
 
 <a name="updateDidKey"></a>
@@ -132,7 +132,7 @@ It should only be called by validator accounts, else will fail
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| identifier | <code>String</code> |  |  |
+| identifier | <code>string</code> |  |  |
 | newKey | <code>Uint8Array</code> |  |  |
 | paraId | <code>Number</code> | <code></code> |  |
 | signingKeypair | <code>KeyringPair</code> |  | // of a validator account |
@@ -140,29 +140,29 @@ It should only be called by validator accounts, else will fail
 
 <a name="convertFixedSizeHex"></a>
 
-## convertFixedSizeHex(data, size) ⇒ <code>String</code>
+## convertFixedSizeHex(data, size) ⇒ <code>string</code>
 Convert to hex but return fixed size always, mimics substrate storage
 
 **Kind**: global function  
 
 | Param | Type | Default |
 | --- | --- | --- |
-| data | <code>String</code> |  | 
+| data | <code>string</code> |  | 
 | size | <code>Int</code> | <code>64</code> | 
 
 <a name="sanitiseDid"></a>
 
-## sanitiseDid(did) ⇒ <code>String</code>
+## sanitiseDid(did) ⇒ <code>string</code>
 Checks if the given did is in hex format or not & converts it into valid hex format.
 
  Note: This util function is needed since dependant module wont convert the utf did to hex anymore
 
 **Kind**: global function  
-**Returns**: <code>String</code> - Hex did  
+**Returns**: <code>string</code> - Hex did  
 
 | Param | Type |
 | --- | --- |
-| did | <code>String</code> | 
+| did | <code>string</code> | 
 
 <a name="isDidValidator"></a>
 
@@ -173,7 +173,7 @@ Check if the user is an approved validator
 
 | Param | Type |
 | --- | --- |
-| identifier | <code>String</code> | 
+| identifier | <code>string</code> | 
 | api | <code>ApiPromise</code> | 
 
 <a name="getDidKeyHistory"></a>
@@ -185,7 +185,7 @@ Fetch the history of rotated keys for the specified DID
 
 | Param | Type | Default |
 | --- | --- | --- |
-| identifier | <code>String</code> |  | 
+| identifier | <code>string</code> |  | 
 | api | <code>ApiPromise</code> | <code>false</code> | 
 
 <a name="updateMetadata"></a>
@@ -196,8 +196,8 @@ Fetch the history of rotated keys for the specified DID
 
 | Param | Type | Description |
 | --- | --- | --- |
-| identifier | <code>String</code> |  |
-| metadata | <code>String</code> |  |
+| identifier | <code>string</code> |  |
+| metadata | <code>string</code> |  |
 | signingKeypair | <code>Keyringpair</code> | of a validator account |
 | api | <code>ApiPromise</code> |  |
 
@@ -211,7 +211,7 @@ Sync DID VC with other chains
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| identifier | <code>String</code> |  |  |
+| identifier | <code>string</code> |  |  |
 | paraId | <code>Number</code> | <code></code> | Optional |
 | signingKeypair | <code>KeyringPair</code> |  | of a validator account |
 | api | <code>ApiPromise</code> |  |  |
@@ -226,7 +226,7 @@ Remove DID VC
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| identifier | <code>String</code> |  |  |
+| identifier | <code>string</code> |  |  |
 | paraId | <code>Number</code> | <code></code> | Optional |
 | signingKeypair | <code>KeyringPair</code> |  | of a SUDO account |
 | api | <code>ApiPromise</code> |  |  |

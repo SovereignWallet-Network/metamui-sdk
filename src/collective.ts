@@ -6,14 +6,14 @@ import { submitTransaction } from './common/helper';
 
 /**
  * Set Members and prime of collective pallet
- * @param  {Array<String>} newMembers Array of Did
- * @param  {String} prime Did of Prime
+ * @param  {Array<string>} newMembers Array of Did
+ * @param  {string} prime Did of Prime
  * @param  {Number} oldCount Old members count
  * @param  {KeyringPair} signingKeypair Key pair of Sender
  * @param  {ApiPromise} api Network Provider
  * @returns {Object} Transaction Object
  */
-async function setMembers(newMembers: String[], prime: String, oldCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
+async function setMembers(newMembers: string[], prime: string, oldCount: number, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   newMembers = newMembers.map(newMember => did.sanitiseDid(newMember));
   prime = prime ? did.sanitiseDid(prime) : null;
@@ -38,12 +38,6 @@ async function setMembers(newMembers: String[], prime: String, oldCount: number,
 async function propose(threshold, proposal, lengthCount, signingKeypair, api: ApiPromise) {
   const provider = api || await buildConnection('local');
   const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
-  const txnInfo = await provider.tx.council.propose(threshold, proposal, lengthCount).paymentInfo(signingKeypair);
-  console.log(`
-  class=${txnInfo.class.toString()},
-  weight=${txnInfo.weight.toString()},
-  partialFee=${txnInfo.partialFee.toHuman()}
-`);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -67,7 +61,7 @@ async function execute(proposal, lengthCount, signingKeypair: KeyringPair, api: 
 
 /**
  * Vote on a proposal
- * @param  {String} proposalHash Hash of proposal
+ * @param  {string} proposalHash Hash of proposal
  * @param  {Number} index Proposal index
  * @param  {Boolean} approve True/false
  * @param  {KeyringPair} signingKeypair Key pair of sender
@@ -84,7 +78,7 @@ async function vote(proposalHash, index, approve, signingKeypair: KeyringPair, a
 
 /**
  * Close a proposal manually, executes call if yes votes is greater than or equal to threshold
- * @param  {String} proposalHash Hash
+ * @param  {string} proposalHash Hash
  * @param  {Number} index Proposal index
  * @param  {Boolean} proposalWeightBond Weight
  * @param  {Number} lengthCount Length
@@ -102,7 +96,7 @@ async function close(proposalHash, index, proposalWeightBond, lengthCount, signi
 
 /**
  * Disapprove proposal
- * @param  {String} proposalHash Hash
+ * @param  {string} proposalHash Hash
  * @param  {KeyringPair} signingKeypair Key pair of sender
  * @param  {ApiPromise} api Network Provider
  * @returns {Object} Transaction Object
@@ -145,7 +139,7 @@ async function getProposals(api?: ApiPromise) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {ApiPromise} api Network Provider
  */
-async function getProposalOf(proposalHash: String, api?: ApiPromise) {
+async function getProposalOf(proposalHash: string, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposalOf(proposalHash)).toJSON();
 }
@@ -154,7 +148,7 @@ async function getProposalOf(proposalHash: String, api?: ApiPromise) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {ApiPromise} api Network Provider
  */
-async function getVotes(proposalHash: String, api?: ApiPromise) {
+async function getVotes(proposalHash: string, api?: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.voting(proposalHash)).toJSON();
 }

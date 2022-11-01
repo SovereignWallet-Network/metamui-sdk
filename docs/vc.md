@@ -19,7 +19,7 @@
 <dt><a href="#createPrivateDidVC">createPrivateDidVC(privateDidVC)</a> ⇒ <code>HexString</code></dt>
 <dd><p>Create Private Did VC</p>
 </dd>
-<dt><a href="#generateVC">generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api)</a> ⇒ <code>String</code></dt>
+<dt><a href="#generateVC">generateVC(vcProperty, owner, issuers, vcType, sigKeypair, ssidUrl)</a> ⇒ <code>string</code></dt>
 <dd><p>Create VC</p>
 </dd>
 <dt><a href="#getVCIdsByDID">getVCIdsByDID(did, api)</a> ⇒ <code>JSON</code></dt>
@@ -55,13 +55,13 @@
 <dt><a href="#updateStatus">updateStatus(vcId, vcStatus, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Update Status of a VC ID</p>
 </dd>
-<dt><a href="#getVCProperty">getVCProperty(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>String</code></dt>
+<dt><a href="#decodeVCProperty">decodeVCProperty(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>string</code></dt>
 <dd><p>function that decodes hex of createTokenVC</p>
 </dd>
-<dt><a href="#decodeVC">decodeVC(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>String</code></dt>
+<dt><a href="#decodeVC">decodeVC(hexValue, typeKey)</a> ⇒ <code>Object</code> | <code>string</code></dt>
 <dd><p>function that decodes hex of createVC where type is TokenVC to it&#39;s corresponding object/value</p>
 </dd>
-<dt><a href="#getFormattedTokenAmount">getFormattedTokenAmount(tokenSymbol, tokenAmount, api)</a> ⇒ <code>String</code></dt>
+<dt><a href="#getFormattedTokenAmount">getFormattedTokenAmount(tokenSymbol, tokenAmount, api)</a> ⇒ <code>string</code></dt>
 <dd></dd>
 </dl>
 
@@ -76,10 +76,10 @@ Encodes Token VC and pads with appropriate bytes
 | Param | Type |
 | --- | --- |
 | TokenVC | <code>Object</code> | 
-| TokenVC.tokenName | <code>String</code> | 
-| TokenVC.reservableBalance | <code>String</code> | 
-| TokenVC.decimal | <code>String</code> | 
-| TokenVC.currencyCode | <code>String</code> | 
+| TokenVC.tokenName | <code>string</code> | 
+| TokenVC.reservableBalance | <code>string</code> | 
+| TokenVC.decimal | <code>string</code> | 
+| TokenVC.currencyCode | <code>string</code> | 
 
 <a name="createMintSlashVC"></a>
 
@@ -106,8 +106,8 @@ Encodes Token VC and pads with appropriate bytes
 | Param | Type | Description |
 | --- | --- | --- |
 | vcProperty | <code>Object</code> | VC Property |
-| vcProperty.vcId | <code>String</code> | VC Id |
-| vcProperty.amount | <code>String</code> | In Highest Form |
+| vcProperty.vcId | <code>string</code> | VC Id |
+| vcProperty.amount | <code>string</code> | In Highest Form |
 
 <a name="createGenericVC"></a>
 
@@ -120,7 +120,7 @@ Encodes Generic VC and pads with appropriate bytes
 | Param | Type |
 | --- | --- |
 | vcProperty | <code>Object</code> | 
-| vcProperty.cid | <code>String</code> | 
+| vcProperty.cid | <code>string</code> | 
 
 <a name="createPublicDidVC"></a>
 
@@ -133,10 +133,10 @@ Create Public Did VC
 | Param | Type |
 | --- | --- |
 | publicDidVC | <code>Object</code> | 
-| publicDidVC.public_key | <code>String</code> | 
-| publicDidVC.registration_number | <code>String</code> | 
-| publicDidVC.company_name | <code>String</code> | 
-| publicDidVC.did | <code>String</code> | 
+| publicDidVC.public_key | <code>string</code> | 
+| publicDidVC.registration_number | <code>string</code> | 
+| publicDidVC.company_name | <code>string</code> | 
+| publicDidVC.did | <code>string</code> | 
 
 <a name="createPrivateDidVC"></a>
 
@@ -149,25 +149,25 @@ Create Private Did VC
 | Param | Type |
 | --- | --- |
 | privateDidVC | <code>Object</code> | 
-| privateDidVC.public_key | <code>String</code> | 
-| privateDidVC.did | <code>String</code> | 
+| privateDidVC.public_key | <code>string</code> | 
+| privateDidVC.did | <code>string</code> | 
 
 <a name="generateVC"></a>
 
-## generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api) ⇒ <code>String</code>
+## generateVC(vcProperty, owner, issuers, vcType, sigKeypair, ssidUrl) ⇒ <code>string</code>
 Create VC
 
 **Kind**: global function  
-**Returns**: <code>String</code> - VC Hex String  
+**Returns**: <code>string</code> - VC Hex String  
 
 | Param | Type | Description |
 | --- | --- | --- |
 | vcProperty | <code>Object</code> |  |
-| owner | <code>String</code> | Did |
-| issuers | <code>Array.&lt;String&gt;</code> | Array of Did |
-| vcType | <code>String</code> | TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC |
+| owner | <code>string</code> | Did |
+| issuers | <code>Array.&lt;string&gt;</code> | Array of Did |
+| vcType | <code>string</code> | TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC |
 | sigKeypair | <code>KeyPair</code> | Owner Key Ring pair |
-| api | <code>ApiPromise</code> | (Optional) |
+| ssidUrl | <code>string</code> | (Optional) |
 
 <a name="getVCIdsByDID"></a>
 
@@ -244,7 +244,7 @@ Get Generic vc data
 
 | Param | Type |
 | --- | --- |
-| vcId | <code>String</code> | 
+| vcId | <code>string</code> | 
 | api | <code>ApiPromise</code> | 
 
 <a name="getGenericVCData"></a>
@@ -257,7 +257,7 @@ Get Generic vc data
 
 | Param | Type |
 | --- | --- |
-| vcId | <code>String</code> | 
+| vcId | <code>string</code> | 
 | api | <code>ApiPromise</code> | 
 
 <a name="verifyGenericVC"></a>
@@ -270,7 +270,7 @@ Verify Generic Vc data
 
 | Param | Type |
 | --- | --- |
-| vcId | <code>String</code> | 
+| vcId | <code>string</code> | 
 | data | <code>Object</code> | 
 | api | <code>ApiPromise</code> | 
 
@@ -312,46 +312,46 @@ Update Status of a VC ID
 
 | Param | Type |
 | --- | --- |
-| vcId | <code>String</code> | 
+| vcId | <code>string</code> | 
 | vcStatus | <code>Boolean</code> | 
 | senderAccountKeyPair | <code>KeyringPair</code> | 
 | api | <code>ApiPromise</code> | 
 
-<a name="getVCProperty"></a>
+<a name="decodeVCProperty"></a>
 
-## getVCProperty(hexValue, typeKey) ⇒ <code>Object</code> \| <code>String</code>
+## decodeVCProperty(hexValue, typeKey) ⇒ <code>Object</code> \| <code>string</code>
 function that decodes hex of createTokenVC
 
 **Kind**: global function  
-**Returns**: <code>Object</code> \| <code>String</code> - Decoded Object/String  
+**Returns**: <code>Object</code> \| <code>string</code> - Decoded Object/String  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| hexValue | <code>String</code> | Hex String to be decoded |
-| typeKey | <code>String</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
+| hexValue | <code>string</code> | Hex String to be decoded |
+| typeKey | <code>string</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
 
 <a name="decodeVC"></a>
 
-## decodeVC(hexValue, typeKey) ⇒ <code>Object</code> \| <code>String</code>
+## decodeVC(hexValue, typeKey) ⇒ <code>Object</code> \| <code>string</code>
 function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
 
 **Kind**: global function  
-**Returns**: <code>Object</code> \| <code>String</code> - Decoded Object/String  
+**Returns**: <code>Object</code> \| <code>string</code> - Decoded Object/String  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| hexValue | <code>String</code> | Hex String to be decoded |
-| typeKey | <code>String</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
+| hexValue | <code>string</code> | Hex String to be decoded |
+| typeKey | <code>string</code> | Key from METABLOCKCHAIN_TYPES which represents type of data |
 
 <a name="getFormattedTokenAmount"></a>
 
-## getFormattedTokenAmount(tokenSymbol, tokenAmount, api) ⇒ <code>String</code>
+## getFormattedTokenAmount(tokenSymbol, tokenAmount, api) ⇒ <code>string</code>
 **Kind**: global function  
-**Returns**: <code>String</code> - Formatted Token Amount  
+**Returns**: <code>string</code> - Formatted Token Amount  
 
 | Param | Type |
 | --- | --- |
-| tokenSymbol | <code>String</code> | 
-| tokenAmount | <code>String</code> | 
+| tokenSymbol | <code>string</code> | 
+| tokenAmount | <code>string</code> | 
 | api | <code>ApiPromise</code> | 
 

@@ -5,7 +5,7 @@ import { initKeyring, SSID_BASE_URL } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
 import * as utils from '../src/utils';
-import { removeDid, councilStoreVC} from './common/helper';
+import { councilStoreVC} from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise, Keyring } from '@polkadot/api';
 import { HexString } from '@polkadot/util/types';
@@ -18,7 +18,6 @@ describe('VC works correctly', () => {
   var provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
-  let sigKeypairBob: KeyringPair;
   let signKeypairEve: KeyringPair;
   let signKeypairDave: KeyringPair;
 
@@ -35,7 +34,6 @@ describe('VC works correctly', () => {
     sigKeypairValidator = keyring.addFromUri('//Swn');
     provider = await buildConnection(constants.providerNetwork);
     ssidUrl = SSID_BASE_URL[constants.providerNetwork];
-    sigKeypairBob = keyring.addFromUri('//Bob');
     signKeypairEve = keyring.addFromUri('//Eve');
     signKeypairDave = keyring.addFromUri('//Dave');
     vc_id = '0x';
@@ -54,9 +52,7 @@ describe('VC works correctly', () => {
       EVE_DID,
     ];
     actualHex = await vc.generateVC(tokenVC, owner, issuers, "TokenVC", sigKeypair);
-    // console.log("Generated TokenVC Hex: \n", actualHex);
     let actualObject = utils.decodeHex(actualHex, 'VC');
-    // console.log("Decoded TokenVC Object: \n", actualObject);
     let expectedObject = {
       hash: '0x1bfef48398ef3adcc90370f64c22d520ed45280455f6ef7df369005dd51989c7',
       owner: did.sanitiseDid(TEST_DID),
@@ -164,93 +160,79 @@ describe('VC works correctly', () => {
 
   if (constants.providerNetwork == 'local') {
 
-  it("Store Token VC and approve works correctly", async () => {
-    let vcData: any;
-    let tokenVC = {
-      tokenName: 'test',
-      reservableBalance: 1000,
-      decimal: 6,
-      currencyCode: 'OTH',
-    };
-    let owner = TEST_DAVE_DID;
-    let issuers = [
-      TEST_SWN_DID,
-      EVE_DID,
-    ];
-    const vcHex = await vc.generateVC(tokenVC, owner, issuers, VCType.TokenVC, sigKeypairValidator, provider, ssidUrl); // Sign with SWN
-    const closedProposal = await councilStoreVC(vcHex, signKeypairDave, sigKeypair, sigKeypairValidator, provider);
-    assert.doesNotReject(closedProposal);
+    it("Store Token VC and approve works correctly", async () => {
+      let vcData: any;
+      let tokenVC = {
+        tokenName: 'test',
+        reservableBalance: 1000,
+        decimal: 6,
+        currencyCode: 'OTH',
+      };
+      let owner = TEST_DAVE_DID;
+      let issuers = [
+        TEST_SWN_DID,
+        EVE_DID,
+      ];
+      const vcHex = await vc.generateVC(tokenVC, owner, issuers, VCType.TokenVC, sigKeypairValidator); // Sign with SWN
+      const closedProposal = await councilStoreVC(vcHex, signKeypairDave, sigKeypair, sigKeypairValidator, provider);
+      assert.doesNotReject(closedProposal);
 
-    vc_id = closedProposal.events.vc.VCValidated.vcid;
-    // console.log("VC ID: ", vc_id);
-    vcData = await vc.getVCs(vc_id, provider);
-    assert.strictEqual(vcData.isVcActive, false);
+      vc_id = closedProposal.events.vc.VCValidated.vcid;
+      vcData = await vc.getVCs(vc_id, provider);
+      assert.strictEqual(vcData.isVcActive, false);
 
-    assert.doesNotReject(await vc.approveVC(vc_id, signKeypairEve, provider, ssidUrl));
+      assert.doesNotReject(await vc.approveVC(vc_id, signKeypairEve, provider, ssidUrl));
 
-    vcData = await vc.getVCs(vc_id, provider);
-    assert.strictEqual(vcData.vcType, VCType.TokenVC);
-    assert.strictEqual(vcData.isVcActive, true);
-  });
+      vcData = await vc.getVCs(vc_id, provider);
+      assert.strictEqual(vcData.vcType, VCType.TokenVC);
+      assert.strictEqual(vcData.isVcActive, true);
+    });
 
-  it('Store and approve Generic VC works correctly', async () => {
-    let genericVC = {
-      cid: 'yD5HYVIgzl3_3Ze3fMgc',
-    };
-    let owner = TEST_DAVE_DID;
-    let issuers = [
-      TEST_SWN_DID,
-      EVE_DID,
-    ];
-    const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypairValidator, provider, ssidUrl); // SWN is also council member
-    const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
-    let vcId = transaction.events.vc.VCValidated.vcid;
-    // console.log("VC ID: ", vcId);
-    let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
-    assert.doesNotReject(transaction);
-    assert.doesNotReject(apTxn);
-    let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
-    // console.log("Data from getGenericVCData : ", data);
-    let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
-    assert.strictEqual(verifyData, true);
-  });
+    it('Store and approve Generic VC works correctly', async () => {
+      let genericVC = {
+        cid: 'yD5HYVIgzl3_3Ze3fMgc',
+      };
+      let owner = TEST_DAVE_DID;
+      let issuers = [
+        TEST_SWN_DID,
+        EVE_DID,
+      ];
+      const vcHex = await vc.generateVC(genericVC, owner, issuers, "GenericVC", sigKeypairValidator, ssidUrl); // SWN is also council member
+      const transaction: any = await vc.storeVC(vcHex, sigKeypairValidator, provider);
+      let vcId = transaction.events.vc.VCValidated.vcid;
+      let apTxn: any = await vc.approveVC(vcId, signKeypairEve, provider, ssidUrl);
+      assert.doesNotReject(transaction);
+      assert.doesNotReject(apTxn);
+      let data:any = await vc.getGenericVCData(vcId, ssidUrl, provider);
+      let verifyData = await vc.verifyGenericVC(vcId, data.data, provider);
+      assert.strictEqual(verifyData, true);
+    });
 
-  it('Get VC Ids by DID after storing VC works correctly', async () => {
-    const vcs = await vc.getVCIdsByDID(TEST_DAVE_DID, provider);
-    assert.strictEqual(vcs?.['length'] > 0, true);
-  });
+    it('Get VC Ids by DID after storing VC works correctly', async () => {
+      const vcs = await vc.getVCIdsByDID(TEST_DAVE_DID, provider);
+      assert.strictEqual(vcs?.['length'] > 0, true);
+    });
 
-  it('Get VCs works correctly', async () => {
-    const vcs = await vc.getVCs(vc_id, provider);
-    assert.notStrictEqual(vcs, null);
-  });
+    it('Get VCs works correctly', async () => {
+      const vcs = await vc.getVCs(vc_id, provider);
+      assert.notStrictEqual(vcs, null);
+    });
 
-  it('Get DID by VC Id works correctly', async () => {
-    const identifier = await vc.getDIDByVCId(vc_id, provider);
-    assert.strictEqual(identifier, did.sanitiseDid(TEST_DAVE_DID));
-  });
+    it('Get DID by VC Id works correctly', async () => {
+      const identifier = await vc.getDIDByVCId(vc_id, provider);
+      assert.strictEqual(identifier, did.sanitiseDid(TEST_DAVE_DID));
+    });
 
-  it('Get VC history by VC ID works correctly', async () => {
-    const vcHistory = await vc.getVCHistoryByVCId(vc_id, provider);
-    assert.notStrictEqual(vcHistory, null);
-  });
+    it('Get VC history by VC ID works correctly', async () => {
+      const vcHistory = await vc.getVCHistoryByVCId(vc_id, provider);
+      assert.notStrictEqual(vcHistory, null);
+    });
 
-  it('Update status works correctly', async () => {
-    const transaction: any = await vc.updateStatus(vc_id, false, signKeypairEve, provider);
-    assert.doesNotReject(transaction);
-    const vcs: any = await vc.getVCs(vc_id, provider);
-    assert.strictEqual(vcs.isVcActive, false);
-  });
-}
-
-  after(async () => {
-    // Delete created DIDs
-    if (constants.providerNetwork == 'local') {
-      try {
-        // await removeDid(TEST_DID, sigKeypair, provider);
-        // await removeDid(EVE_DID, sigKeypair, provider);
-        // await removeDid(TEST_DAVE_DID, sigKeypair, provider);
-      } catch (err) { }
-    }
-  });
+    it('Update status works correctly', async () => {
+      const transaction: any = await vc.updateStatus(vc_id, false, signKeypairEve, provider);
+      assert.doesNotReject(transaction);
+      const vcs: any = await vc.getVCs(vc_id, provider);
+      assert.strictEqual(vcs.isVcActive, false);
+    });
+  }
 });

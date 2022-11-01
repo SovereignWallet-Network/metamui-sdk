@@ -1,10 +1,8 @@
 import assert from 'assert';
 import * as tx from '../src/balances';
-import * as did from '../src/did';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
-import { removeDid } from './common/helper';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { balances } from '../src';
@@ -17,22 +15,7 @@ describe('Balances works correctly', () => {
     const keyring = await initKeyring();
     const provider = await buildConnection(constants.providerNetwork);
     sigKeypairWithBal = keyring.createFromUri(constants.mnemonicWithBalance);
-    // Empty dave account by sending to swn before running this test case
     sigKeypairWithoutBal = keyring.createFromUri('//Dave');
-    if (constants.providerNetwork == 'local') {
-      const didObjTest123 = {
-        private: {
-          public_key: sigKeypairWithoutBal.publicKey,
-          identity: 'did:ssid:test123',
-          metadata: 'Metadata',
-        }
-      };
-      try {
-        // await did.storeDIDOnChain(didObjTest123, sigKeypairWithBal, provider);
-      } catch (err) {
-        // console.log(err);
-      }
-    }
     const transfer = tx.transfer(sigKeypairWithBal, 'did:ssid:alice', 1, provider);
     await assert.doesNotReject(transfer);
   });
@@ -73,7 +56,6 @@ describe('Balances works correctly', () => {
   it('Transaction fails when sender has no balance', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
       await assert.rejects(tx.transfer(sigKeypairWithoutBal, 'did:ssid:alice', 1, provider), (err: {message : any;}) => {
-        // console.log(err.message);
         assert.strictEqual(err.message, 'balances.InsufficientBalance');
         return true;
       });
@@ -101,19 +83,10 @@ describe('Balances works correctly', () => {
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal?.address);
     const transfer = tx.transferWithMemo(sigKeypairWithBal, 'did:ssid:nonexistentdid', 1, 'Memo Test', provider, nonce);
     await assert.rejects(transfer, (err: { message: any; }) => {
-      // console.log(err.message);
       assert.strictEqual(err.message, 'balances.RecipentDIDNotRegistered');
       return true;
     });
-
   });
-
-  after(async () => {
-    // Delete created DIDs
-    if (constants.providerNetwork == 'local') {
-      // await removeDid('did:ssid:test123', sigKeypairWithBal, provider);
-    }
-  })
 
   return true;
 });

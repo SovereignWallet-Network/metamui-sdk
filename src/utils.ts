@@ -181,7 +181,7 @@ const CID_BYTES = 64;
  */
 const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
 /**
- * @param  {String} inputString
+ * @param  {string} inputString
  */
 const hexToBytes = (inputString) => hexToU8a(inputString);
 /**
@@ -208,18 +208,18 @@ registry.register(METABLOCKCHAIN_TYPES);
 registry.register(ENCODE_TYPES);
 
 /** Encodes object/ string of given type to hex
- * @param  {Object | String} data Object to be encoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {String} Encoded Hex
+ * @param  {Object | string} data Object to be encoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {string} Encoded Hex
  */
 function encodeData(data, typeKey) {
   return types.createType(registry, typeKey, data).toHex();
 }
 
 /** Decodes hex of given type to it's corresponding object/value
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
+ * @param  {string} hexValue Hex String to be decoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | string} Decoded Object/String
  */
 function decodeHex(hexValue, typeKey) {
   return types.createType(registry, typeKey, hexValue).toJSON();
@@ -234,8 +234,8 @@ function isUpperAndValid(str) {
 }
 
 /** regex to remove unwanted hex bytes
- * @param  {String} s Hex String to make tidy
- * @returns {Object | String} Decoded tidy Object/String
+ * @param  {string} s Hex String to make tidy
+ * @returns {Object | string} Decoded tidy Object/String
  */
 function tidy(s) {
   const tidy = typeof s === 'string'

@@ -207,7 +207,7 @@ exports.CID_BYTES = CID_BYTES;
 const bytesToHex = (inputBytes) => (0, util_1.u8aToHex)(inputBytes);
 exports.bytesToHex = bytesToHex;
 /**
- * @param  {String} inputString
+ * @param  {string} inputString
  */
 const hexToBytes = (inputString) => (0, util_1.hexToU8a)(inputString);
 exports.hexToBytes = hexToBytes;
@@ -235,18 +235,18 @@ const registry = new types.TypeRegistry();
 registry.register(METABLOCKCHAIN_TYPES);
 registry.register(ENCODE_TYPES);
 /** Encodes object/ string of given type to hex
- * @param  {Object | String} data Object to be encoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {String} Encoded Hex
+ * @param  {Object | string} data Object to be encoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {string} Encoded Hex
  */
 function encodeData(data, typeKey) {
     return types.createType(registry, typeKey, data).toHex();
 }
 exports.encodeData = encodeData;
 /** Decodes hex of given type to it's corresponding object/value
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
+ * @param  {string} hexValue Hex String to be decoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | string} Decoded Object/String
  */
 function decodeHex(hexValue, typeKey) {
     return types.createType(registry, typeKey, hexValue).toJSON();
@@ -261,8 +261,8 @@ function isUpperAndValid(str) {
 }
 exports.isUpperAndValid = isUpperAndValid;
 /** regex to remove unwanted hex bytes
- * @param  {String} s Hex String to make tidy
- * @returns {Object | String} Decoded tidy Object/String
+ * @param  {string} s Hex String to make tidy
+ * @returns {Object | string} Decoded tidy Object/String
  */
 function tidy(s) {
     const tidy = typeof s === 'string'

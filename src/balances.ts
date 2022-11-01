@@ -5,7 +5,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { submitTransaction } from './common/helper';
 
 /** Get account balance(Highest Form) based on the did supplied.
-* @param {String} did
+* @param {string} did
 * @param {APIPromise} api (optional)
 */
 const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
@@ -29,7 +29,7 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
 };
 
 /** Listen to balance changes for a DID and execute the callback.
-* @param {String} identifier
+* @param {string} identifier
 * @param {Function} callback
 * @param {APIPromise} api
 */
@@ -55,7 +55,7 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
  * Note : balanceCheck has not been included in the checks since sender not having balance
  * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
+ * @param {string} receiverDID
  * @param {Number} amount In Lowest Form
  * @param {APIPromise} api (optional)
  * @param {int} nonce (optional)
@@ -88,9 +88,9 @@ async function transfer(
  * This function is similar to sendTransaction except that it provides the user to add the memo to transfer functionality.
  * 
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
+ * @param {string} receiverDID
  * @param {Number} amount In Lowest Form
- * @param {String} memo
+ * @param {string} memo
  * @param {APIPromise} api
  * @param {int} nonce (optional)
  * @returns {Uint8Array}

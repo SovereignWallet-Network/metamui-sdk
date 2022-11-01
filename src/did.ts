@@ -5,16 +5,12 @@ import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
 import { submitTransaction } from './common/helper';
-import { HexString } from '@polkadot/util/types';
+global.Buffer = require('buffer').Buffer;
 
-const IDENTIFIER_PREFIX = 'did:ssid:';
-const IDENTIFIER_MAX_LENGTH = 20;
-const IDENTIFIER_MIN_LENGTH = 3;
 const DID_HEX_LEN = 64;
 
-
 /** Generate Mnemonic
- * @returns {String} Mnemonic
+ * @returns {string} Mnemonic
  */
 const generateMnemonic = () => mnemonicGenerate();
 
@@ -35,20 +31,6 @@ const checkIdentifierFormat = (identifier) => {
 
 async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  // // Check if identifier is available
-  // const did_hex = sanitiseDid(identifier);
-
-  // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-  // if(didCheck != null) {
-  //   //return new Error('did.DIDAlreadyExists');
-  //   throw(new Error('did.DIDAlreadyExists'));
-  // }
-
-  // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
-  // if(pubkeyCheck) {
-  //   throw(new Error('did.PublicKeyRegistered'));
-  // }
-
   const tx = provider.tx.did.createPrivate(vcId, paraId);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
@@ -66,20 +48,6 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
 
  async function createPublic(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  // // Check if identifier is available
-  // const did_hex = sanitiseDid(identifier);
-
-  // const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-  // if(didCheck != null) {
-  //   //return new Error('did.DIDAlreadyExists');
-  //   throw(new Error('did.DIDAlreadyExists'));
-  // }
-
-  // const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
-  // if(pubkeyCheck) {
-  //   throw(new Error('did.PublicKeyRegistered'));
-  // }
-
   const tx = provider.tx.did.createPublic(vcId, paraId);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
@@ -89,7 +57,7 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
 
 /**
  * Get did information from accountID
- * @param {String} identifier DID Identifier
+ * @param {string} identifier DID Identifier
  * @param {ApiPromise} api
  * @returns {JSON} DID Information
  */
@@ -101,7 +69,6 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
     }
     const did_hex = sanitiseDid(identifier);
     const data = (await provider.query.did.diDs(did_hex)).toJSON();
-    // console.log('data', data);
     if (data == null) {
       console.log('DID not found');
       return null;
@@ -131,7 +98,7 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
 
 /**
  * Get the accountId for a given DID
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
  * @param {Number} blockNumber (optional)
  * @returns {JSON}
@@ -165,14 +132,13 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
 
 /**
  * Get the DID associated to given accountID
- * @param {String} accountId (hex/base64 version works)
+ * @param {string} accountId (hex/base64 version works)
  * @param {ApiPromise} api
  * @returns {JSON}
  */
-async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | boolean> {
+async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | Boolean> {
   const provider = api || (await buildConnection('local'));
   const data = (await provider.query.did.rLookup(accountId)).toJSON();
-  // return false if empty
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     return false;
   }
@@ -183,7 +149,7 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
 /**
  * This function will rotate the keys assiged to a DID
  * It should only be called by validator accounts, else will fail
- * @param {String} identifier
+ * @param {string} identifier
  * @param {Uint8Array} newKey
  * @param {Number} paraId
  * @param {KeyringPair} signingKeypair // of a validator account
@@ -211,9 +177,9 @@ async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: K
 
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
- * @param {String} data
+ * @param {string} data
  * @param {Int} size
- * @return {String}
+ * @return {string}
  */
 function convertFixedSizeHex(data, size = 64) {
   if (data.length > size) throw new Error('Invalid Data');
@@ -226,16 +192,14 @@ function convertFixedSizeHex(data, size = 64) {
  * 
  *  Note: This util function is needed since dependant module wont convert the utf did to hex anymore
  * 
- * @param {String} did
- * @return {String} Hex did
+ * @param {string} did
+ * @return {string} Hex did
  */
 const sanitiseDid = (did) => {
 
   if (did.startsWith('0x')) {
-    // already hex string
     return did.padEnd(DID_HEX_LEN, '0');
   }
-  // console.log('Converting to hex');
   let hex_did = Buffer.from(did, 'utf8').toString('hex');
   hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
   return hex_did;
@@ -243,11 +207,11 @@ const sanitiseDid = (did) => {
 
 /**
  * Check if the user is an approved validator
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
  * @returns {Boolean}
  */
-async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
+async function isDidValidator(identifier: string, api?: ApiPromise): Promise<boolean> {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
@@ -259,11 +223,11 @@ async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
 
 /**
  * Fetch the history of rotated keys for the specified DID
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
  * @returns {JSON}
  */
-async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
+async function getDidKeyHistory(identifier: string, api: ApiPromise | false = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   return (await provider.query.did.prevKeys(did_hex)).toJSON();
@@ -271,8 +235,8 @@ async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
 
 /**
  *
- * @param {String} identifier
- * @param {String} metadata
+ * @param {string} identifier
+ * @param {string} metadata
  * @param {Keyringpair} signingKeypair of a validator account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -288,7 +252,7 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: ApiProm
 
 /**
  * Sync DID VC with other chains
- * @param {String} identifier
+ * @param {string} identifier
  * @param {Number} paraId Optional
  * @param {KeyringPair} signingKeypair of a validator account
  * @param {ApiPromise} api
@@ -305,7 +269,7 @@ async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromis
 
 /**
  * Remove DID VC
- * @param {String} identifier
+ * @param {string} identifier
  * @param {Number} paraId Optional
  * @param {KeyringPair} signingKeypair of a SUDO account
  * @param {ApiPromise} api

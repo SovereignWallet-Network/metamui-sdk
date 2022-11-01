@@ -5,7 +5,6 @@
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
  import { HexString } from '@polkadot/util/types';
-
  
  /**
   * Mint token to given currency
@@ -48,7 +47,7 @@
 /**
  * Transfer tokens to a DID
  * @param {HexString} vcId
- * @param {String} toDid
+ * @param {string} toDid
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -74,8 +73,8 @@ async function transferToken(
 
 /**
  * Withdraw Reserved tokens from one DID to another DID
- * @param {String} toDid
- * @param {String} fromDid
+ * @param {string} toDid
+ * @param {string} fromDid
  * @param {Number} amount
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api

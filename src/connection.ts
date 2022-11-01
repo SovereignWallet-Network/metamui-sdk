@@ -2,7 +2,6 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 import { METABLOCKCHAIN_PROVIDER } from './config';
 import { METABLOCKCHAIN_TYPES } from './utils';
 
-// assign network
 const NETWORK_PROVIDER = {
   local: METABLOCKCHAIN_PROVIDER.LOCAL,
   dev: METABLOCKCHAIN_PROVIDER.DEV,
@@ -11,7 +10,6 @@ const NETWORK_PROVIDER = {
   mainnet: METABLOCKCHAIN_PROVIDER.MAINNET,
 };
 
-// global obj to cache ws connection
 let providerInstance: Promise<ApiPromise>;
 
 function buildNewConnection(network = 'local'): Promise<ApiPromise> {

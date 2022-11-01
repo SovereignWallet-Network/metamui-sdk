@@ -51,7 +51,7 @@ exports.slashToken = slashToken;
 /**
  * Transfer tokens to a DID
  * @param {HexString} vcId
- * @param {String} toDid
+ * @param {string} toDid
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -73,8 +73,8 @@ function transferToken(vcId, toDid, senderAccountKeyPair, api) {
 exports.transferToken = transferToken;
 /**
  * Withdraw Reserved tokens from one DID to another DID
- * @param {String} toDid
- * @param {String} fromDid
+ * @param {string} toDid
+ * @param {string} fromDid
  * @param {Number} amount
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api

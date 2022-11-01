@@ -16,10 +16,10 @@ import axios from "axios";
 /**
  * Encodes Token VC and pads with appropriate bytes
  * @param {Object} TokenVC
- * @param {String} TokenVC.tokenName
- * @param {String} TokenVC.reservableBalance
- * @param {String} TokenVC.decimal
- * @param {String} TokenVC.currencyCode
+ * @param {string} TokenVC.tokenName
+ * @param {string} TokenVC.reservableBalance
+ * @param {string} TokenVC.decimal
+ * @param {string} TokenVC.currencyCode
  * @returns {HexString} Token VC Hex String
  */
 function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
@@ -74,8 +74,8 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
 
 /** Encodes Token VC and pads with appropriate bytes
  * @param  {Object} vcProperty VC Property
- * @param  {String} vcProperty.vcId VC Id
- * @param  {String} vcProperty.amount In Highest Form
+ * @param  {string} vcProperty.vcId VC Id
+ * @param  {string} vcProperty.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
 async function createTokenTransferVC({ vc_id, amount }) {
@@ -90,7 +90,7 @@ async function createTokenTransferVC({ vc_id, amount }) {
 
 /** Encodes Generic VC and pads with appropriate bytes
  * @param  {Object} vcProperty
- * @param  {String} vcProperty.cid
+ * @param  {string} vcProperty.cid
  * @returns {HexString} Token VC Hex String
  */
 function createGenericVC({ cid }) {
@@ -105,10 +105,10 @@ function createGenericVC({ cid }) {
 /**
  * Create Public Did VC
  * @param {Object} publicDidVC
- * @param {String} publicDidVC.public_key
- * @param {String} publicDidVC.registration_number
- * @param {String} publicDidVC.company_name
- * @param {String} publicDidVC.did
+ * @param {string} publicDidVC.public_key
+ * @param {string} publicDidVC.registration_number
+ * @param {string} publicDidVC.company_name
+ * @param {string} publicDidVC.did
  * @returns {HexString} Public Did VC Hex String
  */
 function createPublicDidVC({ public_key, registration_number, company_name, did }) {
@@ -126,8 +126,8 @@ function createPublicDidVC({ public_key, registration_number, company_name, did 
 /**
  * Create Private Did VC
  * @param {Object} privateDidVC
- * @param {String} privateDidVC.public_key
- * @param {String} privateDidVC.did
+ * @param {string} privateDidVC.public_key
+ * @param {string} privateDidVC.did
  * @returns {HexString} Private Did VC Hex String
  */
 function createPrivateDidVC({ public_key, did }) {
@@ -143,15 +143,15 @@ function createPrivateDidVC({ public_key, did }) {
 /**
  * Create VC
  * @param  {Object} vcProperty
- * @param  {String} owner Did
- * @param  {String[]} issuers Array of Did
- * @param  {String} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
+ * @param  {string} owner Did
+ * @param  {string[]} issuers Array of Did
+ * @param  {string} vcType TokenVC, MintTokens, SlashTokens, TokenTransferVC, GenericVC
  * @param  {KeyPair} sigKeypair Owner Key Ring pair
- * @param  {ApiPromise} api (Optional)
- * @returns {String} VC Hex String
+ * @param  {string} ssidUrl (Optional)
+ * @returns {string} VC Hex String
  */
 
- async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair, api?: ApiPromise, ssidUrl?: string) {
+ async function generateVC(vcProperty, owner, issuers, vcType, sigKeypair, ssidUrl?: string) {
   let encodedVCProperty, encodedData, hash;
   switch (vcType) {
     case VCType.TokenVC:
@@ -202,11 +202,6 @@ function createPrivateDidVC({ public_key, did }) {
   };
   return utils.encodeData(vcObject, 'VC');
 }
-// Common VC Functions -  
-// encode_vc,
-// decode_vc,
-// encode_vc_property, 
-// decode_vc_property
 
 // Chain State Query Functions
 
@@ -217,7 +212,7 @@ function createPrivateDidVC({ public_key, did }) {
  * @returns {JSON} VC Object
  */
 async function getVCIdsByDID(
-  did: HexString, 
+  did: string, 
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
@@ -287,11 +282,11 @@ async function getVCHistoryByVCId(
 
 /**
  * Get Generic vc data
- * @param {String} vcId
+ * @param {string} vcId
  * @param {ApiPromise} api
  * @returns {JSON} Generic VC data
  */
- async function getGenericVCDataByCId(cid, ssidUrl?: string) {
+ async function getGenericVCDataByCId(cid, ssidUrl?: String) {
   ssidUrl = ssidUrl || SSID_BASE_URL.local;
   let body = {
     action: "get_vc",
@@ -303,7 +298,7 @@ async function getVCHistoryByVCId(
 
 /**
  * Get Generic vc data
- * @param {String} vcId
+ * @param {string} vcId
  * @param {ApiPromise} api
  * @returns {JSON} Generic VC data
  */
@@ -311,7 +306,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
   const provider = await api || (await buildConnection('local'));
   const vc:any = await getVCs(vcId, provider);
   if (!vc) return null
-  const vc_property = getVCProperty(vc.vcProperty, vc.vcType);
+  const vc_property = decodeVCProperty(vc.vcProperty, vc.vcType);
   const { data, hash } = await getGenericVCDataByCId(vc_property.cid, ssidUrl);
   return { data, hash, vcId, issuers: vc.issuers };
 }
@@ -319,7 +314,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
 
 /**
  * Verify Generic Vc data
- * @param {String} vcId
+ * @param {string} vcId
  * @param {Object} data
  * @param {ApiPromise} api
  * @returns {Boolean} true if verified
@@ -396,7 +391,7 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
       }, "VC_HEX");
       hash = blake2AsHex(encodedData);
     } else {
-      const vcProperty = getVCProperty(vc.vcProperty, vc.vcType);
+      const vcProperty = decodeVCProperty(vc.vcProperty, vc.vcType);
       let genericVCData = await getGenericVCDataByCId(vcProperty.cid, ssidUrl);
       hash = genericVCData.hash;
     }
@@ -431,7 +426,7 @@ async function storeVC(
 
 /**
  * Update Status of a VC ID
- * @param {String} vcId
+ * @param {string} vcId
  * @param {Boolean} vcStatus
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
@@ -454,64 +449,67 @@ async function updateStatus(
 
 
  /** function that decodes hex of createTokenVC
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
+ * @param  {string} hexValue Hex String to be decoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | string} Decoded Object/String
  */
-  function getVCProperty(hexValue, VCType) {
+  function decodeVCProperty(hexValue, VCType) {
     let vcs = decodeHex(hexValue, VCType);
-    if(Boolean(vcs.token_name))
-      vcs["token_name"] = hexToString(vcs.token_name);
-    if(Boolean(vcs.currency_code))
-      vcs["currency_code"] = hexToString(vcs.currency_code);
+    switch(vcs.vc_type) {
+      case VCType.TokenVC:
+        vcs["token_name"] = hexToString(vcs.token_name);
+        vcs["currency_code"] = hexToString(vcs.currency_code);
+        break;
+      case VCType.PublicDidVC:
+        vcs["did"] = hexToString(vcs.did);
+        vcs["registration_number"] = hexToString(vcs.registration_number);
+        vcs["company_name"] = hexToString(vcs.company_name);
+        break;
+      case VCType.PrivateDidVC:
+        vcs["did"] = hexToString(vcs.did);
+        break;
+    }
     return vcs;
    }
   
 /** function that decodes hex of createVC where type is TokenVC to it's corresponding object/value
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
+ * @param  {string} hexValue Hex String to be decoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | string} Decoded Object/String
  */
-function decodeVC(hexValue, VCType) {
-    let vcs = decodeHex(hexValue, VCType);
-    vcs["owner"] = hexToString(vcs.owner);
+function decodeVC(hexValue) {
+    let vc = decodeHex(hexValue, "VC");
+    vc["owner"] = hexToString(vc.owner);
     let issuer_did: any = [];
-    for(let i=0; i<vcs.issuers.length; i++){
-        issuer_did.push(hexToString(vcs.issuers[i]));
+    for(let i=0; i<vc.issuers.length; i++){
+        issuer_did.push(hexToString(vc.issuers[i]));
     }
-    vcs["issuers"] = issuer_did;
-    switch(vcs.vc_type) {
+    vc["issuers"] = issuer_did;
+    switch(vc.vc_type) {
+        
         case VCType.MintTokens:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.SlashMintTokens);
-        break;
-        case VCType.TokenVC:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, vcs.vc_type);
-        break;
         case VCType.SlashTokens:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.SlashMintTokens);
+        vc["vc_property"] = decodeVCProperty(vc.vc_property, VCType.SlashMintTokens);
         break;
-        case VCType.TokenTransferVC:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.TokenTransferVC);
-        break;
+
         case VCType.GenericVC:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.GenericVC);
-        break;
         case VCType.PublicDidVC:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.PublicDidVC);
-        break;
         case VCType.PrivateDidVC:
-        vcs["vc_property"] = getVCProperty(vcs.vc_property, VCType.PrivateDidVC);
+        case VCType.TokenVC:
+        case VCType.TokenTransferVC:
+        vc["vc_property"] = decodeVCProperty(vc.vc_property, vc.vc_type);
+        
         default:
         throw new Error("Unknown Type");
     }
-    return vcs;
+    return vc;
 }
 
 /**
- * @param {String} tokenSymbol 
- * @param {String} tokenAmount 
+ * @param {string} tokenSymbol 
+ * @param {string} tokenAmount 
  * @param {ApiPromise} api 
- * @returns {String} Formatted Token Amount
+ * @returns {string} Formatted Token Amount
  */
 
 async function getFormattedTokenAmount(
@@ -559,6 +557,6 @@ export {
     storeVC,
     updateStatus,
     decodeVC,
-    getVCProperty,
+    decodeVCProperty,
     getFormattedTokenAmount,
 };

@@ -54,7 +54,7 @@ Transfer tokens to a DID
 | Param | Type |
 | --- | --- |
 | vcId | <code>HexString</code> | 
-| toDid | <code>String</code> | 
+| toDid | <code>string</code> | 
 | senderAccountKeyPair | <code>KeyringPair</code> | 
 | api | <code>ApiPromise</code> | 
 
@@ -68,8 +68,8 @@ Withdraw Reserved tokens from one DID to another DID
 
 | Param | Type |
 | --- | --- |
-| toDid | <code>String</code> | 
-| fromDid | <code>String</code> | 
+| toDid | <code>string</code> | 
+| fromDid | <code>string</code> | 
 | amount | <code>Number</code> | 
 | senderAccountKeyPair | <code>KeyringPair</code> | 
 | api | <code>ApiPromise</code> | 

@@ -14,7 +14,7 @@ const connection_1 = require("./connection");
 const did_1 = require("./did");
 const helper_1 = require("./common/helper");
 /** Get account balance(Highest Form) based on the did supplied.
-* @param {String} did
+* @param {string} did
 * @param {APIPromise} api (optional)
 */
 const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () {
@@ -40,7 +40,7 @@ const getBalance = (did, api) => __awaiter(void 0, void 0, void 0, function* () 
 });
 exports.getBalance = getBalance;
 /** Listen to balance changes for a DID and execute the callback.
-* @param {String} identifier
+* @param {string} identifier
 * @param {Function} callback
 * @param {APIPromise} api
 */
@@ -66,7 +66,7 @@ exports.subscribeToBalanceChanges = subscribeToBalanceChanges;
  * Note : balanceCheck has not been included in the checks since sender not having balance
  * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
+ * @param {string} receiverDID
  * @param {Number} amount In Lowest Form
  * @param {APIPromise} api (optional)
  * @param {int} nonce (optional)
@@ -94,9 +94,9 @@ exports.transfer = transfer;
  * This function is similar to sendTransaction except that it provides the user to add the memo to transfer functionality.
  *
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
+ * @param {string} receiverDID
  * @param {Number} amount In Lowest Form
- * @param {String} memo
+ * @param {string} memo
  * @param {APIPromise} api
  * @param {int} nonce (optional)
  * @returns {Uint8Array}

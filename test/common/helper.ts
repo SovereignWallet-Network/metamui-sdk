@@ -1,5 +1,3 @@
-import * as did from '../../src/did';
-import { buildConnection } from '../../src/connection';
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import * as tx from '../../src/balances';
@@ -9,25 +7,6 @@ import { submitTransaction } from '../../src/common/helper';
 const TEST_DAVE_DID = "did:ssid:dave";
 const TEST_SWN_DID = "did:ssid:swn";
 const TEST_ROOT_DID = 'did:ssid:alice';
-
-// To remove DID after testing
-
-async function removeDid(didString: string, paraId = null, sigKeyPair: KeyringPair, provider: ApiPromise) {
-  try {
-    const api = provider || (await buildConnection('local'));
-    const txn = api.tx.sudo.sudo(api.tx.did.remove(did.sanitiseDid(didString), paraId));
-    const nonce = await api.rpc.system.accountNextIndex(sigKeyPair.address);
-    await new Promise((resolve, reject) => txn.signAndSend(sigKeyPair, { nonce }, ({ status, dispatchError }) => {
-      if (dispatchError) {
-        reject('Dispatch error');
-      } else if (status.isFinalized) {
-        resolve(status.asFinalized.toHex());
-      }
-    }));
-  } catch (err: any) {
-    throw new Error(err);
-  }
-}
 
 async function councilStoreVC(vcHex: any, sigKeypairOwner: any, sigKeypairRoot: KeyringPair, sigKeypairCouncil: KeyringPair, provider: ApiPromise) {
 
@@ -89,7 +68,6 @@ async function sudoTxn(call, sudoKeyPair: KeyringPair, provider: ApiPromise) {
 }
 
 export {
-  removeDid,
   councilStoreVC,
   sudoStoreVC,
   councilVoteTxn,

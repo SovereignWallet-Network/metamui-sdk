@@ -4,7 +4,6 @@ exports.buildConnection = void 0;
 const api_1 = require("@polkadot/api");
 const config_1 = require("./config");
 const utils_1 = require("./utils");
-// assign network
 const NETWORK_PROVIDER = {
     local: config_1.METABLOCKCHAIN_PROVIDER.LOCAL,
     dev: config_1.METABLOCKCHAIN_PROVIDER.DEV,
@@ -12,7 +11,6 @@ const NETWORK_PROVIDER = {
     testnet: config_1.METABLOCKCHAIN_PROVIDER.TESTNET,
     mainnet: config_1.METABLOCKCHAIN_PROVIDER.MAINNET,
 };
-// global obj to cache ws connection
 let providerInstance;
 function buildNewConnection(network = 'local') {
     if (!(network in NETWORK_PROVIDER))

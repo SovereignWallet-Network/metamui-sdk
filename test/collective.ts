@@ -2,11 +2,9 @@ import assert from 'assert';
 
 import * as collective from '../src/collective';
 import * as did from '../src/did';
-import * as tx from '../src/balances';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
 import * as constants from './common/constants';
-import { removeDid } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise } from '@polkadot/api';
 
@@ -131,13 +129,5 @@ describe('Collective works correctly', () => {
       let transaction: any = await collective.disapproveProposal(proposalHash, sudoPair, provider);
       assert.doesNotReject(transaction);
     });
-
-    after(async () => {
-      // Delete created DID (did:ssid:rocket)
-      if (constants.providerNetwork == 'local') {
-        // await removeDid(TEST_ROCKET_DID, sudoPair, provider);
-        // await removeDid(TEST_DAVE_DID, sudoPair, provider);
-      }
-    })
   }
 });

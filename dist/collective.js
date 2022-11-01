@@ -38,8 +38,8 @@ const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
 /**
  * Set Members and prime of collective pallet
- * @param  {Array<String>} newMembers Array of Did
- * @param  {String} prime Did of Prime
+ * @param  {Array<string>} newMembers Array of Did
+ * @param  {string} prime Did of Prime
  * @param  {Number} oldCount Old members count
  * @param  {KeyringPair} signingKeypair Key pair of Sender
  * @param  {ApiPromise} api Network Provider
@@ -70,12 +70,6 @@ function propose(threshold, proposal, lengthCount, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const tx = provider.tx.council.propose(threshold, proposal, lengthCount);
-        const txnInfo = yield provider.tx.council.propose(threshold, proposal, lengthCount).paymentInfo(signingKeypair);
-        console.log(`
-  class=${txnInfo.class.toString()},
-  weight=${txnInfo.weight.toString()},
-  partialFee=${txnInfo.partialFee.toHuman()}
-`);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -102,7 +96,7 @@ function execute(proposal, lengthCount, signingKeypair, api) {
 exports.execute = execute;
 /**
  * Vote on a proposal
- * @param  {String} proposalHash Hash of proposal
+ * @param  {string} proposalHash Hash of proposal
  * @param  {Number} index Proposal index
  * @param  {Boolean} approve True/false
  * @param  {KeyringPair} signingKeypair Key pair of sender
@@ -121,7 +115,7 @@ function vote(proposalHash, index, approve, signingKeypair, api) {
 exports.vote = vote;
 /**
  * Close a proposal manually, executes call if yes votes is greater than or equal to threshold
- * @param  {String} proposalHash Hash
+ * @param  {string} proposalHash Hash
  * @param  {Number} index Proposal index
  * @param  {Boolean} proposalWeightBond Weight
  * @param  {Number} lengthCount Length
@@ -141,7 +135,7 @@ function close(proposalHash, index, proposalWeightBond, lengthCount, signingKeyp
 exports.close = close;
 /**
  * Disapprove proposal
- * @param  {String} proposalHash Hash
+ * @param  {string} proposalHash Hash
  * @param  {KeyringPair} signingKeypair Key pair of sender
  * @param  {ApiPromise} api Network Provider
  * @returns {Object} Transaction Object

@@ -27,7 +27,7 @@ Get account balance(Highest Form) based on the did supplied.
 
 | Param | Type | Description |
 | --- | --- | --- |
-| did | <code>String</code> |  |
+| did | <code>string</code> |  |
 | api | <code>APIPromise</code> | (optional) |
 
 <a name="subscribeToBalanceChanges"></a>
@@ -39,7 +39,7 @@ Listen to balance changes for a DID and execute the callback.
 
 | Param | Type |
 | --- | --- |
-| identifier | <code>String</code> | 
+| identifier | <code>string</code> | 
 | callback | <code>function</code> | 
 | api | <code>APIPromise</code> | 
 
@@ -56,7 +56,7 @@ is handled in extrinsic, check test/balances.js
 | Param | Type | Description |
 | --- | --- | --- |
 | senderAccountKeyPair | <code>KeyPair</code> |  |
-| receiverDID | <code>String</code> |  |
+| receiverDID | <code>string</code> |  |
 | amount | <code>Number</code> | In Lowest Form |
 | api | <code>APIPromise</code> | (optional) |
 | nonce | <code>int</code> | (optional) |
@@ -71,9 +71,9 @@ This function is similar to sendTransaction except that it provides the user to 
 | Param | Type | Description |
 | --- | --- | --- |
 | senderAccountKeyPair | <code>KeyPair</code> |  |
-| receiverDID | <code>String</code> |  |
+| receiverDID | <code>string</code> |  |
 | amount | <code>Number</code> | In Lowest Form |
-| memo | <code>String</code> |  |
+| memo | <code>string</code> |  |
 | api | <code>APIPromise</code> |  |
 | nonce | <code>int</code> | (optional) |
 

@@ -49,8 +49,8 @@ Set Members and prime of collective pallet
 
 | Param | Type | Description |
 | --- | --- | --- |
-| newMembers | <code>Array.&lt;String&gt;</code> | Array of Did |
-| prime | <code>String</code> | Did of Prime |
+| newMembers | <code>Array.&lt;string&gt;</code> | Array of Did |
+| prime | <code>string</code> | Did of Prime |
 | oldCount | <code>Number</code> | Old members count |
 | signingKeypair | <code>KeyringPair</code> | Key pair of Sender |
 | api | <code>ApiPromise</code> | Network Provider |
@@ -96,7 +96,7 @@ Vote on a proposal
 
 | Param | Type | Description |
 | --- | --- | --- |
-| proposalHash | <code>String</code> | Hash of proposal |
+| proposalHash | <code>string</code> | Hash of proposal |
 | index | <code>Number</code> | Proposal index |
 | approve | <code>Boolean</code> | True/false |
 | signingKeypair | <code>KeyringPair</code> | Key pair of sender |
@@ -112,7 +112,7 @@ Close a proposal manually, executes call if yes votes is greater than or equal t
 
 | Param | Type | Description |
 | --- | --- | --- |
-| proposalHash | <code>String</code> | Hash |
+| proposalHash | <code>string</code> | Hash |
 | index | <code>Number</code> | Proposal index |
 | proposalWeightBond | <code>Boolean</code> | Weight |
 | lengthCount | <code>Number</code> | Length |
@@ -129,7 +129,7 @@ Disapprove proposal
 
 | Param | Type | Description |
 | --- | --- | --- |
-| proposalHash | <code>String</code> | Hash |
+| proposalHash | <code>string</code> | Hash |
 | signingKeypair | <code>KeyringPair</code> | Key pair of sender |
 | api | <code>ApiPromise</code> | Network Provider |
 
