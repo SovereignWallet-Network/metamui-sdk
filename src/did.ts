@@ -1,21 +1,16 @@
 import { ApiPromise } from '@polkadot/api';
 import { AnyJson } from '@polkadot/types/types';
-import { mnemonicGenerate, mnemonicValidate } from '@polkadot/util-crypto';
-import { initKeyring } from './config';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did } from '.';
-import { PRIVATE_DID_TYPE } from './common/types';
 import { submitTransaction } from './common/helper';
+global.Buffer = require('buffer').Buffer;
 
-const IDENTIFIER_PREFIX = 'did:ssid:';
-const IDENTIFIER_MAX_LENGTH = 20;
-const IDENTIFIER_MIN_LENGTH = 3;
 const DID_HEX_LEN = 64;
 
-
 /** Generate Mnemonic
- * @returns {String} Mnemonic
+ * @returns {string} Mnemonic
  */
 const generateMnemonic = () => mnemonicGenerate();
 
@@ -26,75 +21,45 @@ const checkIdentifierFormat = (identifier) => {
 };
 
 /**
- * Generate did object to be stored in blockchain.
- * @returns {Object} Object containing did structure
- */
-const generateDID = async (mnemonic: string, identifier: string, metadata = '') => {
-  const keyring = await initKeyring();
-  const isValidIdentifier = checkIdentifierFormat(identifier);
-  const isValidMnemonic = mnemonicValidate(mnemonic);
-  if (!isValidMnemonic) {
-    throw new Error('Invalid Mnemonic');
-  }
-  if (!isValidIdentifier) {
-    throw new Error('Invalid Identifier');
-  }
-  if (
-    identifier.length > IDENTIFIER_MAX_LENGTH ||
-    identifier.length < IDENTIFIER_MIN_LENGTH
-  ) {
-    throw new Error('Invalid Identifier length');
-  }
-  const pubKey = keyring.createFromUri(mnemonic).publicKey;
-  return {
-    "private": {
-      public_key: pubKey,// this is the public key linked to the did
-      identity: IDENTIFIER_PREFIX + identifier, // this is the actual did
-      metadata,
-    }
-  };
-};
-
-/**
- * Store the generated DID object in blockchain
- * @param {Object} DID
- * @param {Object} signingKeypair
+ * Store the generated DID VC
+ * @param {HexString} vcId
+ * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
- * @returns {String} txnId Txnid for storage operation.
+ * @returns {Object} Transaction Object
  */
 
-
-
-async function storeDIDOnChain(DID: PRIVATE_DID_TYPE, signingKeypair: KeyringPair, api?: ApiPromise) {
+async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  // Check if identifier is available
-  const identifier = DID.private.identity;
-  const did_hex = sanitiseDid(identifier);
-
-  const didCheck = await did.resolveDIDToAccount(did_hex, provider);
-  if(didCheck != null) {
-    //return new Error('did.DIDAlreadyExists');
-    throw(new Error('did.DIDAlreadyExists'));
-  }
-
-  const pubkeyCheck = await did.resolveAccountIdToDid(DID.private.public_key, provider);
-  if(pubkeyCheck) {
-    throw(new Error('did.PublicKeyRegistered'));
-  }
-
-  const tx = provider.tx.validatorCommittee.execute(
-    provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata), 1000
-  );
-  // const tx = provider.tx.did.createPrivate(DID.private.public_key, sanitiseDid(DID.private.identity), DID.private.metadata);
+  const tx = provider.tx.did.createPrivate(vcId, paraId);
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
 }
 
 /**
+ * Create Private DID and store the generated DID object in blockchain
+ * @param {HexString} vcId
+ * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {KeyringPair} signingKeypair
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
+ */
+
+ async function createPublic(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
+  const provider = api || (await buildConnection('local')) as ApiPromise;
+  const tx = provider.tx.did.createPublic(vcId, paraId);
+  const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  const signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
+
+/**
  * Get did information from accountID
- * @param {String} identifier DID Identifier
- * @returns {JSON}
+ * @param {string} identifier DID Identifier
+ * @param {ApiPromise} api
+ * @returns {JSON} DID Information
  */
 async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJson> {
   try {
@@ -108,7 +73,8 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
       console.log('DID not found');
       return null;
     }
-    if (data[0].private.identifier) {
+    
+    if (data?.[0]?.private?.identifier) {
       return {
         identifier: data[0].private.identifier,
         public_key: data[0].private.publicKey,
@@ -120,8 +86,8 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
         identifier: data[0].public.identifier,
         public_key: data[0].public.publicKey,
         metadata: data[0].public.metadata,
-        registration_number: data[0].public.registration_number,
-        company_name: data[0].public.company_name,
+        registration_number: data[0].public.registrationNumber,
+        company_name: data[0].public.companyName,
         added_block: data[1],
       };
     }
@@ -132,25 +98,23 @@ async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJ
 
 /**
  * Get the accountId for a given DID
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
  * @param {Number} blockNumber (optional)
- * @returns {String}
+ * @returns {JSON}
  */
-
-
 
 async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNumber?: number) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {
-    return (await provider.query.did.lookup(did_hex)).toHuman();
+    return (await provider.query.did.lookup(did_hex)).toJSON();
   }
   const didDetails: AnyJson = await getDIDDetails(identifier, provider);
   if (didDetails == null) return null;
   if (typeof didDetails?.['added_block'] === 'number') {
     if (blockNumber >= didDetails?.['added_block']) {
-      return (await provider.query.did.lookup(did_hex)).toHuman();
+      return (await provider.query.did.lookup(did_hex)).toJSON();
     }
   }
   const keyHistories = await getDidKeyHistory(identifier, provider);
@@ -168,13 +132,13 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
 
 /**
  * Get the DID associated to given accountID
- * @param {String} accountId (hex/base64 version works)
+ * @param {string} accountId (hex/base64 version works)
  * @param {ApiPromise} api
+ * @returns {JSON}
  */
-async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | boolean> {
+async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | Boolean> {
   const provider = api || (await buildConnection('local'));
-  const data = (await provider.query.did.rLookup(accountId)).toHuman();
-  // return false if empty
+  const data = (await provider.query.did.rLookup(accountId)).toJSON();
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     return false;
   }
@@ -185,12 +149,14 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
 /**
  * This function will rotate the keys assiged to a DID
  * It should only be called by validator accounts, else will fail
- * @param {String} identifier
+ * @param {string} identifier
  * @param {Uint8Array} newKey
- * @param {KeyringObj} signingKeypair // of a validator account
+ * @param {Number} paraId
+ * @param {KeyringPair} signingKeypair // of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
-async function updateDidKey(identifier, newKey, signingKeypair, api) {
+async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = await did.resolveDIDToAccount(did_hex, provider);
@@ -203,7 +169,7 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
     throw(new Error('did.PublicKeyRegistered'));
   }
   // call the rotateKey extrinsinc
-  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey), 1000);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, paraId), 1000);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   let signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -211,9 +177,9 @@ async function updateDidKey(identifier, newKey, signingKeypair, api) {
 
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
- * @param {String} data
+ * @param {string} data
  * @param {Int} size
- * @return {String}
+ * @return {string}
  */
 function convertFixedSizeHex(data, size = 64) {
   if (data.length > size) throw new Error('Invalid Data');
@@ -226,16 +192,14 @@ function convertFixedSizeHex(data, size = 64) {
  * 
  *  Note: This util function is needed since dependant module wont convert the utf did to hex anymore
  * 
- * @param {String} did
- * @return {String} Hex did
+ * @param {string} did
+ * @return {string} Hex did
  */
 const sanitiseDid = (did) => {
 
   if (did.startsWith('0x')) {
-    // already hex string
     return did.padEnd(DID_HEX_LEN, '0');
   }
-  // console.log('Converting to hex');
   let hex_did = Buffer.from(did, 'utf8').toString('hex');
   hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
   return hex_did;
@@ -243,10 +207,11 @@ const sanitiseDid = (did) => {
 
 /**
  * Check if the user is an approved validator
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
+ * @returns {Boolean}
  */
-async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
+async function isDidValidator(identifier: string, api?: ApiPromise): Promise<boolean> {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
@@ -258,24 +223,25 @@ async function isDidValidator(identifier, api?: ApiPromise): Promise<boolean> {
 
 /**
  * Fetch the history of rotated keys for the specified DID
- * @param {String} identifier
+ * @param {string} identifier
  * @param {ApiPromise} api
- * @returns {Array}
+ * @returns {JSON}
  */
-async function getDidKeyHistory(identifier, api: ApiPromise | false = false) {
+async function getDidKeyHistory(identifier: string, api: ApiPromise | false = false) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  return (await provider.query.did.prevKeys(did_hex)).toHuman();
+  return (await provider.query.did.prevKeys(did_hex)).toJSON();
 }
 
 /**
  *
- * @param {String} identifier
- * @param {String} metadata
- * @param {KeyringObj} signingKeypair of a validator account
+ * @param {string} identifier
+ * @param {string} metadata
+ * @param {Keyringpair} signingKeypair of a validator account
  * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
  */
-async function updateMetadata(identifier, metadata, signingKeypair, api: any = false) {
+async function updateMetadata(identifier, metadata, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const tx = provider.tx.validatorCommittee.execute(provider.tx.did.updateMetadata(did_hex, metadata), 1000);
@@ -284,10 +250,44 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: any = f
   return submitTransaction(signedTx, provider);
 }
 
+/**
+ * Sync DID VC with other chains
+ * @param {string} identifier
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a validator account
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
+ */
+async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, paraId), 1000);
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
+/**
+ * Remove DID VC
+ * @param {string} identifier
+ * @param {Number} paraId Optional
+ * @param {KeyringPair} signingKeypair of a SUDO account
+ * @param {ApiPromise} api
+ * @returns {Object} Transaction Object
+ */
+async function removeDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+  const provider = api || (await buildConnection('local'));
+  const did_hex = sanitiseDid(identifier);
+  const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, paraId));
+  let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
+  let signedTx = await tx.signAsync(signingKeypair, { nonce });
+  return submitTransaction(signedTx, provider);
+}
+
 export {
   generateMnemonic,
-  generateDID,
-  storeDIDOnChain,
+  createPrivate,
+  createPublic,
   getDIDDetails,
   updateDidKey,
   resolveDIDToAccount,
@@ -296,4 +296,6 @@ export {
   isDidValidator,
   updateMetadata,
   sanitiseDid,
+  syncDid,
+  removeDid
 };

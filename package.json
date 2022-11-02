@@ -2,13 +2,14 @@
     "name": "metamui-sdk",
     "version": "1.0.0",
     "description": "An SDK to implement function calls to the metamui-core",
-    "main": "index.js",
+    "main": "dist/index.js",
     "scripts": {
         "prepare": "yarn build",
         "build": "tsc -b",
         "test": "ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
-        "generate:docs": "jsdoc2md src/$FILE.ts > docs/$FILE.md"
+        "test:dev": "env PROVIDER_NETWORK=dev ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
+        "generate:docs": "node createDocs.js"
     },
     "repository": {
         "type": "git",
@@ -34,7 +35,7 @@
         "eslint-plugin-prettier": "^4.2.1",
         "eslint-plugin-promise": "^6.0.0",
         "esm": "^3.2.25",
-        "jsdoc-to-markdown": "^7.1.0",
+        "jsdoc-to-markdown": "^7.1.1",
         "mocha": "^10.0.0",
         "prettier": "^2.7.1",
         "sinon": "^9.2.2",
@@ -44,11 +45,12 @@
         "typescript": "*"
     },
     "dependencies": {
-        "@polkadot/api": "^9.4.1",
-        "@polkadot/types": "^9.4.1",
-        "@polkadot/util": "^10.1.8",
-        "@polkadot/util-crypto": "^10.1.8",
+        "@polkadot/api": "^9.6.2",
+        "@polkadot/types": "^9.6.2",
+        "@polkadot/util": "^10.1.11",
+        "@polkadot/util-crypto": "^10.1.11",
         "axios": "^0.27.2",
+        "buffer": "^6.0.3",
         "js-sha256": "^0.9.0",
         "tsc": "^2.0.4",
         "typescript": "*"

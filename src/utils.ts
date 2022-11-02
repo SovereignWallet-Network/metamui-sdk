@@ -10,6 +10,8 @@ const VCType = {
   TokenTransferVC: "TokenTransferVC",
   SlashMintTokens: "SlashMintTokens",
   GenericVC: "GenericVC",
+  PublicDidVC: "PublicDidVC",
+  PrivateDidVC: "PrivateDidVC",
 };
 Object.freeze(VCType);
 
@@ -21,20 +23,31 @@ const METABLOCKCHAIN_TYPES = {
   "identifier": "[u8;32]",
   "public_key": "[u8;32]",
   "metadata": "BoundedVec<u8, MaxMetadata>",
+  "VCProp": "[u8;128]",
 
   "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
   "CompanyName": "BoundedVec<u8, MaxCompNameLen>",
-  "PrivateDid": {
-    "identifier": "identifier",
+  "PrivateDidVC": {
     "public_key": "public_key",
-    "metadata": "metadata"
+    "did": "identifier"
+  },
+  "PublicDidVC": {
+    "public_key": "public_key",
+    "registration_number": "RegistrationNumber",
+    "company_name": "CompanyName",
+    "did": "identifier",
+  },
+  "PrivateDid": {
+    "identifier": "Did",
+    "public_key": "PublicKey",
+    "metadata": "Metadata"
   },
   "PublicDid": {
-    "identifier": "identifier",
-    "public_key": "public_key",
-    "metadata": "metadata",
+    "identifier": "Did",
+    "public_key": "PublicKey",
+    "metadata": "Metadata",
     "registration_number": "RegistrationNumber",
-    "comapny_name": "CompanyName"
+    "company_name": "CompanyName"
   },
   "Did": "[u8;32]",
   "DIDType": {
@@ -63,8 +76,9 @@ const METABLOCKCHAIN_TYPES = {
     "issuers": "Vec<Did>",
     "signatures": "Vec<Signature>",
     "is_vc_used": "bool",
+    "is_vc_active": "bool",
     "vc_type": "VCType",
-    "vc_property": "[u8;128]"
+    "vc_property": "VCProp"
   },
   "VCType": {
     "_enum": [
@@ -72,7 +86,9 @@ const METABLOCKCHAIN_TYPES = {
       "SlashTokens",
       "MintTokens",
       "TokenTransferVC",
-      "GenericVC"
+      "GenericVC",
+      "PublicDidVC",
+      "PrivateDidVC"
     ]
   },
   "TokenVC": {
@@ -83,12 +99,10 @@ const METABLOCKCHAIN_TYPES = {
   },
   "SlashMintTokens": {
     "vc_id": "VCid",
-    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "TokenTransferVC": {
     "vc_id": "VCid",
-    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "GenericVC": {
@@ -147,7 +161,7 @@ const METABLOCKCHAIN_TYPES = {
 const ENCODE_TYPES = {
   "VC_HEX": {
     "vc_type": "VCType",
-    "vc_property": "[u8;128]",
+    "vc_property": "VCProp",
     "owner": "Did",
     "issuers": "Vec<Did>"
   },
@@ -167,7 +181,7 @@ const CID_BYTES = 64;
  */
 const bytesToHex = (inputBytes) => u8aToHex(inputBytes);
 /**
- * @param  {String} inputString
+ * @param  {string} inputString
  */
 const hexToBytes = (inputString) => hexToU8a(inputString);
 /**
@@ -194,18 +208,18 @@ registry.register(METABLOCKCHAIN_TYPES);
 registry.register(ENCODE_TYPES);
 
 /** Encodes object/ string of given type to hex
- * @param  {Object | String} data Object to be encoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {String} Encoded Hex
+ * @param  {Object | string} data Object to be encoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {string} Encoded Hex
  */
 function encodeData(data, typeKey) {
   return types.createType(registry, typeKey, data).toHex();
 }
 
 /** Decodes hex of given type to it's corresponding object/value
- * @param  {String} hexValue Hex String to be decoded
- * @param  {String} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
- * @returns {Object | String} Decoded Object/String
+ * @param  {string} hexValue Hex String to be decoded
+ * @param  {string} typeKey Key from METABLOCKCHAIN_TYPES which represents type of data
+ * @returns {Object | string} Decoded Object/String
  */
 function decodeHex(hexValue, typeKey) {
   return types.createType(registry, typeKey, hexValue).toJSON();
@@ -220,8 +234,8 @@ function isUpperAndValid(str) {
 }
 
 /** regex to remove unwanted hex bytes
- * @param  {String} s Hex String to make tidy
- * @returns {Object | String} Decoded tidy Object/String
+ * @param  {string} s Hex String to make tidy
+ * @returns {Object | string} Decoded tidy Object/String
  */
 function tidy(s) {
   const tidy = typeof s === 'string'

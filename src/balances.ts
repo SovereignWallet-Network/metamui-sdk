@@ -5,7 +5,8 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { submitTransaction } from './common/helper';
 
 /** Get account balance(Highest Form) based on the did supplied.
-* @param {String} did
+* @param {string} did
+* @param {APIPromise} api (optional)
 */
 const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
   // Resolve the did to get account ID
@@ -13,9 +14,13 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
     try {
       const provider = api || await buildConnection('local');
       const did_hex = sanitiseDid(did);
-      const accountInfo = await provider.query.mui.account(did_hex);
+      const token = await provider.rpc.system.properties();
+      const tokenData: any = token.toHuman();
+      let decimals = tokenData?.['tokenDecimals'][0];
+      console.log('Decimals', decimals);
+      const accountInfo = await provider.query.token.account(did_hex);
       const data = accountInfo.toJSON()?.['data'];
-      resolve(data.free / 1e6);
+      resolve(data.free / Math.pow(10, decimals));
     } catch (err) {
       // console.log(err);
       return reject(new Error("Cannot get balance"));
@@ -24,14 +29,19 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
 };
 
 /** Listen to balance changes for a DID and execute the callback.
-* @param {String} identifier
+* @param {string} identifier
+* @param {Function} callback
+* @param {APIPromise} api
 */
 const subscribeToBalanceChanges = async (identifier: string, callback: (balance: number) => void, api: ApiPromise) => {
   try {
     const provider = api || await buildConnection('local');
     const did_hex = sanitiseDid(identifier);
-    return await provider.query.mui.account(did_hex, ({ data: { free: currentBalance } }) => {
-      callback(currentBalance.toNumber() / 1e6);
+    const token = await provider.rpc.system.properties();
+    const tokenData: any = token.toHuman();
+    let decimals = tokenData?.['tokenDecimals'][0];
+    return await provider.query.token.account(did_hex, ({ data: { free: currentBalance } }) => {
+      callback(currentBalance.toNumber() / Math.pow(10, decimals));
     });
   } catch (err) {
     return null;
@@ -45,8 +55,8 @@ const subscribeToBalanceChanges = async (identifier: string, callback: (balance:
  * Note : balanceCheck has not been included in the checks since sender not having balance
  * is handled in extrinsic, check test/balances.js
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
- * @param {String} amount In Lowest Form
+ * @param {string} receiverDID
+ * @param {Number} amount In Lowest Form
  * @param {APIPromise} api (optional)
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
@@ -78,10 +88,10 @@ async function transfer(
  * This function is similar to sendTransaction except that it provides the user to add the memo to transfer functionality.
  * 
  * @param {KeyPair} senderAccountKeyPair
- * @param {String} receiverDID
- * @param {String} amount In Lowest Form
- * @param {String} memo
- * @param {APIPromise} api (optional)
+ * @param {string} receiverDID
+ * @param {Number} amount In Lowest Form
+ * @param {string} memo
+ * @param {APIPromise} api
  * @param {int} nonce (optional)
  * @returns {Uint8Array}
  */
