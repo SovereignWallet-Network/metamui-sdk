@@ -22,7 +22,7 @@ const METABLOCKCHAIN_TYPES = {
   "PeerId": "OpaquePeerId",
   "identifier": "[u8;32]",
   "public_key": "[u8;32]",
-  "metadata": "BoundedVec<u8, MaxMetadata>",
+  "DidMetadata": "BoundedVec<u8, MaxMetadata>",
   "VCProp": "[u8;128]",
 
   "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
@@ -40,17 +40,17 @@ const METABLOCKCHAIN_TYPES = {
   "PrivateDid": {
     "identifier": "Did",
     "public_key": "PublicKey",
-    "metadata": "Metadata"
+    "metadata": "DidMetadata"
   },
   "PublicDid": {
     "identifier": "Did",
     "public_key": "PublicKey",
-    "metadata": "Metadata",
+    "metadata": "DidMetadata",
     "registration_number": "RegistrationNumber",
     "company_name": "CompanyName"
   },
   "Did": "[u8;32]",
-  "DIDType": {
+  "DIdentity": {
     "_enum": {
       "Public": "PublicDid",
       "Private": "PrivateDid"
@@ -69,7 +69,7 @@ const METABLOCKCHAIN_TYPES = {
   "CurrencyId": "u32",
   "Amount": "i64",
   "Memo": "Vec<u8>",
-  "AccountInfo": "AccountInfoWithDualRefCount",
+  "AccountInfo": "AccountInfoWithTripleRefCount",
   "VC": {
     "hash": "Hash",
     "owner": "Did",
