@@ -43,22 +43,24 @@ const METABLOCKCHAIN_TYPES = {
     "MaxMetadata": "ConstU32<32>",
     "MaxRegNumLen": "ConstU32<32>",
     "MaxCompNameLen": "ConstU32<32>",
+    "MaxKeyChanges": "ConstU32<1000>",
     "PeerId": "OpaquePeerId",
-    "identifier": "[u8;32]",
-    "public_key": "[u8;32]",
+    "Did": "[u8;32]",
+    "PublicKey": "[u8;32]",
     "DidMetadata": "BoundedVec<u8, MaxMetadata>",
     "VCProp": "[u8;128]",
+    "PrevKeysMap": "BoundedVec<(AccountId, BlockNumber), MaxKeyChanges>",
     "RegistrationNumber": "BoundedVec<u8, MaxMetadata>",
     "CompanyName": "BoundedVec<u8, MaxCompNameLen>",
     "PrivateDidVC": {
-        "public_key": "public_key",
-        "did": "identifier"
+        "public_key": "PublicKey",
+        "did": "Did"
     },
     "PublicDidVC": {
-        "public_key": "public_key",
+        "public_key": "PublicKey",
         "registration_number": "RegistrationNumber",
         "company_name": "CompanyName",
-        "did": "identifier",
+        "did": "Did",
     },
     "PrivateDid": {
         "identifier": "Did",
@@ -72,14 +74,12 @@ const METABLOCKCHAIN_TYPES = {
         "registration_number": "RegistrationNumber",
         "company_name": "CompanyName"
     },
-    "Did": "[u8;32]",
     "DIdentity": {
         "_enum": {
             "Public": "PublicDid",
             "Private": "PrivateDid"
         }
     },
-    "PublicKey": "[u8;32]",
     "Address": "MultiAddress",
     "LookupSource": "MultiAddress",
     "Balance": "u128",
