@@ -36,6 +36,6 @@ yarn test:dev
 - <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/balances.md">Balances</a>
 - <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/collective.md">Collective</a>
 - <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/did.md">DID</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/token.md">token</a>
+- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/token.md">Token</a>
 - <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/vc.md">VC</a>
 - <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/utils.md">Utils</a>
