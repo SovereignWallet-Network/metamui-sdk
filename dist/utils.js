@@ -73,7 +73,7 @@ const METABLOCKCHAIN_TYPES = {
         "company_name": "CompanyName"
     },
     "Did": "[u8;32]",
-    "DIDType": {
+    "DIdentity": {
         "_enum": {
             "Public": "PublicDid",
             "Private": "PrivateDid"
@@ -92,7 +92,7 @@ const METABLOCKCHAIN_TYPES = {
     "CurrencyId": "u32",
     "Amount": "i64",
     "Memo": "Vec<u8>",
-    "AccountInfo": "AccountInfoWithDualRefCount",
+    "AccountInfo": "AccountInfoWithTripleRefCount",
     "VC": {
         "hash": "Hash",
         "owner": "Did",

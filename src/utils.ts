@@ -50,7 +50,7 @@ const METABLOCKCHAIN_TYPES = {
     "company_name": "CompanyName"
   },
   "Did": "[u8;32]",
-  "DIDType": {
+  "DIdentity": {
     "_enum": {
       "Public": "PublicDid",
       "Private": "PrivateDid"
