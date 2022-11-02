@@ -69,7 +69,7 @@ const METABLOCKCHAIN_TYPES = {
   "CurrencyId": "u32",
   "Amount": "i64",
   "Memo": "Vec<u8>",
-  "AccountInfo": "AccountInfoWithDualRefCount",
+  "AccountInfo": "AccountInfoWithTripleRefCount",
   "VC": {
     "hash": "Hash",
     "owner": "Did",
