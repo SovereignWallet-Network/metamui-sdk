@@ -2,7 +2,7 @@ const validSchema = '0x15733EA25E1C3A1A8F2330D1B64E80B765971A370653943DB57A2099E
 const inValidSchema = '0x15733EA25E1C3A1A8F2330D1B64E80B765971A370653943DB57A2099EF0EDF1G';
 const mnemonicWithBalance = '//Swn'; // this mnemonic should have balance for test to pass
 const didOfMnemonicWithBalance = 'Swn'; // this should match chain data
-const providerNetwork = process.env.PROVIDER_NETWORK || 'testnet';
+const providerNetwork = process.env.PROVIDER_NETWORK || 'dev';
 
 export {
   validSchema,
