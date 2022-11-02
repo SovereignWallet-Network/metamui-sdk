@@ -31,11 +31,10 @@ yarn test:dev
 ```
 
 ### Modules
-
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/connection.md">Connection</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/balances.md">Balances</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/collective.md">Collective</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/did.md">DID</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/token.md">Token</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/vc.md">VC</a>
-- <a href="https://github.com/SovereignWallet-Network/metamui-sdk/blob/main/docs/utils.md">Utils</a>
+- [Connection](docs/connection.md)
+- [Balances](docs/balances.md)
+- [Collective](docs/collective.md)
+- [DID](docs/did.md)
+- [Token](docs/token.md)
+- [VC](docs/vc.md)
+- [Utils](docs/utils.md)
