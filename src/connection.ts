@@ -43,8 +43,9 @@ function buildConnection(network = 'local', ignoreCache = false): Promise<ApiPro
  * @param {string} wssUrl Tokenchain network wss URL to connect
  * @returns {ApiPromise} APIPromise object
  */
-function buildConnectionByUrl(wssUrl: string, blockchainTypes = METABLOCKCHAIN_TYPES): Promise<ApiPromise> {
-    const provider = new WsProvider(wssUrl);
+function buildConnectionByUrl(wssUrl: string, blockchainTypes?: any): Promise<ApiPromise> {
+  if(!blockchainTypes) blockchainTypes = METABLOCKCHAIN_TYPES;
+  const provider = new WsProvider(wssUrl);
     console.log('Creating new websocket connection via WSS URL!');
     return ApiPromise.create({
       provider,

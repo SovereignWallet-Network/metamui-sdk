@@ -7,6 +7,7 @@
   import * as collective from './collective';
   import * as vc from './vc';
   import * as token from './token';
+  import * as kycUtils from './kycUtils';
 
 export {
     connection,
@@ -17,4 +18,5 @@ export {
     collective,
     vc,
     token,
+    kycUtils
 };

@@ -243,7 +243,7 @@ exports.isDidValidator = isDidValidator;
  * @param {ApiPromise} api
  * @returns {JSON}
  */
-function getDidKeyHistory(identifier, api = false) {
+function getDidKeyHistory(identifier, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
