@@ -61,7 +61,7 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
  * @param {ApiPromise} api
  * @returns {JSON} DID Information
  */
-async function getDIDDetails(identifier: string, api?: ApiPromise): Promise<AnyJson> {
+async function getDIDDetails(identifier: string, api: ApiPromise): Promise<AnyJson> {
   try {
     const provider = api;
     if (!provider) {
@@ -227,7 +227,7 @@ async function isDidValidator(identifier: string, api?: ApiPromise): Promise<boo
  * @param {ApiPromise} api
  * @returns {JSON}
  */
-async function getDidKeyHistory(identifier: string, api: ApiPromise | false = false) {
+async function getDidKeyHistory(identifier: string, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   return (await provider.query.did.prevKeys(did_hex)).toJSON();
