@@ -13,6 +13,9 @@
 <dt><a href="#withdrawReserved">withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Withdraw Reserved tokens from one DID to another DID</p>
 </dd>
+<dt><a href="#getTokenList">getTokenList(api)</a> ⇒ <code>Object</code></dt>
+<dd><p>get Token List</p>
+</dd>
 </dl>
 
 <a name="mintToken"></a>
@@ -72,5 +75,17 @@ Withdraw Reserved tokens from one DID to another DID
 | fromDid | <code>string</code> | 
 | amount | <code>Number</code> | 
 | senderAccountKeyPair | <code>KeyringPair</code> | 
+| api | <code>ApiPromise</code> | 
+
+<a name="getTokenList"></a>
+
+## getTokenList(api) ⇒ <code>Object</code>
+get Token List
+
+**Kind**: global function  
+**Returns**: <code>Object</code> - Token List  
+
+| Param | Type |
+| --- | --- |
 | api | <code>ApiPromise</code> | 
 

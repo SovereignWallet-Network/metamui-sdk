@@ -36,6 +36,27 @@ describe('Balances works correctly', () => {
     }, provider);
   });
 
+  it('Get Total Supply Works correctly', async () => {
+    provider = await buildConnection(constants.providerNetwork);
+    const totalSupply = await balances.getTotalSupply(provider);
+    console.log(totalSupply);
+    assert.notEqual(totalSupply, null);
+  });
+
+  it('Get Detailed Balance Works correctly', async () => {
+    provider = await buildConnection(constants.providerNetwork);
+    const detailedBalance = await balances.getDetailedBalance("did:ssid:swn", provider);
+    console.log(detailedBalance);
+    assert.notEqual(detailedBalance, null);
+  });
+
+  it('Subscribe to get detailed Balance Works correctly', async () => {
+    provider = await buildConnection(constants.providerNetwork);
+    return await balances.subscribeToDetailedBalanceChanges("did:ssid:swn", (data) => {
+      console.log(data);
+    }, provider);
+  });
+
   it('Transaction works correctly with nonce', async () => {
     const provider = await buildConnection(constants.providerNetwork) as ApiPromise;
     const nonce = await provider.rpc.system.accountNextIndex(sigKeypairWithBal.address);
