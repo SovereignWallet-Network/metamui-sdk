@@ -23,10 +23,10 @@ function buildNewConnection(network = 'local'): Promise<ApiPromise> {
 }
 
 /**
- * Return an APIPromise object
+ * Return an ApiPromise object
  * @param {string} network MetaMUI network provider to connect
  * @param {boolean} ignoreCache (optional) (default=true)
- * @returns {ApiPromise} APIPromise object
+ * @returns {ApiPromise} ApiPromise object
  * Note : setting the ignoreCache value to true will create a new ws
  * ws conection on every call
  */
@@ -39,9 +39,9 @@ function buildConnection(network = 'local', ignoreCache = false): Promise<ApiPro
 }
 
 /**
- * Return an APIPromise object
+ * Return an ApiPromise object
  * @param {string} wssUrl Tokenchain network wss URL to connect
- * @returns {ApiPromise} APIPromise object
+ * @returns {ApiPromise} ApiPromise object
  */
 function buildConnectionByUrl(wssUrl: string, blockchainTypes?: any): Promise<ApiPromise> {
   if(!blockchainTypes) blockchainTypes = METABLOCKCHAIN_TYPES;

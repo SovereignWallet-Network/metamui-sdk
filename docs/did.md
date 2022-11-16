@@ -183,10 +183,10 @@ Fetch the history of rotated keys for the specified DID
 
 **Kind**: global function  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| identifier | <code>string</code> |  | 
-| api | <code>ApiPromise</code> | <code>false</code> | 
+| Param | Type |
+| --- | --- |
+| identifier | <code>string</code> | 
+| api | <code>ApiPromise</code> | 
 
 <a name="updateMetadata"></a>
 
