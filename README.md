@@ -36,5 +36,6 @@ yarn test:dev
 - [Collective](docs/collective.md)
 - [DID](docs/did.md)
 - [Token](docs/token.md)
+- [Tokenchain](docs/tokenchain.md)
 - [VC](docs/vc.md)
 - [Utils](docs/utils.md)

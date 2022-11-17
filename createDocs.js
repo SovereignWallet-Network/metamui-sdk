@@ -37,6 +37,12 @@ jsdoc2md.render({ files: './dist/token.js' })
 })
 .catch(console.error)
 
+jsdoc2md.render({ files: './dist/tokenchain.js' })
+.then(output => {
+    fs.writeFileSync('./docs/tokenchain.md', output)
+})
+.catch(console.error)
+
 jsdoc2md.render({ files: './dist/utils.js' })
 .then(output => {
     fs.writeFileSync('./docs/utils.md', output)

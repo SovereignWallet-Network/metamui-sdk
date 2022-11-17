@@ -4,7 +4,6 @@
  import { ApiPromise } from '@polkadot/api';
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
- import { hexToString } from '@polkadot/util';
 
  /**
   * Mint token to given currency
@@ -112,29 +111,9 @@ async function withdrawReserved(
     return submitTransaction(signedTx, provider);
 }
 
-/**
- * get Token List
- * @param {ApiPromise} api
- * @returns {Object} Token List
- */
-async function getTokenList(api: ApiPromise) {
-    const provider = api || (await buildConnection('local'));
-    const paraIds: any = (await provider.query.paras.parachains());
-    let tokenList = [];
-    for (let i = 0; i < paraIds.length; i++) {
-        let tokenInfo = String(await provider.query.tokenchain.rLookup(paraIds[i]));
-        tokenList.push({
-            id: paraIds[i].toString(),
-            name: hexToString(tokenInfo).trim().split('\x00')[0],
-        });
-    }
-    return tokenList;
-}
-
  export {
     mintToken,
     slashToken,
     transferToken,
     withdrawReserved,
-    getTokenList
- };
+};

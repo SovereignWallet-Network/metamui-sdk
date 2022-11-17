@@ -9,12 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenList = exports.withdrawReserved = exports.transferToken = exports.slashToken = exports.mintToken = void 0;
+exports.withdrawReserved = exports.transferToken = exports.slashToken = exports.mintToken = void 0;
 const did_1 = require("./did");
 const connection_1 = require("./connection");
 const did_2 = require("./did");
 const helper_1 = require("./common/helper");
-const util_1 = require("@polkadot/util");
 /**
  * Mint token to given currency
  * @param {HexString} vcId
@@ -101,24 +100,3 @@ function withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api) {
     });
 }
 exports.withdrawReserved = withdrawReserved;
-/**
- * get Token List
- * @param {ApiPromise} api
- * @returns {Object} Token List
- */
-function getTokenList(api) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const paraIds = (yield provider.query.paras.parachains());
-        let tokenList = [];
-        for (let i = 0; i < paraIds.length; i++) {
-            let tokenInfo = String(yield provider.query.tokenchain.rLookup(paraIds[i]));
-            tokenList.push({
-                id: paraIds[i].toString(),
-                name: (0, util_1.hexToString)(tokenInfo).trim().split('\x00')[0],
-            });
-        }
-        return tokenList;
-    });
-}
-exports.getTokenList = getTokenList;

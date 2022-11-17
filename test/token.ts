@@ -15,7 +15,7 @@ import { VCType } from '../src/utils';
 describe('Token works correctly', () => {
   let sigKeypair: KeyringPair;
   const EVE_DID = 'did:ssid:eve';
-  var provider: ApiPromise;
+  let provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
   let sigKeypairBob: KeyringPair;
@@ -28,13 +28,6 @@ describe('Token works correctly', () => {
   const TEST_BOB_DID = "did:ssid:bob";
 
   let vc_id: HexString;
-
-  it('Get Token List Works correctly', async () => {
-    provider = await buildConnection('dev');
-    const tokenList = await token.getTokenList(provider);
-    // console.log(tokenList);
-    assert.notEqual(tokenList, null);
-  });
 
   if (constants.providerNetwork == 'local') {
 
