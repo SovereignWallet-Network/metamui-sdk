@@ -29,6 +29,13 @@ describe('Token works correctly', () => {
 
   let vc_id: HexString;
 
+  it('Get Token List Works correctly', async () => {
+    provider = await buildConnection('dev');
+    const tokenList = await token.getTokenList(provider);
+    // console.log(tokenList);
+    assert.notEqual(tokenList, null);
+  });
+
   if (constants.providerNetwork == 'local') {
 
     before(async () => {

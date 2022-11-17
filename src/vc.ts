@@ -366,7 +366,7 @@ async function getGenericVCData(vcId, ssidUrl: string, api: ApiPromise): Promise
 * Approve VC
 * @param  {HexString} vcID vc_id of VC to be approved
 * @param  {KeyringPair} senderAccountKeyPair Issuer Key Ring pair
-* @param {APIPromise} api
+* @param {ApiPromise} api
 * @returns {Object} Transaction Object
 */
 async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api: ApiPromise, ssidUrl?: string) {

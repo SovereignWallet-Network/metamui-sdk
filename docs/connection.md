@@ -2,20 +2,20 @@
 
 <dl>
 <dt><a href="#buildConnection">buildConnection(network, ignoreCache)</a> ⇒ <code>ApiPromise</code></dt>
-<dd><p>Return an APIPromise object</p>
+<dd><p>Return an ApiPromise object</p>
 </dd>
 <dt><a href="#buildConnectionByUrl">buildConnectionByUrl(wssUrl)</a> ⇒ <code>ApiPromise</code></dt>
-<dd><p>Return an APIPromise object</p>
+<dd><p>Return an ApiPromise object</p>
 </dd>
 </dl>
 
 <a name="buildConnection"></a>
 
 ## buildConnection(network, ignoreCache) ⇒ <code>ApiPromise</code>
-Return an APIPromise object
+Return an ApiPromise object
 
 **Kind**: global function  
-**Returns**: <code>ApiPromise</code> - APIPromise object
+**Returns**: <code>ApiPromise</code> - ApiPromise object
 Note : setting the ignoreCache value to true will create a new ws
 ws conection on every call  
 
@@ -27,10 +27,10 @@ ws conection on every call
 <a name="buildConnectionByUrl"></a>
 
 ## buildConnectionByUrl(wssUrl) ⇒ <code>ApiPromise</code>
-Return an APIPromise object
+Return an ApiPromise object
 
 **Kind**: global function  
-**Returns**: <code>ApiPromise</code> - APIPromise object  
+**Returns**: <code>ApiPromise</code> - ApiPromise object  
 
 | Param | Type | Description |
 | --- | --- | --- |

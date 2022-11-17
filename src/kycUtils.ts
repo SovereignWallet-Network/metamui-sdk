@@ -3,7 +3,12 @@ import { signatureVerify } from "@polkadot/util-crypto";
 import { sha256 } from "js-sha256";
 import { getDIDDetails, getDidKeyHistory, isDidValidator } from "./did";
 
-async function createVC(propertiesJson, schemaToTest) {
+/**
+ * 
+ * @param propertiesJson 
+ * @returns {Object} Create Unsigned VC 
+ */
+async function createVC(propertiesJson) {
     return {
         properties: propertiesJson,
         hash: stringToHex(sha256(JSON.stringify(propertiesJson))),
@@ -12,6 +17,12 @@ async function createVC(propertiesJson, schemaToTest) {
     };
 }
 
+/**
+ * @param {JSON} vcJson
+ * @param {string} verifierDid
+ * @param {string} signingKeyPair
+ * @returns {Object} Signed VC
+ */
 async function signVC(vcJson, verifierDid, signingKeyPair) {
     const expectedHash = stringToHex(sha256(JSON.stringify(vcJson.properties)));
     if (expectedHash !== vcJson.hash) {
@@ -26,6 +37,12 @@ async function signVC(vcJson, verifierDid, signingKeyPair) {
     return resVC;
 }
 
+/**
+ * 
+ * @param vcJson 
+ * @param api 
+ * @returns {boolean} true or false
+ */
 async function verifyVC(vcJson, api) {
     const provider = api;
     if(!vcJson.verifier || !vcJson.signature) {
@@ -59,6 +76,10 @@ async function verifyVC(vcJson, api) {
     return signatureVerify(hexToU8a(vcJson.hash), hexToU8a(vcJson.signature), signerAddress.toString()).isValid;
 }
 
+/**
+ * @param propertiesJson 
+ * @returns {Object} Create Unsigned VC
+ */
 async function createSsidVC(propertiesJson) {
     return {
         properties: propertiesJson,
@@ -67,6 +88,11 @@ async function createSsidVC(propertiesJson) {
     };
 }
 
+/**
+ * @param vcJson 
+ * @param signingKeyPair 
+ * @returns {Object} Signed VC
+ */
 async function signSsidVC(vcJson, signingKeyPair) {
     const dataToSign = hexToU8a(vcJson.hash);
     const signedData = signingKeyPair.sign(dataToSign);
@@ -75,6 +101,10 @@ async function signSsidVC(vcJson, signingKeyPair) {
     return resVC;
 }
 
+/**
+ * @param vcJson 
+ * @returns {boolean} true or false
+ */
 async function verifySsidVC(vcJson) {
     return signatureVerify(
         hexToU8a(vcJson.hash),
@@ -82,6 +112,7 @@ async function verifySsidVC(vcJson) {
         vcJson.properties.public_key.toString()
     ).isValid;
 }
+
 export { 
     createVC, 
     signVC,
