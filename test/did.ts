@@ -51,7 +51,6 @@ describe('DID Module works correctly', () => {
     signKeypairTemp = keyring.addFromUri('//Temp');
   });
 
-
   it('PublicDidVC is created in correct format', async () => {
     let vc_property = {
       public_key: signKeypairPublic.publicKey,
@@ -82,78 +81,12 @@ describe('DID Module works correctly', () => {
     assert.strictEqual(utils.decodeHex(actualObject.vc_property, actualObject.vc_type).public_key, u8aToHex(vc_property.public_key));
   });
 
-  it('DID details are fetched correctly - positive test', async () => {
-    const data: any = await did.getDIDDetails('did:ssid:swn', provider);
-    assert.strictEqual(
-      data.public_key,
-      '0x3cf26ad9ca352503a6741faeb734307ef2554261086adf586bbe86fc2b34f574'
-    );
-    assert.strictEqual(
-      data.identifier,
-      did.sanitiseDid('did:ssid:swn')
-    );
-    assert.strictEqual(data.added_block, 0);
-  });
-
-  it('Resolve DID to account works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
-    assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
-  });
-
-  it('Resolve AccountID to DID works correctly', async () => {
-    const data = await did.resolveAccountIdToDid(
-      '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC',
-      provider
-    );
-    assert.strictEqual(
-      data,
-      did.sanitiseDid('did:ssid:swn')
-    );
-
-    const data2 = await did.resolveAccountIdToDid(
-      '5ES8sejoGKNyPgSpZFe5MdJCynKZcXTrukyjKM5vL2yxeY3r',
-      provider
-    );
-    assert.strictEqual(data2, false);
-  });
-
-  it('Resolve DID to account at block number 0 works correctly', async () => {
-    const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
-    assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
-  });
-
   it('isDidValidator works correctly', async () => {
     const data = await did.isDidValidator('did:ssid:swn', provider);
     assert.strictEqual(data, true);
 
     const data2 = await did.isDidValidator('did:ssid:mui-guru', provider);
     assert.strictEqual(data2, false);
-  });
-
-  it('updateMetadata works correctly', async () => {
-    const data: any = await did.updateMetadata(
-      'did:ssid:swn',
-      'TestMetadata',
-      sigKeypairValidator,
-      provider
-    );
-    assert.doesNotReject(data);
-    const new_data: AnyJson = await did.getDIDDetails('did:ssid:swn', provider);
-    assert.strictEqual(hexToString(new_data?.['metadata']), 'TestMetadata');
-    assert.strictEqual(new_data?.['added_block'], 0);
-  });
-
-  it('updateMetadata throws error for unregistered DID', async () => {
-    const data:any = await did.updateMetadata(
-      'did:ssid:nonexistentdid',
-      'TestMetadata',
-      sigKeypairValidator,
-      provider
-    );
-    assert.rejects(data, (err: any) => {
-      assert.strictEqual(err.message, 'did.DIDDoesNotExist');
-      return true;
-    });
   });
 
   it('sanitiseDid work correctly', async () => {
@@ -175,6 +108,73 @@ describe('DID Module works correctly', () => {
     let updatedKeyBlockNum: number;
     let testIdentifier = 'did:ssid:fenn';
   
+
+    it('DID details are fetched correctly - positive test', async () => {
+      const data: any = await did.getDIDDetails('did:ssid:swn', provider);
+      assert.strictEqual(
+        data.public_key,
+        '0x3cf26ad9ca352503a6741faeb734307ef2554261086adf586bbe86fc2b34f574'
+      );
+      assert.strictEqual(
+        data.identifier,
+        did.sanitiseDid('did:ssid:swn')
+      );
+      assert.strictEqual(data.added_block, 0);
+    });
+  
+    it('Resolve DID to account works correctly', async () => {
+      const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
+      assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
+    });
+  
+    it('Resolve AccountID to DID works correctly', async () => {
+      const data = await did.resolveAccountIdToDid(
+        '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC',
+        provider
+      );
+      assert.strictEqual(
+        data,
+        did.sanitiseDid('did:ssid:swn')
+      );
+  
+      const data2 = await did.resolveAccountIdToDid(
+        '5ES8sejoGKNyPgSpZFe5MdJCynKZcXTrukyjKM5vL2yxeY3r',
+        provider
+      );
+      assert.strictEqual(data2, false);
+    });
+  
+    it('Resolve DID to account at block number 0 works correctly', async () => {
+      const data = await did.resolveDIDToAccount('did:ssid:swn', provider);
+      assert.strictEqual(data, '5DSck4YHW17zNXFFVqMU3XF4Vi7b4zncWgai9nHFVmNS1QNC');
+    });
+
+    it('updateMetadata works correctly', async () => {
+      const data: any = await did.updateMetadata(
+        'did:ssid:swn',
+        'TestMetadata',
+        sigKeypairValidator,
+        provider
+      );
+      assert.doesNotReject(data);
+      const new_data: AnyJson = await did.getDIDDetails('did:ssid:swn', provider);
+      assert.strictEqual(hexToString(new_data?.['metadata']), 'TestMetadata');
+      assert.strictEqual(new_data?.['added_block'], 0);
+    });
+  
+    it('updateMetadata throws error for unregistered DID', async () => {
+      const data:any = await did.updateMetadata(
+        'did:ssid:nonexistentdid',
+        'TestMetadata',
+        sigKeypairValidator,
+        provider
+      );
+      assert.rejects(data, (err: any) => {
+        assert.strictEqual(err.message, 'did.DIDDoesNotExist');
+        return true;
+      });
+    });
+
     it('Store PublicDid works correctly', async () => {
       let vc_property = {
         public_key: signKeypairPublic.publicKey,
