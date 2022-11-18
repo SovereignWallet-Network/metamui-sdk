@@ -30,12 +30,20 @@ yarn test:local
 yarn test:dev
 ```
 
+##### Run single module tests
+```
+ env MODULE=<module-name> PROVIDER_NETWORK=<network-name> yarn test:module
+```
+
+
 ### Modules
 - [Connection](docs/connection.md)
 - [Balances](docs/balances.md)
 - [Collective](docs/collective.md)
 - [DID](docs/did.md)
+- [CacheDid](docs/cacheDid.md)
 - [Token](docs/token.md)
 - [Tokenchain](docs/tokenchain.md)
 - [VC](docs/vc.md)
 - [Utils](docs/utils.md)
+- [kycUtils](docs/kycUtils.md)
