@@ -1,5 +1,5 @@
 import * as assert from 'assert';
-import * as cacheDid from '../src/cacheDid';
+import { cacheDid } from '../src';
 import { buildConnectionByUrl } from '../src/connection';
 import { ApiPromise } from '@polkadot/api';
 import { sanitiseDid } from '../src/did';

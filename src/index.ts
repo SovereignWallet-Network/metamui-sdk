@@ -9,6 +9,7 @@
   import * as token from './token';
   import * as kycUtils from './kycUtils';
   import * as tokenchain from './tokenchain';
+  import * as cacheDid from './cacheDid';
 
 export {
     connection,
@@ -21,4 +22,5 @@ export {
     token,
     kycUtils,
     tokenchain,
+    cacheDid
 };
