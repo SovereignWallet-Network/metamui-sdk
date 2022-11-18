@@ -148,7 +148,7 @@ Convert to hex but return fixed size always, mimics substrate storage
 | Param | Type | Default |
 | --- | --- | --- |
 | data | <code>string</code> |  | 
-| size | <code>Int</code> | <code>64</code> | 
+| size | <code>number</code> | <code>64</code> | 
 
 <a name="sanitiseDid"></a>
 

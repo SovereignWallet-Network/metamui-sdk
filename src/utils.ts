@@ -286,4 +286,5 @@ export {
   isUpperAndValid,
   sortObjectByKeys,
   generateObjectHash,
+  tidy
 };

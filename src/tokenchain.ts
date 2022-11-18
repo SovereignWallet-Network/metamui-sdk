@@ -4,6 +4,7 @@ import { submitTransaction } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { hexToString } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
+import { utils } from '.';
 global.Buffer = require('buffer').Buffer;
 
 /**
@@ -31,7 +32,7 @@ const sanitiseToken = (token: String): String => {
         let tokenInfo = String(await provider.query.tokenchain.rLookup(paraIds[i]));
         tokenList.push({
             id: paraIds[i].toString(),
-            name: hexToString(tokenInfo).trim().split('\x00')[0],
+            name: utils.tidy(hexToString(tokenInfo)),
         });
     }
     return tokenList;
@@ -57,7 +58,7 @@ const sanitiseToken = (token: String): String => {
  */
 async function reverseLookupTokenchain(paraId: Number, api: ApiPromise): Promise<string> {
     const provider = api || (await buildConnection('local'));
-    return hexToString((await provider.query.tokenchain.rLookup(paraId)).toString()).trim().split('\x00')[0];
+    return utils.tidy(hexToString((await provider.query.tokenchain.rLookup(paraId)).toString()));
 }
 
 /**

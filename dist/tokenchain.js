@@ -13,6 +13,7 @@ exports.removeParachain = exports.addParachain = exports.reverseLookupTokenchain
 const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
 const util_1 = require("@polkadot/util");
+const _1 = require(".");
 global.Buffer = require('buffer').Buffer;
 /**
  * Sanitise Token Name
@@ -39,7 +40,7 @@ function getTokenList(api) {
             let tokenInfo = String(yield provider.query.tokenchain.rLookup(paraIds[i]));
             tokenList.push({
                 id: paraIds[i].toString(),
-                name: (0, util_1.hexToString)(tokenInfo).trim().split('\x00')[0],
+                name: _1.utils.tidy((0, util_1.hexToString)(tokenInfo)),
             });
         }
         return tokenList;
@@ -69,7 +70,7 @@ exports.lookupTokenchain = lookupTokenchain;
 function reverseLookupTokenchain(paraId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString()).trim().split('\x00')[0];
+        return _1.utils.tidy((0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString()));
     });
 }
 exports.reverseLookupTokenchain = reverseLookupTokenchain;
