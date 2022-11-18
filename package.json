@@ -8,6 +8,7 @@
         "test": "ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --timeout 80000 --exit",
         "test:local": "env PROVIDER_NETWORK=local ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
         "test:dev": "env PROVIDER_NETWORK=dev ts-mocha -p ./tsconfig.json ./ test/**/*.ts ./test/*.ts --no-timeouts --exit",
+        "test:module": "ts-mocha -p ./tsconfig.json test/$MODULE.ts --no-timeouts --exit",
         "generate:docs": "node createDocs.js"
     },
     "repository": {
