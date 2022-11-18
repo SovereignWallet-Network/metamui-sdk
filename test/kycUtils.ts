@@ -1,6 +1,5 @@
 import { stringToHex } from '@polkadot/util';
 import assert from 'assert';
-import { mnemonicWithBalance, validSchema } from './common/constants';
 import { sha256 } from 'js-sha256';
 import { initKeyring } from '../src/config';
 import { buildConnection } from '../src/connection';
@@ -41,7 +40,6 @@ describe('KYC Utils', () => {
 
     const expectedTestHash = stringToHex(sha256(JSON.stringify(testJson)));
 
-    const schemaToTest = validSchema;
     const expectedHash = stringToHex(sha256(JSON.stringify(originJson)));
     let sigKeyPair: KeyringPair;
     const sigDid = 'did:ssid:swn';
@@ -89,7 +87,6 @@ describe('KYC Utils', () => {
         const x:any = await kycUtils.createSsidVC(testJson);
         assert.strictEqual(x.signature, undefined);
         const signedVC = await kycUtils.signSsidVC(x, sigKeyPair);
-        console.log(signedVC);
         assert.notEqual(x.signature, undefined);
         const isSignVerified = await kycUtils.verifySsidVC(signedVC);
         assert.strictEqual(isSignVerified, true);
