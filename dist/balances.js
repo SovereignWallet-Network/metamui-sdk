@@ -180,3 +180,5 @@ function transferWithMemo(senderAccountKeyPair, receiverDID, amount, memo, api, 
     });
 }
 exports.transferWithMemo = transferWithMemo;
+
+//# sourceMappingURL=balances.js.map

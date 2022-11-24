@@ -218,3 +218,5 @@ function getProposalCount(api) {
     });
 }
 exports.getProposalCount = getProposalCount;
+
+//# sourceMappingURL=collective.js.map

@@ -46,3 +46,5 @@ const tokenchain = __importStar(require("./tokenchain"));
 exports.tokenchain = tokenchain;
 const cacheDid = __importStar(require("./cacheDid"));
 exports.cacheDid = cacheDid;
+
+//# sourceMappingURL=index.js.map

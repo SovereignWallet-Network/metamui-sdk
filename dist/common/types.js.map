@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/common/types.ts"],"names":[],"mappings":"","file":"types.js","sourcesContent":["\ntype PRIVATE_DID_TYPE =\n    {\n        private:\n        {\n            public_key: Uint8Array | undefined;\n            identity: string;\n            metadata: string;\n        }\n    };\n\nexport { PRIVATE_DID_TYPE };"]}

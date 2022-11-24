@@ -32,3 +32,5 @@ const initKeyring = (type = 'sr25519') => __awaiter(void 0, void 0, void 0, func
     return new api_1.Keyring({ type });
 });
 exports.initKeyring = initKeyring;
+
+//# sourceMappingURL=config.js.map

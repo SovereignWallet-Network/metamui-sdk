@@ -15,7 +15,7 @@ describe('VC works correctly', () => {
   let sigKeypair: KeyringPair;
   const TEST_DID = 'did:ssid:rocket';
   const EVE_DID = 'did:ssid:eve';
-  var provider: ApiPromise;
+  let provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
   let signKeypairEve: KeyringPair;
@@ -31,7 +31,7 @@ describe('VC works correctly', () => {
   before(async () => {
     keyring = await initKeyring();
     sigKeypair = keyring.addFromUri('//Alice');
-    sigKeypairValidator = keyring.addFromUri('//Swn');
+    sigKeypairValidator = keyring.addFromUri(constants.mnemonicWithBalance);
     provider = await buildConnection(constants.providerNetwork);
     ssidUrl = SSID_BASE_URL[constants.providerNetwork];
     signKeypairEve = keyring.addFromUri('//Eve');

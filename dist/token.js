@@ -100,3 +100,5 @@ function withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api) {
     });
 }
 exports.withdrawReserved = withdrawReserved;
+
+//# sourceMappingURL=token.js.map

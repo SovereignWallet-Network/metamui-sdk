@@ -126,3 +126,5 @@ function verifySsidVC(vcJson) {
     });
 }
 exports.verifySsidVC = verifySsidVC;
+
+//# sourceMappingURL=kycUtils.js.map

@@ -23,7 +23,7 @@ global.Buffer = require('buffer').Buffer;
 const sanitiseToken = (token) => {
     if (token.startsWith('0x'))
         return token.padEnd(16, '0');
-    return '0x' + Buffer.from(token, 'utf8').toString('hex').padEnd(16, '0');
+    return '0x' + Buffer.from(token.toUpperCase(), 'utf8').toString('hex').padEnd(16, '0');
 };
 exports.sanitiseToken = sanitiseToken;
 /**
@@ -43,6 +43,8 @@ function getTokenList(api) {
                 name: _1.utils.tidy((0, util_1.hexToString)(tokenInfo)),
             });
         }
+        tokenList.push({ id: null, name: 'MUI' });
+        tokenList.sort((a, b) => a.name > b.name ? 1 : -1);
         return tokenList;
     });
 }
@@ -70,7 +72,7 @@ exports.lookupTokenchain = lookupTokenchain;
 function reverseLookupTokenchain(paraId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return _1.utils.tidy((0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString()));
+        return _1.utils.tidy((0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
     });
 }
 exports.reverseLookupTokenchain = reverseLookupTokenchain;
@@ -107,3 +109,5 @@ function removeParachain(tokenName, sudoAccountKeyPair, api) {
     });
 }
 exports.removeParachain = removeParachain;
+
+//# sourceMappingURL=tokenchain.js.map

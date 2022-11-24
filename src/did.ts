@@ -3,7 +3,7 @@ import { AnyJson } from '@polkadot/types/types';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { did } from '.';
+import { did, tokenchain } from '.';
 import { submitTransaction } from './common/helper';
 global.Buffer = require('buffer').Buffer;
 
@@ -23,15 +23,15 @@ const checkIdentifierFormat = (identifier) => {
 /**
  * Store the generated DID VC
  * @param {HexString} vcId
- * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {number|string|null} syncTo - is null for relay chain. Pass valid paraId 
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
 
-async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function createPrivate(vcId, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  const tx = provider.tx.did.createPrivate(vcId, paraId);
+  const tx = provider.tx.did.createPrivate(vcId, sanitiseSyncTo(syncTo, provider));
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -40,15 +40,15 @@ async function createPrivate(vcId, paraId = null, signingKeypair: KeyringPair, a
 /**
  * Create Private DID and store the generated DID object in blockchain
  * @param {HexString} vcId
- * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {number|string} syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
 
- async function createPublic(vcId, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function createPublic(vcId, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
-  const tx = provider.tx.did.createPublic(vcId, paraId);
+  const tx = provider.tx.did.createPublic(vcId, sanitiseSyncTo(syncTo, provider));
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   const signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -136,7 +136,7 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
  * @param {ApiPromise} api
  * @returns {JSON}
  */
-async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<string | Boolean> {
+async function resolveAccountIdToDid(accountId, api: ApiPromise): Promise<string | Boolean> {
   const provider = api || (await buildConnection('local'));
   const data = (await provider.query.did.rLookup(accountId)).toJSON();
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
@@ -151,12 +151,12 @@ async function resolveAccountIdToDid(accountId, api?: ApiPromise): Promise<strin
  * It should only be called by validator accounts, else will fail
  * @param {string} identifier
  * @param {Uint8Array} newKey
- * @param {Number} paraId
+ * @param {string|number} syncTo
  * @param {KeyringPair} signingKeypair // of a validator account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function updateDidKey(identifier, newKey, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = await did.resolveDIDToAccount(did_hex, provider);
@@ -169,7 +169,7 @@ async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: K
     throw(new Error('did.PublicKeyRegistered'));
   }
   // call the rotateKey extrinsinc
-  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, paraId), 1000);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, sanitiseSyncTo(syncTo, provider)), 1000);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   let signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -206,12 +206,40 @@ const sanitiseDid = (did) => {
 }
 
 /**
+ * Sanitize paraId before creating a did
+ * @param {string|number|null} syncTo
+ * @param {ApiPromise} api
+ * @returns {number|null}
+ */
+const sanitiseSyncTo = async (syncTo, api: ApiPromise) => {
+  const provider = api || await buildConnection('local');
+  if(!syncTo || syncTo === null) {
+    return null;
+  } else {
+    if(parseInt(syncTo) > 0) {
+      let data = await tokenchain.reverseLookupTokenchain(syncTo, provider);
+      if(data)
+        return parseInt(syncTo);
+
+      throw new Error('Invalid paraId : syncTo');
+    
+    } else if(typeof syncTo === 'string') {
+      let paraId = await tokenchain.lookupTokenchain(syncTo, provider) || null;
+      if(paraId)
+        return paraId;
+      throw new Error('Invalid Currency Code : syncTo');
+    }
+  }
+  throw new Error('Invalid syncTo');
+}
+
+/**
  * Check if the user is an approved validator
  * @param {string} identifier
  * @param {ApiPromise} api
  * @returns {Boolean}
  */
-async function isDidValidator(identifier: string, api?: ApiPromise): Promise<boolean> {
+async function isDidValidator(identifier: string, api: ApiPromise): Promise<boolean> {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const vList = (await provider.query.validatorSet.members()).toJSON();
@@ -253,15 +281,15 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: ApiProm
 /**
  * Sync DID VC with other chains
  * @param {string} identifier
- * @param {Number} paraId Optional
+ * @param syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair of a validator account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+async function syncDid(identifier, syncTo = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, paraId), 1000);
+  const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, sanitiseSyncTo(syncTo, provider)), 1000);
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   let signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -270,15 +298,15 @@ async function syncDid(identifier, paraId = null, signingKeypair, api: ApiPromis
 /**
  * Remove DID VC
  * @param {string} identifier
- * @param {Number} paraId Optional
+ * @param syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair of a SUDO account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function removeDid(identifier, paraId = null, signingKeypair, api: ApiPromise) {
+async function removeDid(identifier, syncTo = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
-  const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, paraId));
+  const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, sanitiseSyncTo(syncTo, provider)));
   let nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
   let signedTx = await tx.signAsync(signingKeypair, { nonce });
   return submitTransaction(signedTx, provider);
@@ -297,6 +325,7 @@ export {
   isDidValidator,
   updateMetadata,
   sanitiseDid,
+  sanitiseSyncTo,
   syncDid,
   removeDid
 };

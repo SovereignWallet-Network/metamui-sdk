@@ -16,7 +16,7 @@ const sanitiseToken = (token: String): String => {
     if (token.startsWith('0x'))
         return token.padEnd(16, '0');
         
-    return '0x' + Buffer.from(token, 'utf8').toString('hex').padEnd(16, '0');
+    return '0x' + Buffer.from(token.toUpperCase(), 'utf8').toString('hex').padEnd(16, '0');
 }
 
 /**
@@ -35,6 +35,8 @@ const sanitiseToken = (token: String): String => {
             name: utils.tidy(hexToString(tokenInfo)),
         });
     }
+    tokenList.push({ id: null, name: 'MUI' });
+    tokenList.sort((a, b) => a.name > b.name ? 1 : -1);
     return tokenList;
 }
 
@@ -58,7 +60,7 @@ const sanitiseToken = (token: String): String => {
  */
 async function reverseLookupTokenchain(paraId: Number, api: ApiPromise): Promise<string> {
     const provider = api || (await buildConnection('local'));
-    return utils.tidy(hexToString((await provider.query.tokenchain.rLookup(paraId)).toString()));
+    return utils.tidy(hexToString((await provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
 }
 
 /**
