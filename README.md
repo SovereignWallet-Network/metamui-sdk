@@ -37,8 +37,9 @@ yarn build:clean
 yarn test:local
 ```
 ##### Run tests (Dev)
+
 ```bash
-env SWN_MNEMONICyarn test:dev
+env SWN_MNEMONIC="//Swn Change this with testnet mnemonics" yarn test:dev
 ```
 
 ##### Run single module tests
