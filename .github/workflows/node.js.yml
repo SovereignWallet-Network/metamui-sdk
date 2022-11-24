@@ -27,4 +27,4 @@ jobs:
         uses: Borales/actions-yarn@v3
       - run: sudo chmod -R 7777 /home/runner/work/metamui-sdk/metamui-sdk
       - run: sudo yarn
-      - run: env MNEMONIC_SWN=${{ secrets.MNEMONIC_SWN }} yarn test:dev
+      - run: env MNEMONIC_SWN="${{ secrets.MNEMONIC_SWN }}" yarn test:dev
