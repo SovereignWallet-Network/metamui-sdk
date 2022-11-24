@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateObjectHash = exports.sortObjectByKeys = exports.isUpperAndValid = exports.vcHexToVcId = exports.decodeHex = exports.encodeData = exports.stringToBytes = exports.hexToString = exports.base58ToBytes = exports.hexToBytes = exports.bytesToHex = exports.VCType = exports.CID_BYTES = exports.VC_PROPERTY_BYTES = exports.CURRENCY_CODE_BYTES = exports.TOKEN_NAME_BYTES = exports.METABLOCKCHAIN_TYPES = void 0;
+exports.tidy = exports.generateObjectHash = exports.sortObjectByKeys = exports.isUpperAndValid = exports.vcHexToVcId = exports.decodeHex = exports.encodeData = exports.stringToBytes = exports.hexToString = exports.base58ToBytes = exports.hexToBytes = exports.bytesToHex = exports.VCType = exports.CID_BYTES = exports.VC_PROPERTY_BYTES = exports.CURRENCY_CODE_BYTES = exports.TOKEN_NAME_BYTES = exports.METABLOCKCHAIN_TYPES = void 0;
 const util_1 = require("@polkadot/util");
 const util_crypto_1 = require("@polkadot/util-crypto");
 const types = __importStar(require("@polkadot/types"));
@@ -270,6 +270,7 @@ function tidy(s) {
         : s;
     return tidy;
 }
+exports.tidy = tidy;
 /** Sort object by keys
  * @param  {Object} unorderedObj unordered object
  * @returns {Object} ordered object by key

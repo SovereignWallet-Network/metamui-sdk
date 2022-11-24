@@ -148,7 +148,7 @@ Convert to hex but return fixed size always, mimics substrate storage
 | Param | Type | Default |
 | --- | --- | --- |
 | data | <code>string</code> |  | 
-| size | <code>Int</code> | <code>64</code> | 
+| size | <code>number</code> | <code>64</code> | 
 
 <a name="sanitiseDid"></a>
 
@@ -183,10 +183,10 @@ Fetch the history of rotated keys for the specified DID
 
 **Kind**: global function  
 
-| Param | Type | Default |
-| --- | --- | --- |
-| identifier | <code>string</code> |  | 
-| api | <code>ApiPromise</code> | <code>false</code> | 
+| Param | Type |
+| --- | --- |
+| identifier | <code>string</code> | 
+| api | <code>ApiPromise</code> | 
 
 <a name="updateMetadata"></a>
 

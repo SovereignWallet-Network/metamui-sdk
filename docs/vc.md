@@ -286,7 +286,7 @@ Approve VC
 | --- | --- | --- |
 | vcID | <code>HexString</code> | vc_id of VC to be approved |
 | senderAccountKeyPair | <code>KeyringPair</code> | Issuer Key Ring pair |
-| api | <code>APIPromise</code> |  |
+| api | <code>ApiPromise</code> |  |
 
 <a name="storeVC"></a>
 

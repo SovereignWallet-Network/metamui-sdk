@@ -364,7 +364,7 @@ exports.verifyGenericVC = verifyGenericVC;
 * Approve VC
 * @param  {HexString} vcID vc_id of VC to be approved
 * @param  {KeyringPair} senderAccountKeyPair Issuer Key Ring pair
-* @param {APIPromise} api
+* @param {ApiPromise} api
 * @returns {Object} Transaction Object
 */
 function approveVC(vcId, senderAccountKeyPair, api, ssidUrl) {

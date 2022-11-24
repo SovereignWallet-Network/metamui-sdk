@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.kycUtils = exports.token = exports.vc = exports.collective = exports.config = exports.utils = exports.balances = exports.did = exports.connection = void 0;
+exports.cacheDid = exports.tokenchain = exports.kycUtils = exports.token = exports.vc = exports.collective = exports.config = exports.utils = exports.balances = exports.did = exports.connection = void 0;
 const connection = __importStar(require("./connection"));
 exports.connection = connection;
 const did = __importStar(require("./did"));
@@ -42,3 +42,7 @@ const token = __importStar(require("./token"));
 exports.token = token;
 const kycUtils = __importStar(require("./kycUtils"));
 exports.kycUtils = kycUtils;
+const tokenchain = __importStar(require("./tokenchain"));
+exports.tokenchain = tokenchain;
+const cacheDid = __importStar(require("./cacheDid"));
+exports.cacheDid = cacheDid;

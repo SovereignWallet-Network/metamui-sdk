@@ -14,7 +14,12 @@ const util_1 = require("@polkadot/util");
 const util_crypto_1 = require("@polkadot/util-crypto");
 const js_sha256_1 = require("js-sha256");
 const did_1 = require("./did");
-function createVC(propertiesJson, schemaToTest) {
+/**
+ *
+ * @param propertiesJson
+ * @returns {Object} Create Unsigned VC
+ */
+function createVC(propertiesJson) {
     return __awaiter(this, void 0, void 0, function* () {
         return {
             properties: propertiesJson,
@@ -25,6 +30,12 @@ function createVC(propertiesJson, schemaToTest) {
     });
 }
 exports.createVC = createVC;
+/**
+ * @param {JSON} vcJson
+ * @param {string} verifierDid
+ * @param {string} signingKeyPair
+ * @returns {Object} Signed VC
+ */
 function signVC(vcJson, verifierDid, signingKeyPair) {
     return __awaiter(this, void 0, void 0, function* () {
         const expectedHash = (0, util_1.stringToHex)((0, js_sha256_1.sha256)(JSON.stringify(vcJson.properties)));
@@ -40,6 +51,12 @@ function signVC(vcJson, verifierDid, signingKeyPair) {
     });
 }
 exports.signVC = signVC;
+/**
+ *
+ * @param vcJson
+ * @param api
+ * @returns {boolean} true or false
+ */
 function verifyVC(vcJson, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api;
@@ -70,6 +87,10 @@ function verifyVC(vcJson, api) {
     });
 }
 exports.verifyVC = verifyVC;
+/**
+ * @param propertiesJson
+ * @returns {Object} Create Unsigned VC
+ */
 function createSsidVC(propertiesJson) {
     return __awaiter(this, void 0, void 0, function* () {
         return {
@@ -80,6 +101,11 @@ function createSsidVC(propertiesJson) {
     });
 }
 exports.createSsidVC = createSsidVC;
+/**
+ * @param vcJson
+ * @param signingKeyPair
+ * @returns {Object} Signed VC
+ */
 function signSsidVC(vcJson, signingKeyPair) {
     return __awaiter(this, void 0, void 0, function* () {
         const dataToSign = (0, util_1.hexToU8a)(vcJson.hash);
@@ -90,6 +116,10 @@ function signSsidVC(vcJson, signingKeyPair) {
     });
 }
 exports.signSsidVC = signSsidVC;
+/**
+ * @param vcJson
+ * @returns {boolean} true or false
+ */
 function verifySsidVC(vcJson) {
     return __awaiter(this, void 0, void 0, function* () {
         return (0, util_crypto_1.signatureVerify)((0, util_1.hexToU8a)(vcJson.hash), (0, util_1.hexToU8a)(vcJson.signature), vcJson.properties.public_key.toString()).isValid;

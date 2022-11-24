@@ -15,7 +15,7 @@ import { VCType } from '../src/utils';
 describe('Token works correctly', () => {
   let sigKeypair: KeyringPair;
   const EVE_DID = 'did:ssid:eve';
-  var provider: ApiPromise;
+  let provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
   let sigKeypairBob: KeyringPair;

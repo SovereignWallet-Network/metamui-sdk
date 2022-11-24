@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeDid = exports.syncDid = exports.sanitiseDid = exports.updateMetadata = exports.isDidValidator = exports.resolveAccountIdToDid = exports.getDidKeyHistory = exports.resolveDIDToAccount = exports.updateDidKey = exports.getDIDDetails = exports.createPublic = exports.createPrivate = exports.generateMnemonic = void 0;
+exports.removeDid = exports.syncDid = exports.sanitiseDid = exports.updateMetadata = exports.isDidValidator = exports.resolveAccountIdToDid = exports.getDidKeyHistory = exports.resolveDIDToAccount = exports.updateDidKey = exports.getDIDDetails = exports.createPublic = exports.createPrivate = exports.generateMnemonic = exports.convertFixedSizeHex = void 0;
 const util_crypto_1 = require("@polkadot/util-crypto");
 const connection_1 = require("./connection");
 const _1 = require(".");
@@ -193,7 +193,7 @@ exports.updateDidKey = updateDidKey;
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
  * @param {string} data
- * @param {Int} size
+ * @param {number} size
  * @return {string}
  */
 function convertFixedSizeHex(data, size = 64) {
@@ -202,6 +202,7 @@ function convertFixedSizeHex(data, size = 64) {
     const identifierHex = Buffer.from(data).toString('hex');
     return `0x${identifierHex.padEnd(size, '0')}`;
 }
+exports.convertFixedSizeHex = convertFixedSizeHex;
 /**
  * Checks if the given did is in hex format or not & converts it into valid hex format.
  *

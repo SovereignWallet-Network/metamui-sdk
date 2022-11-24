@@ -4,8 +4,7 @@
  import { ApiPromise } from '@polkadot/api';
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
- import { HexString } from '@polkadot/util/types';
- 
+
  /**
   * Mint token to given currency
   * @param {HexString} vcId
@@ -116,5 +115,5 @@ async function withdrawReserved(
     mintToken,
     slashToken,
     transferToken,
-    withdrawReserved
- };
+    withdrawReserved,
+};

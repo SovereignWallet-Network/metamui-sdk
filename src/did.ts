@@ -178,10 +178,10 @@ async function updateDidKey(identifier, newKey, paraId = null, signingKeypair: K
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
  * @param {string} data
- * @param {Int} size
+ * @param {number} size
  * @return {string}
  */
-function convertFixedSizeHex(data, size = 64) {
+function convertFixedSizeHex(data: string, size = 64) {
   if (data.length > size) throw new Error('Invalid Data');
   const identifierHex = Buffer.from(data).toString('hex');
   return `0x${identifierHex.padEnd(size, '0')}`;
@@ -285,6 +285,7 @@ async function removeDid(identifier, paraId = null, signingKeypair, api: ApiProm
 }
 
 export {
+  convertFixedSizeHex,
   generateMnemonic,
   createPrivate,
   createPublic,
