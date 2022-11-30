@@ -5,7 +5,7 @@ import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did, tokenchain } from '.';
 import { submitTransaction } from './common/helper';
-global.Buffer = require('buffer').Buffer;
+import { stringToHex } from '@polkadot/util';
 
 const DID_HEX_LEN = 64;
 
@@ -183,8 +183,9 @@ async function updateDidKey(identifier, newKey, syncTo = null, signingKeypair: K
  */
 function convertFixedSizeHex(data: string, size = 64) {
   if (data.length > size) throw new Error('Invalid Data');
-  const identifierHex = Buffer.from(data).toString('hex');
-  return `0x${identifierHex.padEnd(size, '0')}`;
+  const identifierHex = stringToHex(data);
+  // size + 2 for 0x
+  return identifierHex.padEnd(size + 2, '0');
 }
 
 /**
@@ -196,13 +197,10 @@ function convertFixedSizeHex(data: string, size = 64) {
  * @return {string} Hex did
  */
 const sanitiseDid = (did) => {
-
-  if (did.startsWith('0x')) {
+  if (did.startsWith('0x'))
     return did.padEnd(DID_HEX_LEN, '0');
-  }
-  let hex_did = Buffer.from(did, 'utf8').toString('hex');
-  hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
-  return hex_did;
+  // n + 2 for 0x
+  return stringToHex(did).padEnd(DID_HEX_LEN + 2, '0');
 }
 
 /**
@@ -217,14 +215,14 @@ const sanitiseSyncTo = async (syncTo, api: ApiPromise) => {
     return null;
   } else {
     if(parseInt(syncTo) > 0) {
-      let data = await tokenchain.reverseLookupTokenchain(syncTo, provider);
+      let data = await tokenchain.lookUpParaId(syncTo, provider);
       if(data)
         return parseInt(syncTo);
 
       throw new Error('Invalid paraId : syncTo');
     
     } else if(typeof syncTo === 'string') {
-      let paraId = await tokenchain.lookupTokenchain(syncTo, provider) || null;
+      let paraId = await tokenchain.lookup(syncTo, provider) || null;
       if(paraId)
         return paraId;
       throw new Error('Invalid Currency Code : syncTo');

@@ -1,16 +1,13 @@
 ## Functions
 
 <dl>
-<dt><a href="#sanitiseToken">sanitiseToken(token)</a> ⇒ <code>String</code></dt>
-<dd><p>Sanitise Token Name</p>
-</dd>
 <dt><a href="#getTokenList">getTokenList(api)</a> ⇒ <code>Object</code></dt>
 <dd><p>get Token List</p>
 </dd>
-<dt><a href="#lookupTokenchain">lookupTokenchain(tokenName, api)</a> ⇒ <code>Number</code></dt>
+<dt><a href="#lookup">lookup(tokenName, api)</a> ⇒ <code>Number</code></dt>
 <dd><p>Lookup Tokenchain with Token Name to get ParaId</p>
 </dd>
-<dt><a href="#reverseLookupTokenchain">reverseLookupTokenchain(paraId, api)</a> ⇒ <code>String</code></dt>
+<dt><a href="#lookUpParaId">lookUpParaId(paraId, api)</a> ⇒ <code>String</code></dt>
 <dd><p>Reverse Lookup Tokenchain with ParaId to get Token Name</p>
 </dd>
 <dt><a href="#addParachain">addParachain(tokenName, paraId, sudoAccountKeyPair, api)</a></dt>
@@ -20,18 +17,6 @@
 <dd><p>Remove parachain (requires sudo)</p>
 </dd>
 </dl>
-
-<a name="sanitiseToken"></a>
-
-## sanitiseToken(token) ⇒ <code>String</code>
-Sanitise Token Name
-
-**Kind**: global function  
-**Returns**: <code>String</code> - Sanitised Token Name  
-
-| Param | Type |
-| --- | --- |
-| token | <code>String</code> | 
 
 <a name="getTokenList"></a>
 
@@ -45,9 +30,9 @@ get Token List
 | --- | --- |
 | api | <code>ApiPromise</code> | 
 
-<a name="lookupTokenchain"></a>
+<a name="lookup"></a>
 
-## lookupTokenchain(tokenName, api) ⇒ <code>Number</code>
+## lookup(tokenName, api) ⇒ <code>Number</code>
 Lookup Tokenchain with Token Name to get ParaId
 
 **Kind**: global function  
@@ -58,9 +43,9 @@ Lookup Tokenchain with Token Name to get ParaId
 | tokenName | <code>HexString</code> \| <code>String</code> | 
 | api | <code>ApiPromise</code> | 
 
-<a name="reverseLookupTokenchain"></a>
+<a name="lookUpParaId"></a>
 
-## reverseLookupTokenchain(paraId, api) ⇒ <code>String</code>
+## lookUpParaId(paraId, api) ⇒ <code>String</code>
 Reverse Lookup Tokenchain with ParaId to get Token Name
 
 **Kind**: global function  

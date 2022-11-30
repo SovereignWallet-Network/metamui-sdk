@@ -5,19 +5,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 import { hexToString } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
 import { utils } from '.';
-global.Buffer = require('buffer').Buffer;
-
-/**
- * Sanitise Token Name
- * @param {String} token
- * @returns {String} Sanitised Token Name
- */
-const sanitiseToken = (token: String): String => {
-    if (token.startsWith('0x'))
-        return token.padEnd(16, '0');
-        
-    return '0x' + Buffer.from(token.toUpperCase(), 'utf8').toString('hex').padEnd(16, '0');
-}
+import { sanitiseCCode } from './token';
 
 /**
  * get Token List
@@ -46,9 +34,9 @@ const sanitiseToken = (token: String): String => {
  * @param {ApiPromise} api
  * @returns {Number} Para Id
  */
- async function lookupTokenchain(tokenName: HexString|String, api: ApiPromise) {
+ async function lookup(tokenName: HexString|String, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
-    const paraId = (await provider.query.tokenchain.lookup(sanitiseToken(tokenName))).toString();
+    const paraId = (await provider.query.tokenchain.lookup(sanitiseCCode(tokenName))).toString();
     return parseInt(paraId, 10);
 }
 
@@ -58,7 +46,7 @@ const sanitiseToken = (token: String): String => {
  * @param {ApiPromise} api
  * @returns {String} Token Name
  */
-async function reverseLookupTokenchain(paraId: Number, api: ApiPromise): Promise<string> {
+async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
     const provider = api || (await buildConnection('local'));
     return utils.tidy(hexToString((await provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
 }
@@ -73,7 +61,7 @@ async function reverseLookupTokenchain(paraId: Number, api: ApiPromise): Promise
 async function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
     const tx = provider.tx.sudo.sudo(
-        provider.tx.tokenchain.addParachain(paraId, sanitiseToken(tokenName))
+        provider.tx.tokenchain.addParachain(paraId, sanitiseCCode(tokenName))
     );
     let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
     let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
@@ -89,7 +77,7 @@ async function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPai
  async function removeParachain(tokenName: String, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
     const tx = provider.tx.sudo.sudo(
-        provider.tx.tokenchain.removeParachain(sanitiseToken(tokenName))
+        provider.tx.tokenchain.removeParachain(sanitiseCCode(tokenName))
     );
     let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
     let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
@@ -97,10 +85,10 @@ async function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPai
 }
 
 export {
-    sanitiseToken,
+    sanitiseCCode,
     getTokenList,
-    lookupTokenchain,
-    reverseLookupTokenchain,
+    lookup,
+    lookUpParaId,
     addParachain,
     removeParachain
 };

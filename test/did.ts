@@ -93,7 +93,7 @@ describe('DID Module works correctly', () => {
     const hex_did = did.sanitiseDid('did:ssid:swn');
     assert.strictEqual(
       hex_did,
-      did.sanitiseDid('did:ssid:swn')
+      "0x6469643a737369643a73776e0000000000000000000000000000000000000000"
     );
   });
 

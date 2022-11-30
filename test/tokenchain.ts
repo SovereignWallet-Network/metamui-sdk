@@ -21,22 +21,22 @@ describe('Tokenchain works correctly', () => {
     });
 
     it('lookupTokenchain Works correctly', async () => {
-        const paraId = await tokenchain.lookupTokenchain(validTokenName, provider);
+        const paraId = await tokenchain.lookup(validTokenName, provider);
         assert.equal(paraId, validParaId);
     });
 
     it('lookupTokenchain Works correctly for invalid token name', async () => {
-        const paraId = await tokenchain.lookupTokenchain(invalidTokenName, provider);
+        const paraId = await tokenchain.lookup(invalidTokenName, provider);
         assert.equal(paraId, NaN);
     });
 
     it('reverseLookupTokenchain Works correctly', async () => {
-        const tokenName = await tokenchain.reverseLookupTokenchain(validParaId, provider);
+        const tokenName = await tokenchain.lookUpParaId(validParaId, provider);
         assert.equal(tokenName, validTokenName);
     });
 
     it('reverseLookupTokenchain Works correctly for invalid paraId', async () => {
-        const tokenName = await tokenchain.reverseLookupTokenchain(invalidParaId, provider);
+        const tokenName = await tokenchain.lookUpParaId(invalidParaId, provider);
         assert.equal(tokenName, "");
     });
 

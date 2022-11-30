@@ -35,4 +35,10 @@ declare function transferToken(vcId: any, toDid: any, senderAccountKeyPair: Keyr
  * @returns {Object} Transaction Object
  */
 declare function withdrawReserved(toDid: any, fromDid: any, amount: any, senderAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
-export { mintToken, slashToken, transferToken, withdrawReserved, };
+/**
+ * Sanitise Token Name
+ * @param {String} token
+ * @returns {String} Sanitised Token Name
+ */
+declare const sanitiseCCode: (token: String) => String;
+export { mintToken, slashToken, transferToken, withdrawReserved, sanitiseCCode };

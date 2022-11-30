@@ -14,7 +14,7 @@ const util_crypto_1 = require("@polkadot/util-crypto");
 const connection_1 = require("./connection");
 const _1 = require(".");
 const helper_1 = require("./common/helper");
-global.Buffer = require('buffer').Buffer;
+const util_1 = require("@polkadot/util");
 const DID_HEX_LEN = 64;
 /** Generate Mnemonic
  * @returns {string} Mnemonic
@@ -199,8 +199,9 @@ exports.updateDidKey = updateDidKey;
 function convertFixedSizeHex(data, size = 64) {
     if (data.length > size)
         throw new Error('Invalid Data');
-    const identifierHex = Buffer.from(data).toString('hex');
-    return `0x${identifierHex.padEnd(size, '0')}`;
+    const identifierHex = (0, util_1.stringToHex)(data);
+    // size + 2 for 0x
+    return identifierHex.padEnd(size + 2, '0');
 }
 exports.convertFixedSizeHex = convertFixedSizeHex;
 /**
@@ -212,12 +213,10 @@ exports.convertFixedSizeHex = convertFixedSizeHex;
  * @return {string} Hex did
  */
 const sanitiseDid = (did) => {
-    if (did.startsWith('0x')) {
+    if (did.startsWith('0x'))
         return did.padEnd(DID_HEX_LEN, '0');
-    }
-    let hex_did = Buffer.from(did, 'utf8').toString('hex');
-    hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
-    return hex_did;
+    // n + 2 for 0x
+    return (0, util_1.stringToHex)(did).padEnd(DID_HEX_LEN + 2, '0');
 };
 exports.sanitiseDid = sanitiseDid;
 /**
@@ -233,13 +232,13 @@ const sanitiseSyncTo = (syncTo, api) => __awaiter(void 0, void 0, void 0, functi
     }
     else {
         if (parseInt(syncTo) > 0) {
-            let data = yield _1.tokenchain.reverseLookupTokenchain(syncTo, provider);
+            let data = yield _1.tokenchain.lookUpParaId(syncTo, provider);
             if (data)
                 return parseInt(syncTo);
             throw new Error('Invalid paraId : syncTo');
         }
         else if (typeof syncTo === 'string') {
-            let paraId = (yield _1.tokenchain.lookupTokenchain(syncTo, provider)) || null;
+            let paraId = (yield _1.tokenchain.lookup(syncTo, provider)) || null;
             if (paraId)
                 return paraId;
             throw new Error('Invalid Currency Code : syncTo');

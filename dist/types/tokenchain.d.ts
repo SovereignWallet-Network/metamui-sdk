@@ -1,12 +1,7 @@
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { HexString } from '@polkadot/util/types';
-/**
- * Sanitise Token Name
- * @param {String} token
- * @returns {String} Sanitised Token Name
- */
-declare const sanitiseToken: (token: String) => String;
+import { sanitiseCCode } from './token';
 /**
  * get Token List
  * @param {ApiPromise} api
@@ -19,14 +14,14 @@ declare function getTokenList(api: ApiPromise): Promise<any[]>;
  * @param {ApiPromise} api
  * @returns {Number} Para Id
  */
-declare function lookupTokenchain(tokenName: HexString | String, api: ApiPromise): Promise<number>;
+declare function lookup(tokenName: HexString | String, api: ApiPromise): Promise<number>;
 /**
  * Reverse Lookup Tokenchain with ParaId to get Token Name
  * @param {Number} paraId
  * @param {ApiPromise} api
  * @returns {String} Token Name
  */
-declare function reverseLookupTokenchain(paraId: Number, api: ApiPromise): Promise<string>;
+declare function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string>;
 /**
  * Add new parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
@@ -42,4 +37,4 @@ declare function addParachain(tokenName: String, paraId: Number, sudoAccountKeyP
  * @param {ApiPromise} api
  */
 declare function removeParachain(tokenName: String, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
-export { sanitiseToken, getTokenList, lookupTokenchain, reverseLookupTokenchain, addParachain, removeParachain };
+export { sanitiseCCode, getTokenList, lookup, lookUpParaId, addParachain, removeParachain };

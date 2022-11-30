@@ -9,23 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeParachain = exports.addParachain = exports.reverseLookupTokenchain = exports.lookupTokenchain = exports.getTokenList = exports.sanitiseToken = void 0;
+exports.removeParachain = exports.addParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
 const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
 const util_1 = require("@polkadot/util");
 const _1 = require(".");
-global.Buffer = require('buffer').Buffer;
-/**
- * Sanitise Token Name
- * @param {String} token
- * @returns {String} Sanitised Token Name
- */
-const sanitiseToken = (token) => {
-    if (token.startsWith('0x'))
-        return token.padEnd(16, '0');
-    return '0x' + Buffer.from(token.toUpperCase(), 'utf8').toString('hex').padEnd(16, '0');
-};
-exports.sanitiseToken = sanitiseToken;
+const token_1 = require("./token");
+Object.defineProperty(exports, "sanitiseCCode", { enumerable: true, get: function () { return token_1.sanitiseCCode; } });
 /**
  * get Token List
  * @param {ApiPromise} api
@@ -55,27 +45,27 @@ exports.getTokenList = getTokenList;
  * @param {ApiPromise} api
  * @returns {Number} Para Id
  */
-function lookupTokenchain(tokenName, api) {
+function lookup(tokenName, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const paraId = (yield provider.query.tokenchain.lookup(sanitiseToken(tokenName))).toString();
+        const paraId = (yield provider.query.tokenchain.lookup((0, token_1.sanitiseCCode)(tokenName))).toString();
         return parseInt(paraId, 10);
     });
 }
-exports.lookupTokenchain = lookupTokenchain;
+exports.lookup = lookup;
 /**
  * Reverse Lookup Tokenchain with ParaId to get Token Name
  * @param {Number} paraId
  * @param {ApiPromise} api
  * @returns {String} Token Name
  */
-function reverseLookupTokenchain(paraId, api) {
+function lookUpParaId(paraId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         return _1.utils.tidy((0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
     });
 }
-exports.reverseLookupTokenchain = reverseLookupTokenchain;
+exports.lookUpParaId = lookUpParaId;
 /**
  * Add new parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
@@ -86,7 +76,7 @@ exports.reverseLookupTokenchain = reverseLookupTokenchain;
 function addParachain(tokenName, paraId, sudoAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.addParachain(paraId, sanitiseToken(tokenName)));
+        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.addParachain(paraId, (0, token_1.sanitiseCCode)(tokenName)));
         let nonce = yield provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
         let signedTx = yield tx.signAsync(sudoAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -102,7 +92,7 @@ exports.addParachain = addParachain;
 function removeParachain(tokenName, sudoAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.removeParachain(sanitiseToken(tokenName)));
+        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.removeParachain((0, token_1.sanitiseCCode)(tokenName)));
         let nonce = yield provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
         let signedTx = yield tx.signAsync(sudoAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
