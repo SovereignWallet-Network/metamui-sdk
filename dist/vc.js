@@ -522,3 +522,5 @@ function getFormattedTokenAmount(tokenSymbol, tokenAmount, api) {
     });
 }
 exports.getFormattedTokenAmount = getFormattedTokenAmount;
+
+//# sourceMappingURL=vc.js.map

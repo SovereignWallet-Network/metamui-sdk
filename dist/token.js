@@ -9,11 +9,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.withdrawReserved = exports.transferToken = exports.slashToken = exports.mintToken = void 0;
+exports.sanitiseCCode = exports.withdrawReserved = exports.transferToken = exports.slashToken = exports.mintToken = void 0;
 const did_1 = require("./did");
 const connection_1 = require("./connection");
 const did_2 = require("./did");
 const helper_1 = require("./common/helper");
+const util_1 = require("@polkadot/util");
+const utils_1 = require("./utils");
 /**
  * Mint token to given currency
  * @param {HexString} vcId
@@ -100,3 +102,17 @@ function withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api) {
     });
 }
 exports.withdrawReserved = withdrawReserved;
+/**
+ * Sanitise Token Name
+ * @param {String} token
+ * @returns {String} Sanitised Token Name
+ */
+const sanitiseCCode = (token) => {
+    if (token.startsWith('0x'))
+        return token.padEnd(utils_1.TOKEN_NAME_BYTES, '0');
+    // n + 2 for 0x
+    return (0, util_1.stringToHex)(token.toUpperCase()).padEnd(utils_1.TOKEN_NAME_BYTES + 2, '0');
+};
+exports.sanitiseCCode = sanitiseCCode;
+
+//# sourceMappingURL=token.js.map

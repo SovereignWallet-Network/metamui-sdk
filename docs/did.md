@@ -4,10 +4,10 @@
 <dt><a href="#generateMnemonic">generateMnemonic()</a> ⇒ <code>string</code></dt>
 <dd><p>Generate Mnemonic</p>
 </dd>
-<dt><a href="#createPrivate">createPrivate(vcId, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#createPrivate">createPrivate(vcId, syncTo, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Store the generated DID VC</p>
 </dd>
-<dt><a href="#createPublic">createPublic(vcId, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#createPublic">createPublic(vcId, syncTo, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Create Private DID and store the generated DID object in blockchain</p>
 </dd>
 <dt><a href="#getDIDDetails">getDIDDetails(identifier, api)</a> ⇒ <code>JSON</code></dt>
@@ -19,7 +19,7 @@
 <dt><a href="#resolveAccountIdToDid">resolveAccountIdToDid(accountId, api)</a> ⇒ <code>JSON</code></dt>
 <dd><p>Get the DID associated to given accountID</p>
 </dd>
-<dt><a href="#updateDidKey">updateDidKey(identifier, newKey, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#updateDidKey">updateDidKey(identifier, newKey, syncTo, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>This function will rotate the keys assiged to a DID
 It should only be called by validator accounts, else will fail</p>
 </dd>
@@ -30,6 +30,9 @@ It should only be called by validator accounts, else will fail</p>
 <dd><p>Checks if the given did is in hex format or not &amp; converts it into valid hex format.</p>
 <p> Note: This util function is needed since dependant module wont convert the utf did to hex anymore</p>
 </dd>
+<dt><a href="#sanitiseSyncTo">sanitiseSyncTo(syncTo, api)</a> ⇒ <code>number</code> | <code>null</code></dt>
+<dd><p>Sanitize paraId before creating a did</p>
+</dd>
 <dt><a href="#isDidValidator">isDidValidator(identifier, api)</a> ⇒ <code>Boolean</code></dt>
 <dd><p>Check if the user is an approved validator</p>
 </dd>
@@ -38,10 +41,10 @@ It should only be called by validator accounts, else will fail</p>
 </dd>
 <dt><a href="#updateMetadata">updateMetadata(identifier, metadata, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd></dd>
-<dt><a href="#syncDid">syncDid(identifier, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#syncDid">syncDid(identifier, syncTo, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Sync DID VC with other chains</p>
 </dd>
-<dt><a href="#removeDid">removeDid(identifier, paraId, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#removeDid">removeDid(identifier, syncTo, signingKeypair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Remove DID VC</p>
 </dd>
 </dl>
@@ -55,7 +58,7 @@ Generate Mnemonic
 **Returns**: <code>string</code> - Mnemonic  
 <a name="createPrivate"></a>
 
-## createPrivate(vcId, paraId, signingKeypair, api) ⇒ <code>Object</code>
+## createPrivate(vcId, syncTo, signingKeypair, api) ⇒ <code>Object</code>
 Store the generated DID VC
 
 **Kind**: global function  
@@ -64,13 +67,13 @@ Store the generated DID VC
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | vcId | <code>HexString</code> |  |  |
-| paraId |  | <code></code> | Optional - Stores in current chain if paraId not provided |
+| syncTo | <code>number</code> \| <code>string</code> \| <code>null</code> | <code></code> | is null for relay chain. Pass valid paraId |
 | signingKeypair | <code>KeyringPair</code> |  |  |
 | api | <code>ApiPromise</code> |  |  |
 
 <a name="createPublic"></a>
 
-## createPublic(vcId, paraId, signingKeypair, api) ⇒ <code>Object</code>
+## createPublic(vcId, syncTo, signingKeypair, api) ⇒ <code>Object</code>
 Create Private DID and store the generated DID object in blockchain
 
 **Kind**: global function  
@@ -79,7 +82,7 @@ Create Private DID and store the generated DID object in blockchain
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | vcId | <code>HexString</code> |  |  |
-| paraId |  | <code></code> | Optional - Stores in current chain if paraId not provided |
+| syncTo | <code>number</code> \| <code>string</code> | <code></code> | is null for relay chain |
 | signingKeypair | <code>KeyringPair</code> |  |  |
 | api | <code>ApiPromise</code> |  |  |
 
@@ -123,7 +126,7 @@ Get the DID associated to given accountID
 
 <a name="updateDidKey"></a>
 
-## updateDidKey(identifier, newKey, paraId, signingKeypair, api) ⇒ <code>Object</code>
+## updateDidKey(identifier, newKey, syncTo, signingKeypair, api) ⇒ <code>Object</code>
 This function will rotate the keys assiged to a DID
 It should only be called by validator accounts, else will fail
 
@@ -134,7 +137,7 @@ It should only be called by validator accounts, else will fail
 | --- | --- | --- | --- |
 | identifier | <code>string</code> |  |  |
 | newKey | <code>Uint8Array</code> |  |  |
-| paraId | <code>Number</code> | <code></code> |  |
+| syncTo | <code>string</code> \| <code>number</code> | <code>null</code> |  |
 | signingKeypair | <code>KeyringPair</code> |  | // of a validator account |
 | api | <code>ApiPromise</code> |  |  |
 
@@ -163,6 +166,18 @@ Checks if the given did is in hex format or not & converts it into valid hex for
 | Param | Type |
 | --- | --- |
 | did | <code>string</code> | 
+
+<a name="sanitiseSyncTo"></a>
+
+## sanitiseSyncTo(syncTo, api) ⇒ <code>number</code> \| <code>null</code>
+Sanitize paraId before creating a did
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| syncTo | <code>string</code> \| <code>number</code> \| <code>null</code> | 
+| api | <code>ApiPromise</code> | 
 
 <a name="isDidValidator"></a>
 
@@ -203,7 +218,7 @@ Fetch the history of rotated keys for the specified DID
 
 <a name="syncDid"></a>
 
-## syncDid(identifier, paraId, signingKeypair, api) ⇒ <code>Object</code>
+## syncDid(identifier, syncTo, signingKeypair, api) ⇒ <code>Object</code>
 Sync DID VC with other chains
 
 **Kind**: global function  
@@ -212,13 +227,13 @@ Sync DID VC with other chains
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | identifier | <code>string</code> |  |  |
-| paraId | <code>Number</code> | <code></code> | Optional |
+| syncTo |  | <code></code> | is null for relay chain |
 | signingKeypair | <code>KeyringPair</code> |  | of a validator account |
 | api | <code>ApiPromise</code> |  |  |
 
 <a name="removeDid"></a>
 
-## removeDid(identifier, paraId, signingKeypair, api) ⇒ <code>Object</code>
+## removeDid(identifier, syncTo, signingKeypair, api) ⇒ <code>Object</code>
 Remove DID VC
 
 **Kind**: global function  
@@ -227,7 +242,7 @@ Remove DID VC
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | identifier | <code>string</code> |  |  |
-| paraId | <code>Number</code> | <code></code> | Optional |
+| syncTo |  | <code></code> | is null for relay chain |
 | signingKeypair | <code>KeyringPair</code> |  | of a SUDO account |
 | api | <code>ApiPromise</code> |  |  |
 

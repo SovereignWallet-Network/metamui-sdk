@@ -47,3 +47,5 @@ function submitTransaction(signedTx, api) {
     }));
 }
 exports.submitTransaction = submitTransaction;
+
+//# sourceMappingURL=helper.js.map

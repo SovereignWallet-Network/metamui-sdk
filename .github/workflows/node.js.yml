@@ -5,9 +5,9 @@ name: Integration Test
 
 on:
   push:
-    branches: [main, release, development]
+    branches: [main, release]
   pull_request:
-    branches: [main, release, development]
+    branches: [main, release, dev]
 
 jobs:
   build:
@@ -20,11 +20,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+
       - name: GitHub Action for Yarn
         uses: Borales/actions-yarn@v3
-      - run: sudo chmod -R 7777 /home/runner/work/metamui-sdk/metamui-sdk
-      - run: sudo yarn
-      - run: env MNEMONIC_SWN="${{ secrets.MNEMONIC_SWN }}" yarn test:dev
+      
+      - name: Set Required Permissions
+        run: sudo chmod -R 7777 /home/runner/work/metamui-sdk/metamui-sdk
+
+      - name: Install Dependencies and compile SDK
+        run: sudo yarn build
+
+      - name: Run integration tests
+        run: env MNEMONIC_SWN="${{ secrets.MNEMONIC_SWN }}" yarn test:dev

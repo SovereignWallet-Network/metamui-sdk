@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeDid = exports.syncDid = exports.sanitiseDid = exports.updateMetadata = exports.isDidValidator = exports.resolveAccountIdToDid = exports.getDidKeyHistory = exports.resolveDIDToAccount = exports.updateDidKey = exports.getDIDDetails = exports.createPublic = exports.createPrivate = exports.generateMnemonic = exports.convertFixedSizeHex = void 0;
+exports.removeDid = exports.syncDid = exports.sanitiseSyncTo = exports.sanitiseDid = exports.updateMetadata = exports.isDidValidator = exports.resolveAccountIdToDid = exports.getDidKeyHistory = exports.resolveDIDToAccount = exports.updateDidKey = exports.getDIDDetails = exports.createPublic = exports.createPrivate = exports.generateMnemonic = exports.convertFixedSizeHex = void 0;
 const util_crypto_1 = require("@polkadot/util-crypto");
 const connection_1 = require("./connection");
 const _1 = require(".");
 const helper_1 = require("./common/helper");
-global.Buffer = require('buffer').Buffer;
+const util_1 = require("@polkadot/util");
 const DID_HEX_LEN = 64;
 /** Generate Mnemonic
  * @returns {string} Mnemonic
@@ -28,15 +28,15 @@ const checkIdentifierFormat = (identifier) => {
 /**
  * Store the generated DID VC
  * @param {HexString} vcId
- * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {number|string|null} syncTo - is null for relay chain. Pass valid paraId
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function createPrivate(vcId, paraId = null, signingKeypair, api) {
+function createPrivate(vcId, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.did.createPrivate(vcId, paraId);
+        const tx = provider.tx.did.createPrivate(vcId, sanitiseSyncTo(syncTo, provider));
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -46,15 +46,15 @@ exports.createPrivate = createPrivate;
 /**
  * Create Private DID and store the generated DID object in blockchain
  * @param {HexString} vcId
- * @param paraId Optional - Stores in current chain if paraId not provided
+ * @param {number|string} syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function createPublic(vcId, paraId = null, signingKeypair, api) {
+function createPublic(vcId, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.did.createPublic(vcId, paraId);
+        const tx = provider.tx.did.createPublic(vcId, sanitiseSyncTo(syncTo, provider));
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -165,12 +165,12 @@ exports.resolveAccountIdToDid = resolveAccountIdToDid;
  * It should only be called by validator accounts, else will fail
  * @param {string} identifier
  * @param {Uint8Array} newKey
- * @param {Number} paraId
+ * @param {string|number} syncTo
  * @param {KeyringPair} signingKeypair // of a validator account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function updateDidKey(identifier, newKey, paraId = null, signingKeypair, api) {
+function updateDidKey(identifier, newKey, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
@@ -183,7 +183,7 @@ function updateDidKey(identifier, newKey, paraId = null, signingKeypair, api) {
             throw (new Error('did.PublicKeyRegistered'));
         }
         // call the rotateKey extrinsinc
-        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, paraId), 1000);
+        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, sanitiseSyncTo(syncTo, provider)), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -199,8 +199,9 @@ exports.updateDidKey = updateDidKey;
 function convertFixedSizeHex(data, size = 64) {
     if (data.length > size)
         throw new Error('Invalid Data');
-    const identifierHex = Buffer.from(data).toString('hex');
-    return `0x${identifierHex.padEnd(size, '0')}`;
+    const identifierHex = (0, util_1.stringToHex)(data);
+    // size + 2 for 0x
+    return identifierHex.padEnd(size + 2, '0');
 }
 exports.convertFixedSizeHex = convertFixedSizeHex;
 /**
@@ -212,14 +213,40 @@ exports.convertFixedSizeHex = convertFixedSizeHex;
  * @return {string} Hex did
  */
 const sanitiseDid = (did) => {
-    if (did.startsWith('0x')) {
+    if (did.startsWith('0x'))
         return did.padEnd(DID_HEX_LEN, '0');
-    }
-    let hex_did = Buffer.from(did, 'utf8').toString('hex');
-    hex_did = '0x' + hex_did.padEnd(DID_HEX_LEN, '0');
-    return hex_did;
+    // n + 2 for 0x
+    return (0, util_1.stringToHex)(did).padEnd(DID_HEX_LEN + 2, '0');
 };
 exports.sanitiseDid = sanitiseDid;
+/**
+ * Sanitize paraId before creating a did
+ * @param {string|number|null} syncTo
+ * @param {ApiPromise} api
+ * @returns {number|null}
+ */
+const sanitiseSyncTo = (syncTo, api) => __awaiter(void 0, void 0, void 0, function* () {
+    const provider = api || (yield (0, connection_1.buildConnection)('local'));
+    if (!syncTo || syncTo === null) {
+        return null;
+    }
+    else {
+        if (parseInt(syncTo) > 0) {
+            let data = yield _1.tokenchain.lookUpParaId(syncTo, provider);
+            if (data)
+                return parseInt(syncTo);
+            throw new Error('Invalid paraId : syncTo');
+        }
+        else if (typeof syncTo === 'string') {
+            let paraId = (yield _1.tokenchain.lookup(syncTo, provider)) || null;
+            if (paraId)
+                return paraId;
+            throw new Error('Invalid Currency Code : syncTo');
+        }
+    }
+    throw new Error('Invalid syncTo');
+});
+exports.sanitiseSyncTo = sanitiseSyncTo;
 /**
  * Check if the user is an approved validator
  * @param {string} identifier
@@ -274,16 +301,16 @@ exports.updateMetadata = updateMetadata;
 /**
  * Sync DID VC with other chains
  * @param {string} identifier
- * @param {Number} paraId Optional
+ * @param syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair of a validator account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function syncDid(identifier, paraId = null, signingKeypair, api) {
+function syncDid(identifier, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
-        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, paraId), 1000);
+        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, sanitiseSyncTo(syncTo, provider)), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -293,19 +320,21 @@ exports.syncDid = syncDid;
 /**
  * Remove DID VC
  * @param {string} identifier
- * @param {Number} paraId Optional
+ * @param syncTo - is null for relay chain
  * @param {KeyringPair} signingKeypair of a SUDO account
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function removeDid(identifier, paraId = null, signingKeypair, api) {
+function removeDid(identifier, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
-        const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, paraId));
+        const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, sanitiseSyncTo(syncTo, provider)));
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
 exports.removeDid = removeDid;
+
+//# sourceMappingURL=did.js.map

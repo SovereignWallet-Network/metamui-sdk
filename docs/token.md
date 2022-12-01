@@ -13,6 +13,9 @@
 <dt><a href="#withdrawReserved">withdrawReserved(toDid, fromDid, amount, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Withdraw Reserved tokens from one DID to another DID</p>
 </dd>
+<dt><a href="#sanitiseCCode">sanitiseCCode(token)</a> ⇒ <code>String</code></dt>
+<dd><p>Sanitise Token Name</p>
+</dd>
 </dl>
 
 <a name="mintToken"></a>
@@ -73,4 +76,16 @@ Withdraw Reserved tokens from one DID to another DID
 | amount | <code>Number</code> | 
 | senderAccountKeyPair | <code>KeyringPair</code> | 
 | api | <code>ApiPromise</code> | 
+
+<a name="sanitiseCCode"></a>
+
+## sanitiseCCode(token) ⇒ <code>String</code>
+Sanitise Token Name
+
+**Kind**: global function  
+**Returns**: <code>String</code> - Sanitised Token Name  
+
+| Param | Type |
+| --- | --- |
+| token | <code>String</code> | 
 

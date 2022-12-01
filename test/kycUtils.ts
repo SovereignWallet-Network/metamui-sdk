@@ -6,7 +6,7 @@ import { buildConnection } from '../src/connection';
 import * as kycUtils from '../src/kycUtils';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { ApiPromise } from '@polkadot/api';
-import { mnemonicWithBalance, providerNetwork } from '../test/common/constants';
+import { mnemonicWithBalance, providerNetwork } from './common/constants';
 
 
 const vcJson = {
@@ -48,7 +48,7 @@ describe('KYC Utils', () => {
     before(async () => {
         const keyring = await initKeyring();
         sigKeyPair = keyring.addFromUri(mnemonicWithBalance);
-        provider = await buildConnection(providerNetwork);
+        provider = await buildConnection(providerNetwork, true);
     });
 
 

@@ -9,7 +9,7 @@ import { submitTransaction } from './common/helper';
 * @param {ApiPromise} api (optional)
 * @returns {Number}
 */
-const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
+const getBalance = async (did: string, api: ApiPromise): Promise<number> => {
   // Resolve the did to get account ID
   return new Promise(async (resolve, reject) => {
     try {
@@ -35,7 +35,7 @@ const getBalance = async (did: string, api?: ApiPromise): Promise<number> => {
 * @param {ApiPromise} api (optional)
 * @returns {Object}
 */
-const getDetailedBalance = async (did: string, api?: ApiPromise): Promise<Object> => {
+const getDetailedBalance = async (did: string, api: ApiPromise): Promise<Object> => {
   // Resolve the did to get account ID
   return new Promise(async (resolve, reject) => {
     try {

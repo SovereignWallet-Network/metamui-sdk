@@ -53,3 +53,5 @@ function buildConnectionByUrl(wssUrl, blockchainTypes) {
     });
 }
 exports.buildConnectionByUrl = buildConnectionByUrl;
+
+//# sourceMappingURL=connection.js.map

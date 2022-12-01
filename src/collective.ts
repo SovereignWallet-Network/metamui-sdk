@@ -114,7 +114,7 @@ async function disapproveProposal(proposalHash, signingKeypair: KeyringPair, api
  * Get Members of Council
  * @param  {ApiPromise} api Network Provider
  */
-async function getMembers(api?: ApiPromise) {
+async function getMembers(api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.members()).toJSON();
 }
@@ -122,7 +122,7 @@ async function getMembers(api?: ApiPromise) {
  * Get Prime of Council
  * @param  {ApiPromise} api Network Provider
  */
-async function getPrime(api?: ApiPromise) {
+async function getPrime(api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.prime()).toJSON();
 }
@@ -130,7 +130,7 @@ async function getPrime(api?: ApiPromise) {
  * Get All Proposals
  * @param  {ApiPromise} api Network Provider
  */
-async function getProposals(api?: ApiPromise) {
+async function getProposals(api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposals()).toJSON();
 }
@@ -139,7 +139,7 @@ async function getProposals(api?: ApiPromise) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {ApiPromise} api Network Provider
  */
-async function getProposalOf(proposalHash: string, api?: ApiPromise) {
+async function getProposalOf(proposalHash: string, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposalOf(proposalHash)).toJSON();
 }
@@ -148,7 +148,7 @@ async function getProposalOf(proposalHash: string, api?: ApiPromise) {
  * @param {Hash} proposalHash Hash of proposal
  * @param  {ApiPromise} api Network Provider
  */
-async function getVotes(proposalHash: string, api?: ApiPromise) {
+async function getVotes(proposalHash: string, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.voting(proposalHash)).toJSON();
 }
@@ -156,7 +156,7 @@ async function getVotes(proposalHash: string, api?: ApiPromise) {
  * Get Total proposals count
  * @param  {ApiPromise} api Network Provider
  */
-async function getProposalCount(api?: ApiPromise) {
+async function getProposalCount(api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   return (await provider.query.council.proposalCount()).toJSON();
 }

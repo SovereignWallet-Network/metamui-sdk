@@ -30,7 +30,7 @@ describe('DID Module works correctly', () => {
   let signKeypairPrivate: KeyringPair;
   let sigKeypair: KeyringPair;
   const EVE_DID = 'did:ssid:eve';
-  var provider: ApiPromise;
+  let provider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
   let signKeypairEve: KeyringPair;
@@ -43,7 +43,7 @@ describe('DID Module works correctly', () => {
     keyring = await initKeyring();
     provider = await buildConnection(constants.providerNetwork);
     sigKeypair = keyring.addFromUri('//Alice');
-    sigKeypairValidator = keyring.addFromUri('//Swn');
+    sigKeypairValidator = keyring.addFromUri(constants.mnemonicWithBalance);
     signKeypairEve = keyring.addFromUri('//Eve');
     signKeypairFenn = keyring.addFromUri('//Fenn');
     signKeypairPublic = keyring.addFromUri('//Public');
@@ -93,7 +93,7 @@ describe('DID Module works correctly', () => {
     const hex_did = did.sanitiseDid('did:ssid:swn');
     assert.strictEqual(
       hex_did,
-      did.sanitiseDid('did:ssid:swn')
+      "0x6469643a737369643a73776e0000000000000000000000000000000000000000"
     );
   });
 

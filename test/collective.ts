@@ -27,7 +27,7 @@ describe('Collective works correctly', () => {
       provider = await buildConnection(constants.providerNetwork);
       let keyring = await initKeyring();
       sudoPair = keyring.addFromUri('//Alice');
-      sigKeyPairSwn = keyring.addFromUri('//Swn');
+      sigKeyPairSwn = keyring.addFromUri(constants.mnemonicWithBalance);
       sigKeyPairEve = keyring.addFromUri('//Eve');
       sigKeypairDave = keyring.addFromUri('//Dave');
     });
