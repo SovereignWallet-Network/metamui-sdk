@@ -99,10 +99,12 @@ const METABLOCKCHAIN_TYPES = {
   },
   "SlashMintTokens": {
     "vc_id": "VCid",
+    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "TokenTransferVC": {
     "vc_id": "VCid",
+    "currency_code": "CurrencyCode",
     "amount": "u128"
   },
   "GenericVC": {
@@ -169,12 +171,14 @@ const ENCODE_TYPES = {
   "currency_code": "[u8;8]",
   "token_bytes": "[u8;16]",
   "CID": "[u8;64]",
+  "Did": "[u8;32]",
 };
 
 const TOKEN_NAME_BYTES = 16;
 const CURRENCY_CODE_BYTES = 8;
 const VC_PROPERTY_BYTES = 128;
 const CID_BYTES = 64;
+const DID_BYTES = 32;
 
 /**
  * @param  {Bytes} inputBytes u8[]
@@ -274,6 +278,7 @@ export {
   CURRENCY_CODE_BYTES,
   VC_PROPERTY_BYTES,
   CID_BYTES,
+  DID_BYTES,
   VCType,
   bytesToHex,
   hexToBytes,
