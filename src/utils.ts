@@ -134,6 +134,13 @@ const METABLOCKCHAIN_TYPES = {
     "nonce": "u32",
     "data": "TokenAccountData"
   },
+  "Status": {
+    "_enum": [
+      "ToBeDeployed",
+      "Deployed",
+      "Removed"
+    ]
+  },
   "Votes": {
     "index": "ProposalIndex",
     "threshold": "MemberCount",

@@ -23,6 +23,20 @@ declare function lookup(tokenName: HexString | String, api: ApiPromise): Promise
  */
 declare function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string>;
 /**
+ * Get Token Issuer by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {String} Token Isssuer Did
+ */
+declare function getTokenIssuer(currencyCode: String, api: ApiPromise): Promise<string>;
+/**
+ * Get Token Issuer by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {Object} Token Details
+ */
+declare function getTokenInfo(currencyCode: String, api: ApiPromise): Promise<any>;
+/**
  * Add new parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
  * @param {Number} paraId
@@ -37,4 +51,4 @@ declare function addParachain(tokenName: String, paraId: Number, sudoAccountKeyP
  * @param {ApiPromise} api
  */
 declare function removeParachain(tokenName: String, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
-export { sanitiseCCode, getTokenList, lookup, lookUpParaId, addParachain, removeParachain };
+export { sanitiseCCode, getTokenList, lookup, lookUpParaId, addParachain, removeParachain, getTokenIssuer, getTokenInfo, };
