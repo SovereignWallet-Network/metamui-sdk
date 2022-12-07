@@ -5,9 +5,8 @@ import { submitTransaction } from "./common/helper";
 import { sanitiseDid } from "./did";
 import { signatureVerify, blake2AsHex } from "@polkadot/util-crypto";
 import { hexToU8a } from "@polkadot/util";
-import { bool } from "@polkadot/types";
 import { HexString } from "@polkadot/util/types";
-import { AnyJson, AnyString } from "@polkadot/types/types";
+import { AnyJson } from "@polkadot/types/types";
 import { did, utils } from ".";
 import { decodeHex, hexToString, VCType } from "./utils";
 import { SSID_BASE_URL } from "./config";
@@ -62,9 +61,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
- async function createMintSlashVC({ vc_id, amount }) {
+ async function createMintSlashVC({ vc_id, currencyCode, amount }) {
   let vcProperty = {
     vc_id: vc_id,
+    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     amount: utils.encodeData(amount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.SlashMintTokens)
@@ -78,9 +78,10 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
  * @param  {string} vcProperty.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
-async function createTokenTransferVC({ vc_id, amount }) {
+async function createTokenTransferVC({ vc_id, currencyCode, amount }) {
   let vcProperty = {
     vc_id: vc_id,
+    currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     amount: utils.encodeData(amount, 'Balance'),
   };
   return utils.encodeData(vcProperty, VCType.TokenTransferVC)

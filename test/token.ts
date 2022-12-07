@@ -62,10 +62,11 @@ describe('Token works correctly', () => {
     it('Mint Token VC is created correctly', async () => {
       let vc_property = {
         vc_id,
+        currencyCode: 'MUI',
         amount: 1000
       }
-      const vc_property_hex = utils.encodeData(vc_property, 'SlashMintTokens');
-      const actual_vc_property = utils.decodeHex(vc_property_hex, 'SlashMintTokens');
+      const vc_property_hex = utils.encodeData(vc_property, VCType.SlashMintTokens);
+      const actual_vc_property = utils.decodeHex(vc_property_hex, VCType.SlashMintTokens);
       assert.strictEqual(vc_property.vc_id, actual_vc_property.vc_id);
       assert.strictEqual(vc_property.amount, actual_vc_property.amount);
     });
@@ -73,6 +74,7 @@ describe('Token works correctly', () => {
     it('Mint Token VC is stored correctly', async () => {
       let vc_property = {
         vc_id,
+        currencyCode: 'MUI',
         amount: 1000
       }
       let owner = TEST_DAVE_DID;
@@ -90,6 +92,7 @@ describe('Token works correctly', () => {
     it('Transfer Token VC works created correctly', async () => {
       let vc_property = {
         vc_id,
+        currencyCode: 'MUI',
         amount: 50,
       }
       let owner = TEST_DAVE_DID;
@@ -107,6 +110,7 @@ describe('Token works correctly', () => {
     it('Slash Token VC works created correctly', async () => {
       let vc_property = {
         vc_id,
+        currencyCode: 'MUI',
         amount: 50,
       };
       let owner = TEST_DAVE_DID;
