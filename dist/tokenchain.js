@@ -80,7 +80,7 @@ function getTokenIssuer(currencyCode, api) {
 }
 exports.getTokenIssuer = getTokenIssuer;
 /**
- * Get Token Issuer by currency code
+ * Get Token Info by currency code
  * @param {String} currencyCode
  * @param {ApiPromise} api
  * @returns {Object} Token Details

@@ -62,7 +62,7 @@ declare function updateDidKey(identifier: any, newKey: any, syncTo: any, signing
  * @param {number} size
  * @return {string}
  */
-declare function convertFixedSizeHex(data: string, size?: number): string;
+declare function convertFixedSizeHex(data: string, size?: number): any;
 /**
  * Checks if the given did is in hex format or not & converts it into valid hex format.
  *

@@ -69,10 +69,11 @@ exports.createTokenVC = createTokenVC;
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
-function createMintSlashVC({ vc_id, amount }) {
+function createMintSlashVC({ vc_id, currencyCode, amount }) {
     return __awaiter(this, void 0, void 0, function* () {
         let vcProperty = {
             vc_id: vc_id,
+            currency_code: _1.utils.encodeData(currencyCode.padEnd(_1.utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
             amount: _1.utils.encodeData(amount, 'Balance'),
         };
         return _1.utils.encodeData(vcProperty, utils_1.VCType.SlashMintTokens)
@@ -86,10 +87,11 @@ exports.createMintSlashVC = createMintSlashVC;
  * @param  {string} vcProperty.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
-function createTokenTransferVC({ vc_id, amount }) {
+function createTokenTransferVC({ vc_id, currencyCode, amount }) {
     return __awaiter(this, void 0, void 0, function* () {
         let vcProperty = {
             vc_id: vc_id,
+            currency_code: _1.utils.encodeData(currencyCode.padEnd(_1.utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
             amount: _1.utils.encodeData(amount, 'Balance'),
         };
         return _1.utils.encodeData(vcProperty, utils_1.VCType.TokenTransferVC)

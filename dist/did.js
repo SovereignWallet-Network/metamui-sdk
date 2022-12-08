@@ -14,8 +14,6 @@ const util_crypto_1 = require("@polkadot/util-crypto");
 const connection_1 = require("./connection");
 const _1 = require(".");
 const helper_1 = require("./common/helper");
-const util_1 = require("@polkadot/util");
-const DID_HEX_LEN = 64;
 /** Generate Mnemonic
  * @returns {string} Mnemonic
  */
@@ -36,7 +34,7 @@ const checkIdentifierFormat = (identifier) => {
 function createPrivate(vcId, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.did.createPrivate(vcId, sanitiseSyncTo(syncTo, provider));
+        const tx = provider.tx.did.createPrivate(vcId, yield sanitiseSyncTo(syncTo, provider));
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -54,7 +52,7 @@ exports.createPrivate = createPrivate;
 function createPublic(vcId, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.did.createPublic(vcId, sanitiseSyncTo(syncTo, provider));
+        const tx = provider.tx.did.createPublic(vcId, yield sanitiseSyncTo(syncTo, provider));
         const nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         const signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -183,7 +181,7 @@ function updateDidKey(identifier, newKey, syncTo = null, signingKeypair, api) {
             throw (new Error('did.PublicKeyRegistered'));
         }
         // call the rotateKey extrinsinc
-        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, sanitiseSyncTo(syncTo, provider)), 1000);
+        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.rotateKey(did_hex, newKey, yield sanitiseSyncTo(syncTo, provider)), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -199,9 +197,7 @@ exports.updateDidKey = updateDidKey;
 function convertFixedSizeHex(data, size = 64) {
     if (data.length > size)
         throw new Error('Invalid Data');
-    const identifierHex = (0, util_1.stringToHex)(data);
-    // size + 2 for 0x
-    return identifierHex.padEnd(size + 2, '0');
+    return _1.utils.encodeData(data.padEnd(_1.utils.DID_BYTES, '\0'), 'Did');
 }
 exports.convertFixedSizeHex = convertFixedSizeHex;
 /**
@@ -214,9 +210,8 @@ exports.convertFixedSizeHex = convertFixedSizeHex;
  */
 const sanitiseDid = (did) => {
     if (did.startsWith('0x'))
-        return did.padEnd(DID_HEX_LEN, '0');
-    // n + 2 for 0x
-    return (0, util_1.stringToHex)(did).padEnd(DID_HEX_LEN + 2, '0');
+        return did.padEnd(_1.utils.DID_BYTES, '\0');
+    return _1.utils.encodeData(did.padEnd(_1.utils.DID_BYTES, '\0'), 'Did');
 };
 exports.sanitiseDid = sanitiseDid;
 /**
@@ -310,7 +305,7 @@ function syncDid(identifier, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
-        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, sanitiseSyncTo(syncTo, provider)), 1000);
+        const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, yield sanitiseSyncTo(syncTo, provider)), 1000);
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -329,7 +324,7 @@ function removeDid(identifier, syncTo = null, signingKeypair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
-        const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, sanitiseSyncTo(syncTo, provider)));
+        const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, yield sanitiseSyncTo(syncTo, provider)));
         let nonce = yield provider.rpc.system.accountNextIndex(signingKeypair.address);
         let signedTx = yield tx.signAsync(signingKeypair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);

@@ -83,10 +83,12 @@ declare const METABLOCKCHAIN_TYPES: {
     };
     SlashMintTokens: {
         vc_id: string;
+        currency_code: string;
         amount: string;
     };
     TokenTransferVC: {
         vc_id: string;
+        currency_code: string;
         amount: string;
     };
     GenericVC: {
@@ -137,6 +139,7 @@ declare const TOKEN_NAME_BYTES = 16;
 declare const CURRENCY_CODE_BYTES = 8;
 declare const VC_PROPERTY_BYTES = 128;
 declare const CID_BYTES = 64;
+declare const DID_BYTES = 32;
 /**
  * @param  {Bytes} inputBytes u8[]
  */
@@ -193,4 +196,4 @@ declare function sortObjectByKeys(unorderedObj: any): {};
  * @returns {Object} ordered object by key
  */
 declare function generateObjectHash(object: any): `0x${string}`;
-export { METABLOCKCHAIN_TYPES, TOKEN_NAME_BYTES, CURRENCY_CODE_BYTES, VC_PROPERTY_BYTES, CID_BYTES, VCType, bytesToHex, hexToBytes, base58ToBytes, hexToString, stringToBytes, encodeData, decodeHex, vcHexToVcId, isUpperAndValid, sortObjectByKeys, generateObjectHash, tidy };
+export { METABLOCKCHAIN_TYPES, TOKEN_NAME_BYTES, CURRENCY_CODE_BYTES, VC_PROPERTY_BYTES, CID_BYTES, DID_BYTES, VCType, bytesToHex, hexToBytes, base58ToBytes, hexToString, stringToBytes, encodeData, decodeHex, vcHexToVcId, isUpperAndValid, sortObjectByKeys, generateObjectHash, tidy };
