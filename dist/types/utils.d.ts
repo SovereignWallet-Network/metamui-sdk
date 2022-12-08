@@ -115,6 +115,9 @@ declare const METABLOCKCHAIN_TYPES: {
         nonce: string;
         data: string;
     };
+    Status: {
+        _enum: string[];
+    };
     Votes: {
         index: string;
         threshold: string;

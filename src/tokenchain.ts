@@ -51,6 +51,29 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
     return utils.tidy(hexToString((await provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
 }
 
+
+/**
+ * Get Token Issuer by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {String} Token Isssuer Did
+ */
+ async function getTokenIssuer(currencyCode: String, api: ApiPromise): Promise<string> {
+    const provider = api || (await buildConnection('local'));
+    return (await provider.query.tokenchain.tokenIssuers(currencyCode)).toHex();
+}
+
+/**
+ * Get Token Info by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {Object} Token Details
+ */
+ async function getTokenInfo(currencyCode: String, api: ApiPromise): Promise<any> {
+    const provider = api || (await buildConnection('local'));
+    return (await provider.query.tokenchain.tokenInfo(currencyCode)).toJSON();
+}
+
 /**
  * Add new parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
@@ -90,5 +113,7 @@ export {
     lookup,
     lookUpParaId,
     addParachain,
-    removeParachain
+    removeParachain,
+    getTokenIssuer,
+    getTokenInfo,
 };

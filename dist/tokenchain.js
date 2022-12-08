@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeParachain = exports.addParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
+exports.getTokenInfo = exports.getTokenIssuer = exports.removeParachain = exports.addParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
 const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
 const util_1 = require("@polkadot/util");
@@ -66,6 +66,32 @@ function lookUpParaId(paraId, api) {
     });
 }
 exports.lookUpParaId = lookUpParaId;
+/**
+ * Get Token Issuer by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {String} Token Isssuer Did
+ */
+function getTokenIssuer(currencyCode, api) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
+        return (yield provider.query.tokenchain.tokenIssuers(currencyCode)).toHex();
+    });
+}
+exports.getTokenIssuer = getTokenIssuer;
+/**
+ * Get Token Issuer by currency code
+ * @param {String} currencyCode
+ * @param {ApiPromise} api
+ * @returns {Object} Token Details
+ */
+function getTokenInfo(currencyCode, api) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
+        return (yield provider.query.tokenchain.tokenInfo(currencyCode)).toJSON();
+    });
+}
+exports.getTokenInfo = getTokenInfo;
 /**
  * Add new parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString

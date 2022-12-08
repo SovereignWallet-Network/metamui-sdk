@@ -10,6 +10,12 @@
 <dt><a href="#lookUpParaId">lookUpParaId(paraId, api)</a> ⇒ <code>String</code></dt>
 <dd><p>Reverse Lookup Tokenchain with ParaId to get Token Name</p>
 </dd>
+<dt><a href="#getTokenIssuer">getTokenIssuer(currencyCode, api)</a> ⇒ <code>String</code></dt>
+<dd><p>Get Token Issuer by currency code</p>
+</dd>
+<dt><a href="#getTokenInfo">getTokenInfo(currencyCode, api)</a> ⇒ <code>Object</code></dt>
+<dd><p>Get Token Issuer by currency code</p>
+</dd>
 <dt><a href="#addParachain">addParachain(tokenName, paraId, sudoAccountKeyPair, api)</a></dt>
 <dd><p>Add new parachain (requires sudo)</p>
 </dd>
@@ -54,6 +60,32 @@ Reverse Lookup Tokenchain with ParaId to get Token Name
 | Param | Type |
 | --- | --- |
 | paraId | <code>Number</code> | 
+| api | <code>ApiPromise</code> | 
+
+<a name="getTokenIssuer"></a>
+
+## getTokenIssuer(currencyCode, api) ⇒ <code>String</code>
+Get Token Issuer by currency code
+
+**Kind**: global function  
+**Returns**: <code>String</code> - Token Isssuer Did  
+
+| Param | Type |
+| --- | --- |
+| currencyCode | <code>String</code> | 
+| api | <code>ApiPromise</code> | 
+
+<a name="getTokenInfo"></a>
+
+## getTokenInfo(currencyCode, api) ⇒ <code>Object</code>
+Get Token Issuer by currency code
+
+**Kind**: global function  
+**Returns**: <code>Object</code> - Token Details  
+
+| Param | Type |
+| --- | --- |
+| currencyCode | <code>String</code> | 
 | api | <code>ApiPromise</code> | 
 
 <a name="addParachain"></a>
