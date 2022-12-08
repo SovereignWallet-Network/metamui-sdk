@@ -23,8 +23,9 @@ declare function createTokenVC({ tokenName, reservableBalance, decimal, currency
  * @param  {String} MintSlashVC.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
-declare function createMintSlashVC({ vc_id, amount }: {
+declare function createMintSlashVC({ vc_id, currencyCode, amount }: {
     vc_id: any;
+    currencyCode: any;
     amount: any;
 }): Promise<any>;
 /** Encodes Token VC and pads with appropriate bytes
@@ -33,8 +34,9 @@ declare function createMintSlashVC({ vc_id, amount }: {
  * @param  {string} vcProperty.amount In Highest Form
  * @returns {HexString} Token VC Hex String
  */
-declare function createTokenTransferVC({ vc_id, amount }: {
+declare function createTokenTransferVC({ vc_id, currencyCode, amount }: {
     vc_id: any;
+    currencyCode: any;
     amount: any;
 }): Promise<any>;
 /** Encodes Generic VC and pads with appropriate bytes

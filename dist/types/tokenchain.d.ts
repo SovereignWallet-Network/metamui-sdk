@@ -30,7 +30,7 @@ declare function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string>;
  */
 declare function getTokenIssuer(currencyCode: String, api: ApiPromise): Promise<string>;
 /**
- * Get Token Issuer by currency code
+ * Get Token Info by currency code
  * @param {String} currencyCode
  * @param {ApiPromise} api
  * @returns {Object} Token Details

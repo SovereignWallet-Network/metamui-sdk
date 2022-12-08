@@ -14,7 +14,6 @@ const did_1 = require("./did");
 const connection_1 = require("./connection");
 const did_2 = require("./did");
 const helper_1 = require("./common/helper");
-const util_1 = require("@polkadot/util");
 const utils_1 = require("./utils");
 /**
  * Mint token to given currency
@@ -109,9 +108,8 @@ exports.withdrawReserved = withdrawReserved;
  */
 const sanitiseCCode = (token) => {
     if (token.startsWith('0x'))
-        return token.padEnd(utils_1.TOKEN_NAME_BYTES, '0');
-    // n + 2 for 0x
-    return (0, util_1.stringToHex)(token.toUpperCase()).padEnd(utils_1.TOKEN_NAME_BYTES + 2, '0');
+        return token.padEnd(utils_1.CURRENCY_CODE_BYTES, '\0');
+    return (0, utils_1.encodeData)(token.padEnd(utils_1.CURRENCY_CODE_BYTES, '\0'), 'currency_code');
 };
 exports.sanitiseCCode = sanitiseCCode;
 

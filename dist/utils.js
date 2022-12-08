@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.tidy = exports.generateObjectHash = exports.sortObjectByKeys = exports.isUpperAndValid = exports.vcHexToVcId = exports.decodeHex = exports.encodeData = exports.stringToBytes = exports.hexToString = exports.base58ToBytes = exports.hexToBytes = exports.bytesToHex = exports.VCType = exports.CID_BYTES = exports.VC_PROPERTY_BYTES = exports.CURRENCY_CODE_BYTES = exports.TOKEN_NAME_BYTES = exports.METABLOCKCHAIN_TYPES = void 0;
+exports.tidy = exports.generateObjectHash = exports.sortObjectByKeys = exports.isUpperAndValid = exports.vcHexToVcId = exports.decodeHex = exports.encodeData = exports.stringToBytes = exports.hexToString = exports.base58ToBytes = exports.hexToBytes = exports.bytesToHex = exports.VCType = exports.DID_BYTES = exports.CID_BYTES = exports.VC_PROPERTY_BYTES = exports.CURRENCY_CODE_BYTES = exports.TOKEN_NAME_BYTES = exports.METABLOCKCHAIN_TYPES = void 0;
 const util_1 = require("@polkadot/util");
 const util_crypto_1 = require("@polkadot/util-crypto");
 const types = __importStar(require("@polkadot/types"));
@@ -122,10 +122,12 @@ const METABLOCKCHAIN_TYPES = {
     },
     "SlashMintTokens": {
         "vc_id": "VCid",
+        "currency_code": "CurrencyCode",
         "amount": "u128"
     },
     "TokenTransferVC": {
         "vc_id": "VCid",
+        "currency_code": "CurrencyCode",
         "amount": "u128"
     },
     "GenericVC": {
@@ -199,6 +201,7 @@ const ENCODE_TYPES = {
     "currency_code": "[u8;8]",
     "token_bytes": "[u8;16]",
     "CID": "[u8;64]",
+    "Did": "[u8;32]",
 };
 const TOKEN_NAME_BYTES = 16;
 exports.TOKEN_NAME_BYTES = TOKEN_NAME_BYTES;
@@ -208,6 +211,8 @@ const VC_PROPERTY_BYTES = 128;
 exports.VC_PROPERTY_BYTES = VC_PROPERTY_BYTES;
 const CID_BYTES = 64;
 exports.CID_BYTES = CID_BYTES;
+const DID_BYTES = 32;
+exports.DID_BYTES = DID_BYTES;
 /**
  * @param  {Bytes} inputBytes u8[]
  */

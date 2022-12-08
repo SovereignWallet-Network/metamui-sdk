@@ -14,7 +14,7 @@
 <dd><p>Get Token Issuer by currency code</p>
 </dd>
 <dt><a href="#getTokenInfo">getTokenInfo(currencyCode, api)</a> ⇒ <code>Object</code></dt>
-<dd><p>Get Token Issuer by currency code</p>
+<dd><p>Get Token Info by currency code</p>
 </dd>
 <dt><a href="#addParachain">addParachain(tokenName, paraId, sudoAccountKeyPair, api)</a></dt>
 <dd><p>Add new parachain (requires sudo)</p>
@@ -78,7 +78,7 @@ Get Token Issuer by currency code
 <a name="getTokenInfo"></a>
 
 ## getTokenInfo(currencyCode, api) ⇒ <code>Object</code>
-Get Token Issuer by currency code
+Get Token Info by currency code
 
 **Kind**: global function  
 **Returns**: <code>Object</code> - Token Details  

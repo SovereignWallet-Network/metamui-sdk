@@ -4,8 +4,7 @@
  import { ApiPromise } from '@polkadot/api';
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
-import { stringToHex } from '@polkadot/util';
-import { TOKEN_NAME_BYTES } from './utils';
+import { encodeData, CURRENCY_CODE_BYTES } from './utils';
 
  /**
   * Mint token to given currency
@@ -120,9 +119,8 @@ async function withdrawReserved(
  */
  const sanitiseCCode = (token: String): String => {
     if (token.startsWith('0x'))
-        return token.padEnd(TOKEN_NAME_BYTES, '0');
-    // n + 2 for 0x
-    return stringToHex(token.toUpperCase()).padEnd(TOKEN_NAME_BYTES + 2, '0');
+        return token.padEnd(CURRENCY_CODE_BYTES, '\0');
+    return encodeData(token.padEnd(CURRENCY_CODE_BYTES, '\0'), 'currency_code');
 }
 
 
