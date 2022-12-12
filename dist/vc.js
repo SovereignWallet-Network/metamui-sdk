@@ -55,7 +55,7 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
     }
     let vcProperty = {
         token_name: _1.utils.encodeData(tokenName.padEnd(_1.utils.TOKEN_NAME_BYTES, '\0'), 'token_bytes'),
-        reservable_balance: _1.utils.encodeData(reservableBalance * (Math.pow(10, decimal)), 'Balance'),
+        reservable_balance: _1.utils.encodeData(reservableBalance * (Math.pow(10, 6)), 'Balance'),
         decimal: _1.utils.encodeData(decimal, 'decimal'),
         currency_code: _1.utils.encodeData(currencyCode.padEnd(_1.utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     };
@@ -395,8 +395,6 @@ function approveVC(vcId, senderAccountKeyPair, api, ssidUrl) {
             hash = genericVCData.hash;
         }
         const sign = _1.utils.bytesToHex(senderAccountKeyPair.sign(hash));
-        // console.log("Sign", sign);
-        // adding signature to the chain
         const tx = provider.tx.vc.addSignature(vcId, sign);
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });

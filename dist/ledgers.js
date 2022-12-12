@@ -10,11 +10,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.totalIssuance = exports.tokenIssuer = exports.tokenInfoRLookup = exports.tokenInfo = exports.tokenData = exports.tokenCurrencyCounter = exports.removedTokens = exports.locks = exports.accounts = exports.sanitiseCCode = exports.transferToken = exports.transferTokenWithMemo = exports.transferAll = exports.transfer = exports.slashToken = exports.setBalance = exports.removeToken = exports.mintToken = exports.issueToken = void 0;
-const did_1 = require("./did");
 const connection_1 = require("./connection");
-const did_2 = require("./did");
+const did_1 = require("./did");
 const helper_1 = require("./common/helper");
 const utils_1 = require("./utils");
+const _1 = require(".");
 // Extrinsic functions
 /**
  * Issue a new currency
@@ -63,12 +63,12 @@ exports.mintToken = mintToken;
 function removeToken(currencyCode, vcId, fromDid, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        let from_did_hex = (0, did_2.sanitiseDid)(fromDid);
-        let from_did_check = yield (0, did_1.resolveDIDToAccount)(from_did_hex, provider);
+        let from_did_hex = (0, did_1.sanitiseDid)(fromDid);
+        let from_did_check = yield _1.did.resolveDIDToAccount(from_did_hex, provider);
         if (!from_did_check) {
             throw new Error('DID.DIDNotRegistered');
         }
-        const tx = provider.tx.tokens.removeToken(currencyCode, vcId, from_did_hex);
+        const tx = provider.tx.sudo.sudo(provider.tx.tokens.removeToken(sanitiseCCode(currencyCode), vcId, from_did_hex));
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -87,12 +87,12 @@ exports.removeToken = removeToken;
 function setBalance(dest, currencyCode, amount, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        let dest_hex = (0, did_2.sanitiseDid)(dest);
-        let dest_check = yield (0, did_1.resolveDIDToAccount)(dest_hex, provider);
+        let dest_did_hex = (0, did_1.sanitiseDid)(dest);
+        let dest_check = yield _1.did.resolveDIDToAccount(dest_did_hex, provider);
         if (!dest_check) {
             throw new Error('DID.DIDNotRegistered');
         }
-        const tx = provider.tx.tokens.setBalance(dest_hex, sanitiseCCode(currencyCode), amount);
+        const tx = provider.tx.tokens.setBalance(dest_did_hex, sanitiseCCode(currencyCode), amount);
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -128,8 +128,8 @@ exports.slashToken = slashToken;
 function transfer(destDid, currencyCode, amount, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        let dest_did_hex = (0, did_2.sanitiseDid)(destDid);
-        let dest_did_check = yield (0, did_1.resolveDIDToAccount)(dest_did_hex, provider);
+        let dest_did_hex = (0, did_1.sanitiseDid)(destDid);
+        let dest_did_check = yield _1.did.resolveDIDToAccount(dest_did_hex, provider);
         if (!dest_did_check) {
             throw new Error('DID.RecipentDIDNotRegistered');
         }
@@ -151,8 +151,8 @@ exports.transfer = transfer;
 function transferAll(destDid, currencyCode, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        let dest_did_hex = (0, did_2.sanitiseDid)(destDid);
-        let dest_did_check = yield (0, did_1.resolveDIDToAccount)(dest_did_hex, provider);
+        let dest_did_hex = (0, did_1.sanitiseDid)(destDid);
+        let dest_did_check = yield _1.did.resolveDIDToAccount(dest_did_hex, provider);
         if (!dest_did_check) {
             throw new Error('DID.RecipentDIDNotRegistered');
         }
@@ -176,12 +176,12 @@ exports.transferAll = transferAll;
 function transferTokenWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        let dest_did_hex = (0, did_2.sanitiseDid)(destDid);
-        let dest_did_check = yield (0, did_1.resolveDIDToAccount)(dest_did_hex, provider);
+        let dest_did_hex = (0, did_1.sanitiseDid)(destDid);
+        let dest_did_check = yield _1.did.resolveDIDToAccount(dest_did_hex, provider);
         if (!dest_did_check) {
             throw new Error('DID.RecipentDIDNotRegistered');
         }
-        const tx = provider.tx.tokens.transfer(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
+        const tx = provider.tx.tokens.transferTokenWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -198,8 +198,8 @@ exports.transferTokenWithMemo = transferTokenWithMemo;
  */
 function transferToken(vcId, toDid, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
-        let to_did_hex = (0, did_2.sanitiseDid)(toDid);
-        let to_did_check = yield (0, did_1.resolveDIDToAccount)(to_did_hex, api);
+        let to_did_hex = (0, did_1.sanitiseDid)(toDid);
+        let to_did_check = yield _1.did.resolveDIDToAccount(to_did_hex, api);
         if (!to_did_check) {
             throw new Error('DID.RecipentDIDNotRegistered');
         }
@@ -234,7 +234,7 @@ exports.sanitiseCCode = sanitiseCCode;
 function accounts(currencyCode, did, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_2.sanitiseDid)(did))).toJSON();
+        return (yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did))).toJSON();
     });
 }
 exports.accounts = accounts;
@@ -247,7 +247,7 @@ exports.accounts = accounts;
 function locks(currencyCode, did, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (yield provider.query.tokens.locks(sanitiseCCode(currencyCode), (0, did_2.sanitiseDid)(did))).toJSON();
+        return (yield provider.query.tokens.locks(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did))).toJSON();
     });
 }
 exports.locks = locks;

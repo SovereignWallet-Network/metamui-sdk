@@ -117,7 +117,17 @@ function resolveDIDToAccount(identifier, api, blockNumber) {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const did_hex = sanitiseDid(identifier);
         if (!blockNumber && blockNumber !== 0) {
-            return (yield provider.query.did.lookup(did_hex)).toJSON();
+            let lookUpModule;
+            if (provider.query.did) {
+                lookUpModule = provider.query.did;
+            }
+            else if (provider.query.cacheDid) {
+                lookUpModule = provider.query.cacheDid;
+            }
+            else {
+                throw new Error("No DID module found");
+            }
+            return (yield lookUpModule.lookup(did_hex)).toJSON();
         }
         const didDetails = yield getDIDDetails(identifier, provider);
         if (didDetails == null)
@@ -150,7 +160,17 @@ exports.resolveDIDToAccount = resolveDIDToAccount;
 function resolveAccountIdToDid(accountId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const data = (yield provider.query.did.rLookup(accountId)).toJSON();
+        let lookUpModule;
+        if (provider.query.did) {
+            lookUpModule = provider.query.did;
+        }
+        else if (provider.query.cacheDid) {
+            lookUpModule = provider.query.cacheId;
+        }
+        else {
+            throw new Error("No DID module found");
+        }
+        const data = (yield lookUpModule.rLookup(accountId)).toJSON();
         if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
             return false;
         }
