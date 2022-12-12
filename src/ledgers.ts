@@ -4,7 +4,8 @@ import { ApiPromise } from '@polkadot/api';
 import { submitTransaction } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { encodeData, CURRENCY_CODE_BYTES } from './utils';
-import { did } from '.';
+import { balances, did, vc } from '.';
+import { decodeVC } from './vc';
 
 // Extrinsic functions
 
@@ -23,6 +24,23 @@ import { did } from '.';
     api: ApiPromise,
  ) {
    const provider = api || (await buildConnection('local'));
+   // get VC from VC ID
+   let vc_details = await vc.getVCs(vcId, provider);
+   if (!vc_details) {
+      throw new Error('VC.VCNotRegistered');
+   }
+   // check if vc property has reservable balance
+   let decoded_vc = decodeVC(vc_details);
+   if (!decoded_vc.vc_property.reservable_balance) {
+      throw new Error('VC.VCNotReservable');
+   }
+   // Check for balance in relay
+   const relayConn = await buildConnection(process.env.PROVIDER_NETWORK || 'local');
+   let balance = await balances.getBalance(decoded_vc.owner, relayConn);
+   if (decoded_vc.vc_property.reservable_balance > balance) {
+      throw new Error('VC.InsufficientBalance');
+   }
+   
    const tx = provider.tx.tokens.issueToken(vcId, totalSupply);
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
