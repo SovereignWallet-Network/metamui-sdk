@@ -47,7 +47,6 @@ describe('Token works correctly', () => {
     it('Issued a new currency correctly', async () => {
       let total_supply = 10000;
       const issueToken = await ledger.issueToken(vc_id, total_supply, sigKeypairValidator, provider);
-      console.log(issueToken);
       assert.doesNotReject(issueToken);
     });
 

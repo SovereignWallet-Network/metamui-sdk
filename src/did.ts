@@ -110,7 +110,7 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
     if(provider.query.did) {
       lookUpModule=provider.query.did;
     } else if(provider.query.cacheDid) {
-      lookUpModule=provider.query.cacheId;
+      lookUpModule=provider.query.cacheDid;
     } else {
       throw new Error("No DID module found");
     }
