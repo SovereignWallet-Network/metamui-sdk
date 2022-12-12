@@ -5,6 +5,7 @@ import { buildConnection } from './connection';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { did, tokenchain, utils } from '.';
 import { submitTransaction } from './common/helper';
+import { QueryableModuleStorage } from '@polkadot/api/types';
 
 /** Generate Mnemonic
  * @returns {string} Mnemonic
@@ -105,7 +106,15 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   if (!blockNumber && blockNumber !== 0) {
-    return (await provider.query.did.lookup(did_hex)).toJSON();
+    let lookUpModule: QueryableModuleStorage<"promise">;
+    if(provider.query.did) {
+      lookUpModule=provider.query.did;
+    } else if(provider.query.cacheDid) {
+      lookUpModule=provider.query.cacheId;
+    } else {
+      throw new Error("No DID module found");
+    }
+    return (await lookUpModule.lookup(did_hex)).toJSON();
   }
   const didDetails: AnyJson = await getDIDDetails(identifier, provider);
   if (didDetails == null) return null;
@@ -135,11 +144,19 @@ async function resolveDIDToAccount(identifier: string, api: ApiPromise, blockNum
  */
 async function resolveAccountIdToDid(accountId, api: ApiPromise): Promise<string | Boolean> {
   const provider = api || (await buildConnection('local'));
-  const data = (await provider.query.did.rLookup(accountId)).toJSON();
+  let lookUpModule: QueryableModuleStorage<"promise">;
+  if(provider.query.did) {
+    lookUpModule=provider.query.did;
+  } else if(provider.query.cacheDid) {
+    lookUpModule=provider.query.cacheId;
+  } else {
+    throw new Error("No DID module found");
+  }
+
+  const data = (await lookUpModule.rLookup(accountId)).toJSON();
   if (data === '0x0000000000000000000000000000000000000000000000000000000000000000') {
     return false;
   }
-
   return (typeof data === 'string') ? data : false;
 }
 
