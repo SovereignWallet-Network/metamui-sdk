@@ -46,7 +46,7 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode}) {
 
     let vcProperty = {
         token_name: utils.encodeData(tokenName.padEnd(utils.TOKEN_NAME_BYTES, '\0'), 'token_bytes'),
-        reservable_balance: utils.encodeData(reservableBalance*(Math.pow(10,decimal)), 'Balance'),
+        reservable_balance: utils.encodeData(reservableBalance*(Math.pow(10, 6)), 'Balance'),
         decimal: utils.encodeData(decimal, 'decimal'),
         currency_code: utils.encodeData(currencyCode.padEnd(utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     };
