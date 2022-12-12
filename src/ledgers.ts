@@ -70,7 +70,9 @@ import { did } from '.';
    if (!from_did_check) {
         throw new Error('DID.DIDNotRegistered');
    }
-   const tx = provider.tx.tokens.removeToken(currencyCode, vcId, from_did_hex);
+   const tx = provider.tx.sudo.sudo(
+      provider.tx.tokens.removeToken(sanitiseCCode(currencyCode), vcId, from_did_hex)
+   );
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
    return submitTransaction(signedTx, provider);
@@ -201,7 +203,7 @@ async function slashToken(
    if (!dest_did_check) {
       throw new Error('DID.RecipentDIDNotRegistered');
    }
-   const tx = provider.tx.tokens.transfer(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
+   const tx = provider.tx.tokens.transferTokenWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
    return submitTransaction(signedTx, provider);
