@@ -1,10 +1,10 @@
-import { resolveDIDToAccount } from './did';
 import { buildConnection } from './connection';
 import { sanitiseDid } from './did';
 import { ApiPromise } from '@polkadot/api';
 import { submitTransaction } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { encodeData, CURRENCY_CODE_BYTES } from './utils';
+import { did } from '.';
 
 // Extrinsic functions
 
@@ -66,7 +66,7 @@ import { encodeData, CURRENCY_CODE_BYTES } from './utils';
 ) {
    const provider = api || (await buildConnection('local'));
    let from_did_hex = sanitiseDid(fromDid);
-   let from_did_check = await resolveDIDToAccount(from_did_hex, provider);
+   let from_did_check = await did.resolveDIDToAccount(from_did_hex, provider);
    if (!from_did_check) {
         throw new Error('DID.DIDNotRegistered');
    }
@@ -93,12 +93,12 @@ import { encodeData, CURRENCY_CODE_BYTES } from './utils';
    api: ApiPromise,
   ) {
    const provider = api || (await buildConnection('local'));
-   let dest_hex = sanitiseDid(dest);
-   let dest_check = await resolveDIDToAccount(dest_hex, provider);
+   let dest_did_hex = sanitiseDid(dest);
+   let dest_check = await did.resolveDIDToAccount(dest_did_hex, provider);
    if (!dest_check) {
       throw new Error('DID.DIDNotRegistered');
    }
-   const tx = provider.tx.tokens.setBalance(dest_hex, sanitiseCCode(currencyCode), amount);
+   const tx = provider.tx.tokens.setBalance(dest_did_hex, sanitiseCCode(currencyCode), amount);
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
    return submitTransaction(signedTx, provider);
@@ -141,7 +141,7 @@ async function slashToken(
   ) {
    const provider = api || (await buildConnection('local'));
    let dest_did_hex = sanitiseDid(destDid);
-   let dest_did_check = await resolveDIDToAccount(dest_did_hex, provider);
+   let dest_did_check = await did.resolveDIDToAccount(dest_did_hex, provider);
    if (!dest_did_check) {
       throw new Error('DID.RecipentDIDNotRegistered');
    }
@@ -167,7 +167,7 @@ async function slashToken(
   ) {
    const provider = api || (await buildConnection('local'));
    let dest_did_hex = sanitiseDid(destDid);
-   let dest_did_check = await resolveDIDToAccount(dest_did_hex, provider);
+   let dest_did_check = await did.resolveDIDToAccount(dest_did_hex, provider);
    if (!dest_did_check) {
       throw new Error('DID.RecipentDIDNotRegistered');
    }
@@ -197,7 +197,7 @@ async function slashToken(
   ) {
    const provider = api || (await buildConnection('local'));
    let dest_did_hex = sanitiseDid(destDid);
-   let dest_did_check = await resolveDIDToAccount(dest_did_hex, provider);
+   let dest_did_check = await did.resolveDIDToAccount(dest_did_hex, provider);
    if (!dest_did_check) {
       throw new Error('DID.RecipentDIDNotRegistered');
    }
@@ -223,7 +223,7 @@ async function slashToken(
    ) {
 
    let to_did_hex = sanitiseDid(toDid);
-   let to_did_check = await resolveDIDToAccount(to_did_hex, api);
+   let to_did_check = await did.resolveDIDToAccount(to_did_hex, api);
    if (!to_did_check) {
        throw new Error('DID.RecipentDIDNotRegistered');
    }

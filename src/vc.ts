@@ -397,8 +397,6 @@ async function approveVC(vcId: HexString, senderAccountKeyPair: KeyringPair, api
       hash = genericVCData.hash;
     }
     const sign = utils.bytesToHex(senderAccountKeyPair.sign(hash));
-    // console.log("Sign", sign);
-    // adding signature to the chain
     const tx = provider.tx.vc.addSignature(vcId, sign);
     let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
     let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
