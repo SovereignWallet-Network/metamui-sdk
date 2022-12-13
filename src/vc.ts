@@ -458,6 +458,8 @@ async function updateStatus(
       case VCType.TokenVC:
         vcs["token_name"] = hexToString(vcs.token_name);
         vcs["currency_code"] = hexToString(vcs.currency_code);
+        vcs["reservable_balance"] = vcs.reservable_balance;
+        vcs["decimal"] = vcs.decimal;
         break;
       case VCType.PublicDidVC:
         vcs["did"] = hexToString(vcs.did);
