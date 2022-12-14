@@ -76,15 +76,15 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
 
 /**
  * Add new parachain (requires sudo)
- * @param {String} tokenName Currency Code HexString
- * @param {Number} paraId
+ * @param {string} vcId Currency Code HexString
+ * @param {number} initialIssuance LOWEST FORM
  * @param {KeyringPair} sudoAccountKeyPair
  * @param {ApiPromise} api
  */
-async function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
+async function initParachain(vcId: string, initialIssuance: number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
     const tx = provider.tx.sudo.sudo(
-        provider.tx.tokenchain.addParachain(paraId, sanitiseCCode(tokenName))
+        provider.tx.tokenchain.initParachain(vcId, initialIssuance)
     );
     let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
     let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
@@ -112,7 +112,7 @@ export {
     getTokenList,
     lookup,
     lookUpParaId,
-    addParachain,
+    initParachain,
     removeParachain,
     getTokenIssuer,
     getTokenInfo,
