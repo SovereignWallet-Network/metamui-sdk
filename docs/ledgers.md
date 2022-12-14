@@ -1,7 +1,7 @@
 ## Functions
 
 <dl>
-<dt><a href="#issueToken">issueToken(vcId, totalSupply, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#issueToken">issueToken(vcId, totalSupply, senderAccountKeyPair, api, relayApi)</a> ⇒ <code>Object</code></dt>
 <dd><p>Issue a new currency</p>
 </dd>
 <dt><a href="#mintToken">mintToken(vcId, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
@@ -75,7 +75,7 @@ A valid registered did is required</p>
 
 <a name="issueToken"></a>
 
-## issueToken(vcId, totalSupply, senderAccountKeyPair, api) ⇒ <code>Object</code>
+## issueToken(vcId, totalSupply, senderAccountKeyPair, api, relayApi) ⇒ <code>Object</code>
 Issue a new currency
 
 **Kind**: global function  
@@ -86,7 +86,8 @@ Issue a new currency
 | vcId | <code>HexString</code> |  |
 | totalSupply | <code>Number</code> | HIGHEST FORM WITHOUT DECIMALS |
 | senderAccountKeyPair | <code>KeyringPair</code> |  |
-| api | <code>ApiPromise</code> |  |
+| api | <code>ApiPromise</code> | Ledger chain connection |
+| relayApi | <code>ApiPromise</code> | Relay chain connection |
 
 <a name="mintToken"></a>
 

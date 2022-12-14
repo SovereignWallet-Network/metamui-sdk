@@ -13,6 +13,7 @@ import { sanitiseDid } from '../src/did';
 
 describe('Token works correctly', () => {
   let provider: ApiPromise;
+  let relayProvider: ApiPromise;
   let keyring: Keyring;
   let sigKeypairValidator: KeyringPair;
 
@@ -27,6 +28,7 @@ describe('Token works correctly', () => {
       keyring = await initKeyring();
       sigKeypairValidator = keyring.addFromUri(constants.mnemonicWithBalance);
       provider = await buildConnectionByUrl("ws://127.0.0.1:7744");
+      relayProvider = await buildConnectionByUrl("ws://127.0.0.1:9944");
       vc_id = '0x';
 
       let tokenVC = {
@@ -52,7 +54,7 @@ describe('Token works correctly', () => {
 
     it('Issued a new currency correctly', async () => {
       let total_supply = 10000;
-      const issueToken = await ledger.issueToken(vc_id, total_supply, sigKeypairValidator, provider);
+      const issueToken = await ledger.issueToken(vc_id, total_supply, sigKeypairValidator, provider, relayProvider);
       assert.doesNotReject(issueToken);
     });
 

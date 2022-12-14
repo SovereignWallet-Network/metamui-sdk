@@ -14,7 +14,8 @@ import { decodeVCProperty } from './vc';
  * @param {HexString} vcId
  * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
- * @param {ApiPromise} api
+ * @param {ApiPromise} api Ledger chain connection
+ * @param {ApiPromise} relayApi Relay chain connection
  * @returns {Object} Transaction Object
  */
  async function issueToken(
@@ -22,6 +23,7 @@ import { decodeVCProperty } from './vc';
     totalSupply,
     senderAccountKeyPair: KeyringPair,
     api: ApiPromise,
+    relayApi: ApiPromise,
  ) {
    const provider = api || (await buildConnection('local'));
    // get VC from VC ID
@@ -31,11 +33,11 @@ import { decodeVCProperty } from './vc';
    }
    // check if vc property has reservable balance
    let decoded_vc = decodeVCProperty(vc_details.vcProperty, "TokenVC");
-   if (!decoded_vc.reservable_balance) {
+   if (decoded_vc.reservable_balance == undefined || decoded_vc.reservable_balance == null) {
       throw new Error('VC.VCNotReservable');
    }
    // Check for balance in relay
-   const relayConn = await buildConnection(process.env.PROVIDER_NETWORK || 'local');
+   const relayConn = relayApi || await buildConnection('local');
    let balance = await balances.getBalance(vc_details.owner, relayConn);
    if (decoded_vc.reservable_balance > ( balance * Math.pow(10, 6)) ) {
       throw new Error('VC.InsufficientBalance');

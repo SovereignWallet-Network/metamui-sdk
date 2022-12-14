@@ -5,10 +5,11 @@ import { KeyringPair } from '@polkadot/keyring/types';
  * @param {HexString} vcId
  * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
- * @param {ApiPromise} api
+ * @param {ApiPromise} api Ledger chain connection
+ * @param {ApiPromise} relayApi Relay chain connection
  * @returns {Object} Transaction Object
  */
-declare function issueToken(vcId: any, totalSupply: any, senderAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function issueToken(vcId: any, totalSupply: any, senderAccountKeyPair: KeyringPair, api: ApiPromise, relayApi: ApiPromise): Promise<any>;
 /**
  * Mint token to given currency
  * @param {HexString} vcId
@@ -91,11 +92,11 @@ declare function transferToken(vcId: any, toDid: any, senderAccountKeyPair: Keyr
  */
 declare const sanitiseCCode: (token: any) => any;
 /** Get account balance (Highest Form) based on the did supplied.
-* @param {string} did valid registered did
-* @param {string} currencyCode
-* @param {ApiPromise} api (optional)
-* @returns {number}
-*/
+ * @param {string} did valid registered did
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {number}
+ */
 declare const getBalance: (did: string, currencyCode: string, api: ApiPromise) => Promise<number>;
 /** Get account balance (Lowest Form) based on the did supplied.
  * A valid registered did is required
@@ -105,19 +106,19 @@ declare const getBalance: (did: string, currencyCode: string, api: ApiPromise) =
  */
 declare const getDetailedBalance: (did: string, currencyCode: string, api: ApiPromise) => Promise<unknown>;
 /** Listen to balance (Highest Form) changes for a DID and execute the callback
-* @param {string} did
-* @param {string} currencyCode
-* @param {Function} callback
-* @param {ApiPromise} api
-*/
-declare const subscribeToBalanceChanges: (did: string, currencyCode: string, callback: (balance: number) => void, api: ApiPromise) => Promise<import("@polkadot/types-codec/types").Codec>;
-/**
- * Subsribe to detailed balance changes for a DID and execute the callback.
  * @param {string} did
  * @param {string} currencyCode
  * @param {Function} callback
  * @param {ApiPromise} api
  */
+declare const subscribeToBalanceChanges: (did: string, currencyCode: string, callback: (balance: number) => void, api: ApiPromise) => Promise<import("@polkadot/types-codec/types").Codec>;
+/**
+  * Subsribe to detailed balance changes for a DID and execute the callback.
+  * @param {string} did
+  * @param {string} currencyCode
+  * @param {Function} callback
+  * @param {ApiPromise} api
+  */
 declare const subscribeToDetailedBalanceChanges: (did: string, currencyCode: string, callback: (data: Object) => void, api: ApiPromise) => Promise<import("@polkadot/types-codec/types").Codec>;
 /**
  * get Token List

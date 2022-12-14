@@ -22,10 +22,11 @@ const vc_1 = require("./vc");
  * @param {HexString} vcId
  * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
- * @param {ApiPromise} api
+ * @param {ApiPromise} api Ledger chain connection
+ * @param {ApiPromise} relayApi Relay chain connection
  * @returns {Object} Transaction Object
  */
-function issueToken(vcId, totalSupply, senderAccountKeyPair, api) {
+function issueToken(vcId, totalSupply, senderAccountKeyPair, api, relayApi) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         // get VC from VC ID
@@ -35,11 +36,11 @@ function issueToken(vcId, totalSupply, senderAccountKeyPair, api) {
         }
         // check if vc property has reservable balance
         let decoded_vc = (0, vc_1.decodeVCProperty)(vc_details.vcProperty, "TokenVC");
-        if (!decoded_vc.reservable_balance) {
+        if (decoded_vc.reservable_balance == undefined || decoded_vc.reservable_balance == null) {
             throw new Error('VC.VCNotReservable');
         }
         // Check for balance in relay
-        const relayConn = yield (0, connection_1.buildConnection)(process.env.PROVIDER_NETWORK || 'local');
+        const relayConn = relayApi || (yield (0, connection_1.buildConnection)('local'));
         let balance = yield _1.balances.getBalance(vc_details.owner, relayConn);
         if (decoded_vc.reservable_balance > (balance * Math.pow(10, 6))) {
             throw new Error('VC.InsufficientBalance');
@@ -243,11 +244,11 @@ const sanitiseCCode = (token) => {
 exports.sanitiseCCode = sanitiseCCode;
 // Storage Query Functions
 /** Get account balance (Highest Form) based on the did supplied.
-* @param {string} did valid registered did
-* @param {string} currencyCode
-* @param {ApiPromise} api (optional)
-* @returns {number}
-*/
+ * @param {string} did valid registered did
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {number}
+ */
 const getBalance = (did, currencyCode, api) => __awaiter(void 0, void 0, void 0, function* () {
     // Resolve the did to get account ID
     return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
@@ -291,11 +292,11 @@ const getDetailedBalance = (did, currencyCode, api) => __awaiter(void 0, void 0,
 });
 exports.getDetailedBalance = getDetailedBalance;
 /** Listen to balance (Highest Form) changes for a DID and execute the callback
-* @param {string} did
-* @param {string} currencyCode
-* @param {Function} callback
-* @param {ApiPromise} api
-*/
+ * @param {string} did
+ * @param {string} currencyCode
+ * @param {Function} callback
+ * @param {ApiPromise} api
+ */
 const subscribeToBalanceChanges = (did, currencyCode, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
@@ -311,12 +312,12 @@ const subscribeToBalanceChanges = (did, currencyCode, callback, api) => __awaite
 });
 exports.subscribeToBalanceChanges = subscribeToBalanceChanges;
 /**
- * Subsribe to detailed balance changes for a DID and execute the callback.
- * @param {string} did
- * @param {string} currencyCode
- * @param {Function} callback
- * @param {ApiPromise} api
- */
+  * Subsribe to detailed balance changes for a DID and execute the callback.
+  * @param {string} did
+  * @param {string} currencyCode
+  * @param {Function} callback
+  * @param {ApiPromise} api
+  */
 const subscribeToDetailedBalanceChanges = (did, currencyCode, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
