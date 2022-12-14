@@ -4,7 +4,7 @@
  import { ApiPromise } from '@polkadot/api';
  import { submitTransaction } from './common/helper';
  import { KeyringPair } from '@polkadot/keyring/types';
-import { encodeData, CURRENCY_CODE_BYTES } from './utils';
+ import { encodeData, CURRENCY_CODE_BYTES } from './utils';
 
  /**
   * Mint token to given currency

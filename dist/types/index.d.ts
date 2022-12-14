@@ -9,4 +9,5 @@ import * as token from './token';
 import * as kycUtils from './kycUtils';
 import * as tokenchain from './tokenchain';
 import * as cacheDid from './cacheDid';
-export { connection, did, balances, utils, config, collective, vc, token, kycUtils, tokenchain, cacheDid };
+import * as ledgers from './ledgers';
+export { connection, did, balances, utils, config, collective, vc, token, kycUtils, tokenchain, cacheDid, ledgers, };
