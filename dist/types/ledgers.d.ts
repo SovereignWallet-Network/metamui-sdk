@@ -3,7 +3,7 @@ import { KeyringPair } from '@polkadot/keyring/types';
 /**
  * Issue a new currency
  * @param {HexString} vcId
- * @param {Number} totalSupply
+ * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -90,20 +90,48 @@ declare function transferToken(vcId: any, toDid: any, senderAccountKeyPair: Keyr
  * @returns {String} Sanitised Token Name
  */
 declare const sanitiseCCode: (token: any) => any;
+/** Get account balance (Highest Form) based on the did supplied.
+* @param {string} did valid registered did
+* @param {string} currencyCode
+* @param {ApiPromise} api (optional)
+* @returns {number}
+*/
+declare const getBalance: (did: string, currencyCode: string, api: ApiPromise) => Promise<number>;
+/** Get account balance (Lowest Form) based on the did supplied.
+ * A valid registered did is required
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {Object} Balance Object { free: number, reserved: number, frozen: number}
+ */
+declare const getDetailedBalance: (did: string, currencyCode: string, api: ApiPromise) => Promise<unknown>;
+/** Listen to balance (Highest Form) changes for a DID and execute the callback
+* @param {string} did
+* @param {string} currencyCode
+* @param {Function} callback
+* @param {ApiPromise} api
+*/
+declare const subscribeToBalanceChanges: (did: string, currencyCode: string, callback: (balance: number) => void, api: ApiPromise) => Promise<import("@polkadot/types-codec/types").Codec>;
 /**
- * Get the token balance of an account
- * @param {String} currencyCode
- * @param {String} did
+ * Subsribe to detailed balance changes for a DID and execute the callback.
+ * @param {string} did
+ * @param {string} currencyCode
+ * @param {Function} callback
  * @param {ApiPromise} api
  */
-declare function accounts(currencyCode: String, did: String, api: ApiPromise): Promise<import("@polkadot/types-codec/types").AnyJson>;
+declare const subscribeToDetailedBalanceChanges: (did: string, currencyCode: string, callback: (data: Object) => void, api: ApiPromise) => Promise<import("@polkadot/types-codec/types").Codec>;
+/**
+ * get Token List
+ * @param {ApiPromise} api
+ * @returns {Object} Token List
+ */
+declare function getTokenList(api: ApiPromise): Promise<any>;
 /**
  * Get any liquidity locks of a token type under an account
  * @param {String} currencyCode
  * @param {String} did
  * @param {ApiPromise} api
  */
-declare function locks(currencyCode: String, did: String, api: ApiPromise): Promise<import("@polkadot/types-codec/types").AnyJson>;
+declare function getLocks(currencyCode: String, did: String, api: ApiPromise): Promise<import("@polkadot/types-codec/types").AnyJson>;
 /**
  * Storage map between currency code and block number
  * @param {ApiPromise} api
@@ -117,10 +145,10 @@ declare function removedTokens(api: ApiPromise, currencyCode?: String): Promise<
 declare function tokenCurrencyCounter(api: ApiPromise): Promise<string>;
 /**
  * Map to store a friendly token name for token
- * @param {String} currencyCode
+ * @param {string | null} currencyCode
  * @param {ApiPromise} api
  */
-declare function tokenData(currencyCode: String, api: ApiPromise): Promise<import("@polkadot/types-codec/types").AnyJson>;
+declare function tokenData(currencyCode: string | null, api: ApiPromise): Promise<import("@polkadot/types-codec/types").AnyJson>;
 /**
  * Get Token Information
  * @param {String} currencyCode
@@ -149,4 +177,4 @@ declare function tokenIssuer(currencyCode: String, api: ApiPromise): Promise<`0x
  * @returns {Number} Token Issuance
  */
 declare function totalIssuance(currencyCode: String, api: ApiPromise): Promise<string>;
-export { issueToken, mintToken, removeToken, setBalance, slashToken, transfer, transferAll, transferTokenWithMemo, transferToken, sanitiseCCode, accounts, locks, removedTokens, tokenCurrencyCounter, tokenData, tokenInfo, tokenInfoRLookup, tokenIssuer, totalIssuance };
+export { issueToken, mintToken, removeToken, getBalance, setBalance, getDetailedBalance, subscribeToBalanceChanges, subscribeToDetailedBalanceChanges, slashToken, transfer, transferAll, transferTokenWithMemo, transferToken, sanitiseCCode, getLocks, removedTokens, tokenCurrencyCounter, getTokenList, tokenData, tokenInfo, tokenInfoRLookup, tokenIssuer, totalIssuance };

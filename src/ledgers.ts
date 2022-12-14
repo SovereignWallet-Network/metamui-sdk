@@ -5,14 +5,14 @@ import { submitTransaction } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { encodeData, CURRENCY_CODE_BYTES } from './utils';
 import { balances, did, vc } from '.';
-import { decodeVC } from './vc';
+import { decodeVCProperty } from './vc';
 
 // Extrinsic functions
 
 /**
  * Issue a new currency
  * @param {HexString} vcId
- * @param {Number} totalSupply
+ * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -25,23 +25,23 @@ import { decodeVC } from './vc';
  ) {
    const provider = api || (await buildConnection('local'));
    // get VC from VC ID
-   let vc_details = await vc.getVCs(vcId, provider);
+   let vc_details: any = await vc.getVCs(vcId, provider);
    if (!vc_details) {
       throw new Error('VC.VCNotRegistered');
    }
    // check if vc property has reservable balance
-   let decoded_vc = decodeVC(vc_details);
-   if (!decoded_vc.vc_property.reservable_balance) {
+   let decoded_vc = decodeVCProperty(vc_details.vcProperty, "TokenVC");
+   if (!decoded_vc.reservable_balance) {
       throw new Error('VC.VCNotReservable');
    }
    // Check for balance in relay
    const relayConn = await buildConnection(process.env.PROVIDER_NETWORK || 'local');
-   let balance = await balances.getBalance(decoded_vc.owner, relayConn);
-   if (decoded_vc.vc_property.reservable_balance > balance) {
+   let balance = await balances.getBalance(vc_details.owner, relayConn);
+   if (decoded_vc.reservable_balance > ( balance * Math.pow(10, 6)) ) {
       throw new Error('VC.InsufficientBalance');
    }
-   
-   const tx = provider.tx.tokens.issueToken(vcId, totalSupply);
+
+   const tx = provider.tx.tokens.issueToken(vcId, totalSupply * Math.pow(10, decoded_vc.decimal));
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
    return submitTransaction(signedTx, provider);
@@ -268,19 +268,104 @@ async function slashToken(
 
 // Storage Query Functions
 
-/**
- * Get the token balance of an account
- * @param {String} currencyCode
- * @param {String} did
+/** Get account balance (Highest Form) based on the did supplied.
+ * @param {string} did valid registered did
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {number}
+ */
+ const getBalance = async (did: string, currencyCode: string, api: ApiPromise): Promise<number> => {
+   // Resolve the did to get account ID
+   return new Promise(async (resolve, reject) => {
+      try {
+         const provider = api || await buildConnection('local');
+         const tokenInfo = await tokenData(currencyCode, provider);
+         let decimals = tokenInfo?.['decimal'];
+         // console.log('Decimals', decimals);
+         const accountInfo = await provider.query.tokens.accounts(sanitiseCCode(currencyCode), sanitiseDid(did));
+         const data = accountInfo.toJSON()?.['data'];
+         resolve(data.free / Math.pow(10, decimals));
+      } catch (err) {
+         // console.log(err);
+         return reject(new Error("Cannot get balance"));
+      }
+   });
+}
+
+/** Get account balance (Lowest Form) based on the did supplied.
+ * A valid registered did is required
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {Object} Balance Object { free: number, reserved: number, frozen: number}
+ */
+ const getDetailedBalance = async (did: string, currencyCode: string, api: ApiPromise) => {
+   // Resolve the did to get account ID
+   return new Promise(async (resolve, reject) => {
+      try {
+         const provider = api || await buildConnection('local');
+         const accountInfo = await provider.query.tokens.accounts(sanitiseCCode(currencyCode), sanitiseDid(did));
+         resolve( accountInfo.toJSON()?.['data'] );
+      } catch (err) {
+         // console.log(err);
+         return reject(new Error("Cannot get balance"));
+      }
+   });
+}
+
+/** Listen to balance (Highest Form) changes for a DID and execute the callback
+ * @param {string} did
+ * @param {string} currencyCode
+ * @param {Function} callback
  * @param {ApiPromise} api
  */
- async function accounts(
-   currencyCode: String,
-   did: String,
-   api: ApiPromise,
-  ) {
+ const subscribeToBalanceChanges = async (did: string, currencyCode: string, callback: (balance: number) => void, api: ApiPromise) => {
+   try {
+     const provider = api || await buildConnection('local');
+     const tokenInfo = await tokenData(currencyCode, provider);
+     let decimals = tokenInfo?.['decimal'];
+     return await provider.query.tokens.accounts(sanitiseCCode(currencyCode), sanitiseDid(did), ({ data: { free: currentBalance } }) => {
+       callback(currentBalance.toNumber() / Math.pow(10, decimals));
+     });
+   } catch (err) {
+     return null;
+   }
+};
+
+ 
+/**
+  * Subsribe to detailed balance changes for a DID and execute the callback.
+  * @param {string} did
+  * @param {string} currencyCode
+  * @param {Function} callback
+  * @param {ApiPromise} api
+  */
+ const subscribeToDetailedBalanceChanges = async (did: string, currencyCode: string, callback: (data: Object) => void, api: ApiPromise) => {
+   try {
+     const provider = api || await buildConnection('local');
+     return await provider.query.tokens.accounts(sanitiseCCode(currencyCode), sanitiseDid(did), ({ data }) => {
+       callback(data.toJSON());
+     });
+   } catch (err) {
+     return null;
+   }
+};
+
+/**
+ * get Token List
+ * @param {ApiPromise} api
+ * @returns {Object} Token List
+ */
+async function getTokenList(api: ApiPromise) {
    const provider = api || (await buildConnection('local'));
-   return (await provider.query.tokens.accounts(sanitiseCCode(currencyCode), sanitiseDid(did))).toJSON();
+   const data: any = await provider.query.tokens.tokenData.entries();
+   if(!data) return null;
+   return data.map(([{ args: [currencyCode] }, value]) => ({
+      name: value.toHuman().tokenName,
+      currencyCode: value.toHuman().currencyCode,
+      decimal: value.toHuman().decimal,
+      blockNumber: value.toHuman().blockNumber,
+   })
+  );
 }
 
 /**
@@ -289,7 +374,7 @@ async function slashToken(
  * @param {String} did
  * @param {ApiPromise} api
  */
- async function locks(
+ async function getLocks(
    currencyCode: String,
    did: String,
    api: ApiPromise,
@@ -324,11 +409,11 @@ async function slashToken(
 
 /**
  * Map to store a friendly token name for token
- * @param {String} currencyCode
+ * @param {string | null} currencyCode
  * @param {ApiPromise} api
  */
  async function tokenData(
-   currencyCode: String,
+   currencyCode: string | null,
    api: ApiPromise,
   ) {
    const provider = api || (await buildConnection('local'));
@@ -395,17 +480,21 @@ export {
    issueToken,
    mintToken,
    removeToken,
+   getBalance,
    setBalance,
+   getDetailedBalance,
+   subscribeToBalanceChanges,
+   subscribeToDetailedBalanceChanges,
    slashToken,
    transfer,
    transferAll,
    transferTokenWithMemo,
    transferToken,
    sanitiseCCode,
-   accounts,
-   locks,
+   getLocks,
    removedTokens,
    tokenCurrencyCounter,
+   getTokenList,
    tokenData,
    tokenInfo,
    tokenInfoRLookup,

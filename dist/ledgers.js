@@ -9,17 +9,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.totalIssuance = exports.tokenIssuer = exports.tokenInfoRLookup = exports.tokenInfo = exports.tokenData = exports.tokenCurrencyCounter = exports.removedTokens = exports.locks = exports.accounts = exports.sanitiseCCode = exports.transferToken = exports.transferTokenWithMemo = exports.transferAll = exports.transfer = exports.slashToken = exports.setBalance = exports.removeToken = exports.mintToken = exports.issueToken = void 0;
+exports.totalIssuance = exports.tokenIssuer = exports.tokenInfoRLookup = exports.tokenInfo = exports.tokenData = exports.getTokenList = exports.tokenCurrencyCounter = exports.removedTokens = exports.getLocks = exports.sanitiseCCode = exports.transferToken = exports.transferTokenWithMemo = exports.transferAll = exports.transfer = exports.slashToken = exports.subscribeToDetailedBalanceChanges = exports.subscribeToBalanceChanges = exports.getDetailedBalance = exports.setBalance = exports.getBalance = exports.removeToken = exports.mintToken = exports.issueToken = void 0;
 const connection_1 = require("./connection");
 const did_1 = require("./did");
 const helper_1 = require("./common/helper");
 const utils_1 = require("./utils");
 const _1 = require(".");
+const vc_1 = require("./vc");
 // Extrinsic functions
 /**
  * Issue a new currency
  * @param {HexString} vcId
- * @param {Number} totalSupply
+ * @param {Number} totalSupply HIGHEST FORM WITHOUT DECIMALS
  * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
@@ -27,7 +28,23 @@ const _1 = require(".");
 function issueToken(vcId, totalSupply, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.tokens.issueToken(vcId, totalSupply);
+        // get VC from VC ID
+        let vc_details = yield _1.vc.getVCs(vcId, provider);
+        if (!vc_details) {
+            throw new Error('VC.VCNotRegistered');
+        }
+        // check if vc property has reservable balance
+        let decoded_vc = (0, vc_1.decodeVCProperty)(vc_details.vcProperty, "TokenVC");
+        if (!decoded_vc.reservable_balance) {
+            throw new Error('VC.VCNotReservable');
+        }
+        // Check for balance in relay
+        const relayConn = yield (0, connection_1.buildConnection)(process.env.PROVIDER_NETWORK || 'local');
+        let balance = yield _1.balances.getBalance(vc_details.owner, relayConn);
+        if (decoded_vc.reservable_balance > (balance * Math.pow(10, 6))) {
+            throw new Error('VC.InsufficientBalance');
+        }
+        const tx = provider.tx.tokens.issueToken(vcId, totalSupply * Math.pow(10, decoded_vc.decimal));
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
@@ -225,32 +242,126 @@ const sanitiseCCode = (token) => {
 };
 exports.sanitiseCCode = sanitiseCCode;
 // Storage Query Functions
+/** Get account balance (Highest Form) based on the did supplied.
+* @param {string} did valid registered did
+* @param {string} currencyCode
+* @param {ApiPromise} api (optional)
+* @returns {number}
+*/
+const getBalance = (did, currencyCode, api) => __awaiter(void 0, void 0, void 0, function* () {
+    // Resolve the did to get account ID
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
+        try {
+            const provider = api || (yield (0, connection_1.buildConnection)('local'));
+            const tokenInfo = yield tokenData(currencyCode, provider);
+            let decimals = tokenInfo === null || tokenInfo === void 0 ? void 0 : tokenInfo['decimal'];
+            // console.log('Decimals', decimals);
+            const accountInfo = yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did));
+            const data = (_a = accountInfo.toJSON()) === null || _a === void 0 ? void 0 : _a['data'];
+            resolve(data.free / Math.pow(10, decimals));
+        }
+        catch (err) {
+            // console.log(err);
+            return reject(new Error("Cannot get balance"));
+        }
+    }));
+});
+exports.getBalance = getBalance;
+/** Get account balance (Lowest Form) based on the did supplied.
+ * A valid registered did is required
+ * @param {string} currencyCode
+ * @param {ApiPromise} api (optional)
+ * @returns {Object} Balance Object { free: number, reserved: number, frozen: number}
+ */
+const getDetailedBalance = (did, currencyCode, api) => __awaiter(void 0, void 0, void 0, function* () {
+    // Resolve the did to get account ID
+    return new Promise((resolve, reject) => __awaiter(void 0, void 0, void 0, function* () {
+        var _b;
+        try {
+            const provider = api || (yield (0, connection_1.buildConnection)('local'));
+            const accountInfo = yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did));
+            resolve((_b = accountInfo.toJSON()) === null || _b === void 0 ? void 0 : _b['data']);
+        }
+        catch (err) {
+            // console.log(err);
+            return reject(new Error("Cannot get balance"));
+        }
+    }));
+});
+exports.getDetailedBalance = getDetailedBalance;
+/** Listen to balance (Highest Form) changes for a DID and execute the callback
+* @param {string} did
+* @param {string} currencyCode
+* @param {Function} callback
+* @param {ApiPromise} api
+*/
+const subscribeToBalanceChanges = (did, currencyCode, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
+        const tokenInfo = yield tokenData(currencyCode, provider);
+        let decimals = tokenInfo === null || tokenInfo === void 0 ? void 0 : tokenInfo['decimal'];
+        return yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did), ({ data: { free: currentBalance } }) => {
+            callback(currentBalance.toNumber() / Math.pow(10, decimals));
+        });
+    }
+    catch (err) {
+        return null;
+    }
+});
+exports.subscribeToBalanceChanges = subscribeToBalanceChanges;
 /**
- * Get the token balance of an account
- * @param {String} currencyCode
- * @param {String} did
+ * Subsribe to detailed balance changes for a DID and execute the callback.
+ * @param {string} did
+ * @param {string} currencyCode
+ * @param {Function} callback
  * @param {ApiPromise} api
  */
-function accounts(currencyCode, did, api) {
+const subscribeToDetailedBalanceChanges = (did, currencyCode, callback, api) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const provider = api || (yield (0, connection_1.buildConnection)('local'));
+        return yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did), ({ data }) => {
+            callback(data.toJSON());
+        });
+    }
+    catch (err) {
+        return null;
+    }
+});
+exports.subscribeToDetailedBalanceChanges = subscribeToDetailedBalanceChanges;
+/**
+ * get Token List
+ * @param {ApiPromise} api
+ * @returns {Object} Token List
+ */
+function getTokenList(api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (yield provider.query.tokens.accounts(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did))).toJSON();
+        const data = yield provider.query.tokens.tokenData.entries();
+        if (!data)
+            return null;
+        return data.map(([{ args: [currencyCode] }, value]) => ({
+            name: value.toHuman().tokenName,
+            currencyCode: value.toHuman().currencyCode,
+            decimal: value.toHuman().decimal,
+            blockNumber: value.toHuman().blockNumber,
+        }));
     });
 }
-exports.accounts = accounts;
+exports.getTokenList = getTokenList;
 /**
  * Get any liquidity locks of a token type under an account
  * @param {String} currencyCode
  * @param {String} did
  * @param {ApiPromise} api
  */
-function locks(currencyCode, did, api) {
+function getLocks(currencyCode, did, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         return (yield provider.query.tokens.locks(sanitiseCCode(currencyCode), (0, did_1.sanitiseDid)(did))).toJSON();
     });
 }
-exports.locks = locks;
+exports.getLocks = getLocks;
 /**
  * Storage map between currency code and block number
  * @param {ApiPromise} api
@@ -276,7 +387,7 @@ function tokenCurrencyCounter(api) {
 exports.tokenCurrencyCounter = tokenCurrencyCounter;
 /**
  * Map to store a friendly token name for token
- * @param {String} currencyCode
+ * @param {string | null} currencyCode
  * @param {ApiPromise} api
  */
 function tokenData(currencyCode, api) {

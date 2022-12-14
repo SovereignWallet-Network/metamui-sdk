@@ -449,6 +449,8 @@ function decodeVCProperty(hexValue, VCType) {
         case VCType.TokenVC:
             vcs["token_name"] = (0, utils_1.hexToString)(vcs.token_name);
             vcs["currency_code"] = (0, utils_1.hexToString)(vcs.currency_code);
+            vcs["reservable_balance"] = vcs.reservable_balance;
+            vcs["decimal"] = vcs.decimal;
             break;
         case VCType.PublicDidVC:
             vcs["did"] = (0, utils_1.hexToString)(vcs.did);

@@ -42,12 +42,27 @@ describe('Token works correctly', () => {
       const vcHex = await vc.generateVC(tokenVC, owner, issuers, VCType.TokenVC, sigKeypairValidator); // Sign with SWN
       const closedProposal = await sudoStoreVC(vcHex, sigKeypairValidator, provider);
       vc_id = closedProposal.events.vc.VCValidated.vcid;
+      // console.log('TokenVC created with vc_id => ', vc_id);
+    });
+
+    it("Get token list works correctly", async () => {
+      let tokenList = await ledger.getTokenList(provider);
+      assert.notEqual(tokenList, null);
     });
 
     it('Issued a new currency correctly', async () => {
       let total_supply = 10000;
       const issueToken = await ledger.issueToken(vc_id, total_supply, sigKeypairValidator, provider);
       assert.doesNotReject(issueToken);
+    });
+
+    it('Get Balance for tokens works correctly', async () => {
+      let currencyCode = 'XYZ';
+      let did = TEST_SWN_DID;
+      let balance = await ledger.getBalance(did, currencyCode, provider);
+      assert.equal(balance, 10000);
+      let detailedBalance: any = await ledger.getDetailedBalance(did, currencyCode, provider);
+      assert.equal(detailedBalance.free, 1000000);
     });
 
     it('Mint Token VC is stored correctly', async () => {

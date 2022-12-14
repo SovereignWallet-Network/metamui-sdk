@@ -31,10 +31,23 @@
 <dt><a href="#sanitiseCCode">sanitiseCCode(token)</a> ⇒ <code>String</code></dt>
 <dd><p>Sanitise Token Name</p>
 </dd>
-<dt><a href="#accounts">accounts(currencyCode, did, api)</a></dt>
-<dd><p>Get the token balance of an account</p>
+<dt><a href="#getBalance">getBalance(did, currencyCode, api)</a> ⇒ <code>number</code></dt>
+<dd><p>Get account balance (Highest Form) based on the did supplied.</p>
 </dd>
-<dt><a href="#locks">locks(currencyCode, did, api)</a></dt>
+<dt><a href="#getDetailedBalance">getDetailedBalance(currencyCode, api)</a> ⇒ <code>Object</code></dt>
+<dd><p>Get account balance (Lowest Form) based on the did supplied.
+A valid registered did is required</p>
+</dd>
+<dt><a href="#subscribeToBalanceChanges">subscribeToBalanceChanges(did, currencyCode, callback, api)</a></dt>
+<dd><p>Listen to balance (Highest Form) changes for a DID and execute the callback</p>
+</dd>
+<dt><a href="#subscribeToDetailedBalanceChanges">subscribeToDetailedBalanceChanges(did, currencyCode, callback, api)</a></dt>
+<dd><p>Subsribe to detailed balance changes for a DID and execute the callback.</p>
+</dd>
+<dt><a href="#getTokenList">getTokenList(api)</a> ⇒ <code>Object</code></dt>
+<dd><p>get Token List</p>
+</dd>
+<dt><a href="#getLocks">getLocks(currencyCode, did, api)</a></dt>
 <dd><p>Get any liquidity locks of a token type under an account</p>
 </dd>
 <dt><a href="#removedTokens">removedTokens(api, currencyCode)</a></dt>
@@ -68,12 +81,12 @@ Issue a new currency
 **Kind**: global function  
 **Returns**: <code>Object</code> - Transaction Object  
 
-| Param | Type |
-| --- | --- |
-| vcId | <code>HexString</code> | 
-| totalSupply | <code>Number</code> | 
-| senderAccountKeyPair | <code>KeyringPair</code> | 
-| api | <code>ApiPromise</code> | 
+| Param | Type | Description |
+| --- | --- | --- |
+| vcId | <code>HexString</code> |  |
+| totalSupply | <code>Number</code> | HIGHEST FORM WITHOUT DECIMALS |
+| senderAccountKeyPair | <code>KeyringPair</code> |  |
+| api | <code>ApiPromise</code> |  |
 
 <a name="mintToken"></a>
 
@@ -210,22 +223,76 @@ Sanitise Token Name
 | --- | --- |
 | token | <code>String</code> | 
 
-<a name="accounts"></a>
+<a name="getBalance"></a>
 
-## accounts(currencyCode, did, api)
-Get the token balance of an account
+## getBalance(did, currencyCode, api) ⇒ <code>number</code>
+Get account balance (Highest Form) based on the did supplied.
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| did | <code>string</code> | valid registered did |
+| currencyCode | <code>string</code> |  |
+| api | <code>ApiPromise</code> | (optional) |
+
+<a name="getDetailedBalance"></a>
+
+## getDetailedBalance(currencyCode, api) ⇒ <code>Object</code>
+Get account balance (Lowest Form) based on the did supplied.
+A valid registered did is required
+
+**Kind**: global function  
+**Returns**: <code>Object</code> - Balance Object { free: number, reserved: number, frozen: number}  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| currencyCode | <code>string</code> |  |
+| api | <code>ApiPromise</code> | (optional) |
+
+<a name="subscribeToBalanceChanges"></a>
+
+## subscribeToBalanceChanges(did, currencyCode, callback, api)
+Listen to balance (Highest Form) changes for a DID and execute the callback
 
 **Kind**: global function  
 
 | Param | Type |
 | --- | --- |
-| currencyCode | <code>String</code> | 
-| did | <code>String</code> | 
+| did | <code>string</code> | 
+| currencyCode | <code>string</code> | 
+| callback | <code>function</code> | 
 | api | <code>ApiPromise</code> | 
 
-<a name="locks"></a>
+<a name="subscribeToDetailedBalanceChanges"></a>
 
-## locks(currencyCode, did, api)
+## subscribeToDetailedBalanceChanges(did, currencyCode, callback, api)
+Subsribe to detailed balance changes for a DID and execute the callback.
+
+**Kind**: global function  
+
+| Param | Type |
+| --- | --- |
+| did | <code>string</code> | 
+| currencyCode | <code>string</code> | 
+| callback | <code>function</code> | 
+| api | <code>ApiPromise</code> | 
+
+<a name="getTokenList"></a>
+
+## getTokenList(api) ⇒ <code>Object</code>
+get Token List
+
+**Kind**: global function  
+**Returns**: <code>Object</code> - Token List  
+
+| Param | Type |
+| --- | --- |
+| api | <code>ApiPromise</code> | 
+
+<a name="getLocks"></a>
+
+## getLocks(currencyCode, did, api)
 Get any liquidity locks of a token type under an account
 
 **Kind**: global function  
@@ -268,7 +335,7 @@ Map to store a friendly token name for token
 
 | Param | Type |
 | --- | --- |
-| currencyCode | <code>String</code> | 
+| currencyCode | <code>string</code> \| <code>null</code> | 
 | api | <code>ApiPromise</code> | 
 
 <a name="tokenInfo"></a>
