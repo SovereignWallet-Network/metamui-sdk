@@ -163,6 +163,15 @@ const METABLOCKCHAIN_TYPES = {
       "V1_0_0",
       "V2_0_0"
     ]
+  },
+  "PalletName": "[u8;32]",
+  "FunctionName": "[u8;32]",
+  "BlacklistReason": "[u8;32]",
+  "ReasonCode": "u8",
+  "CurrentReasonCode": "u8",
+  "InitialExtrinsics": {
+    "pallet_name": "PalletName",
+    "function_name": "FunctionName"
   }
 }
 
