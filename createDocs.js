@@ -8,6 +8,7 @@ let modules = [
     "connection",
     "did",
     "kycUtils",
+    "ledgers",
     "token",
     "tokenchain",
     "utils",
