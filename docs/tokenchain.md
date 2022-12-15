@@ -16,7 +16,7 @@
 <dt><a href="#getTokenInfo">getTokenInfo(currencyCode, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Get Token Info by currency code</p>
 </dd>
-<dt><a href="#addParachain">addParachain(tokenName, paraId, sudoAccountKeyPair, api)</a></dt>
+<dt><a href="#initParachain">initParachain(vcId, initialIssuance, sudoAccountKeyPair, api)</a></dt>
 <dd><p>Add new parachain (requires sudo)</p>
 </dd>
 <dt><a href="#removeParachain">removeParachain(tokenName, sudoAccountKeyPair, api)</a></dt>
@@ -88,17 +88,17 @@ Get Token Info by currency code
 | currencyCode | <code>String</code> | 
 | api | <code>ApiPromise</code> | 
 
-<a name="addParachain"></a>
+<a name="initParachain"></a>
 
-## addParachain(tokenName, paraId, sudoAccountKeyPair, api)
+## initParachain(vcId, initialIssuance, sudoAccountKeyPair, api)
 Add new parachain (requires sudo)
 
 **Kind**: global function  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| tokenName | <code>String</code> | Currency Code HexString |
-| paraId | <code>Number</code> |  |
+| vcId | <code>HexString</code> | Currency Code HexString |
+| initialIssuance | <code>number</code> | LOWEST FORM |
 | sudoAccountKeyPair | <code>KeyringPair</code> |  |
 | api | <code>ApiPromise</code> |  |
 

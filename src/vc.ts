@@ -217,7 +217,7 @@ async function getVCIdsByDID(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.lookup(sanitiseDid(did))).toJSON();
+    return (await provider.query.vc.lookup(sanitiseDid(did))).toJSON();
 }
 
 
@@ -232,7 +232,7 @@ async function getDIDByVCId(
   api: ApiPromise
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.rLookup(vcId)).toJSON();
+    return (await provider.query.vc.rLookup(vcId)).toJSON();
 }
 
 
@@ -277,7 +277,7 @@ async function getVCHistoryByVCId(
   api: ApiPromise,
 ) {
     const provider = api || (await buildConnection('local'));
-    return await (await provider.query.vc.vcHistory(vcId)).toJSON();
+    return (await provider.query.vc.vcHistory(vcId)).toJSON();
 }
 
 

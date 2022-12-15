@@ -222,7 +222,7 @@ exports.generateVC = generateVC;
 function getVCIdsByDID(did, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.lookup((0, did_1.sanitiseDid)(did))).toJSON();
+        return (yield provider.query.vc.lookup((0, did_1.sanitiseDid)(did))).toJSON();
     });
 }
 exports.getVCIdsByDID = getVCIdsByDID;
@@ -235,7 +235,7 @@ exports.getVCIdsByDID = getVCIdsByDID;
 function getDIDByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.rLookup(vcId)).toJSON();
+        return (yield provider.query.vc.rLookup(vcId)).toJSON();
     });
 }
 exports.getDIDByVCId = getDIDByVCId;
@@ -274,7 +274,7 @@ exports.getVCApprovers = getVCApprovers;
 function getVCHistoryByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.vcHistory(vcId)).toJSON();
+        return (yield provider.query.vc.vcHistory(vcId)).toJSON();
     });
 }
 exports.getVCHistoryByVCId = getVCHistoryByVCId;

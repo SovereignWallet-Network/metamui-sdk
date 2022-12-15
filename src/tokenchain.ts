@@ -6,6 +6,7 @@ import { hexToString } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
 import { utils } from '.';
 import { sanitiseCCode } from './token';
+import { getVCs } from './vc';
 
 /**
  * get Token List
@@ -76,15 +77,20 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
 
 /**
  * Add new parachain (requires sudo)
- * @param {String} tokenName Currency Code HexString
- * @param {Number} paraId
+ * @param {HexString} vcId Currency Code HexString
+ * @param {number} initialIssuance LOWEST FORM
  * @param {KeyringPair} sudoAccountKeyPair
  * @param {ApiPromise} api
  */
-async function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
+async function initParachain(vcId: HexString, initialIssuance: number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
+    const vc_check = await getVCs(vcId, provider);
+    if(vc_check == null)
+        throw new Error('VC does not exist');
+    if(initialIssuance < 1 || initialIssuance == null)
+        throw new Error('Initial Issuance must be greater than 0');
     const tx = provider.tx.sudo.sudo(
-        provider.tx.tokenchain.addParachain(paraId, sanitiseCCode(tokenName))
+        provider.tx.tokenchain.initParachain(vcId, initialIssuance)
     );
     let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
     let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
@@ -112,7 +118,7 @@ export {
     getTokenList,
     lookup,
     lookUpParaId,
-    addParachain,
+    initParachain,
     removeParachain,
     getTokenIssuer,
     getTokenInfo,
