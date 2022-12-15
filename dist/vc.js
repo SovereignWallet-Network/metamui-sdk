@@ -55,7 +55,7 @@ function createTokenVC({ tokenName, reservableBalance, decimal, currencyCode }) 
     }
     let vcProperty = {
         token_name: _1.utils.encodeData(tokenName.padEnd(_1.utils.TOKEN_NAME_BYTES, '\0'), 'token_bytes'),
-        reservable_balance: _1.utils.encodeData(reservableBalance * (Math.pow(10, decimal)), 'Balance'),
+        reservable_balance: _1.utils.encodeData(reservableBalance * (Math.pow(10, 6)), 'Balance'),
         decimal: _1.utils.encodeData(decimal, 'decimal'),
         currency_code: _1.utils.encodeData(currencyCode.padEnd(_1.utils.CURRENCY_CODE_BYTES, '\0'), 'currency_code'),
     };
@@ -222,7 +222,7 @@ exports.generateVC = generateVC;
 function getVCIdsByDID(did, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.lookup((0, did_1.sanitiseDid)(did))).toJSON();
+        return (yield provider.query.vc.lookup((0, did_1.sanitiseDid)(did))).toJSON();
     });
 }
 exports.getVCIdsByDID = getVCIdsByDID;
@@ -235,7 +235,7 @@ exports.getVCIdsByDID = getVCIdsByDID;
 function getDIDByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.rLookup(vcId)).toJSON();
+        return (yield provider.query.vc.rLookup(vcId)).toJSON();
     });
 }
 exports.getDIDByVCId = getDIDByVCId;
@@ -274,7 +274,7 @@ exports.getVCApprovers = getVCApprovers;
 function getVCHistoryByVCId(vcId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return yield (yield provider.query.vc.vcHistory(vcId)).toJSON();
+        return (yield provider.query.vc.vcHistory(vcId)).toJSON();
     });
 }
 exports.getVCHistoryByVCId = getVCHistoryByVCId;

@@ -9,13 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenInfo = exports.getTokenIssuer = exports.removeParachain = exports.addParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
+exports.getTokenInfo = exports.getTokenIssuer = exports.removeParachain = exports.initParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
 const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
 const util_1 = require("@polkadot/util");
 const _1 = require(".");
 const token_1 = require("./token");
 Object.defineProperty(exports, "sanitiseCCode", { enumerable: true, get: function () { return token_1.sanitiseCCode; } });
+const vc_1 = require("./vc");
 /**
  * get Token List
  * @param {ApiPromise} api
@@ -94,21 +95,26 @@ function getTokenInfo(currencyCode, api) {
 exports.getTokenInfo = getTokenInfo;
 /**
  * Add new parachain (requires sudo)
- * @param {String} tokenName Currency Code HexString
- * @param {Number} paraId
+ * @param {HexString} vcId Currency Code HexString
+ * @param {number} initialIssuance LOWEST FORM
  * @param {KeyringPair} sudoAccountKeyPair
  * @param {ApiPromise} api
  */
-function addParachain(tokenName, paraId, sudoAccountKeyPair, api) {
+function initParachain(vcId, initialIssuance, sudoAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.addParachain(paraId, (0, token_1.sanitiseCCode)(tokenName)));
+        const vc_check = yield (0, vc_1.getVCs)(vcId, provider);
+        if (vc_check == null)
+            throw new Error('VC does not exist');
+        if (initialIssuance < 1 || initialIssuance == null)
+            throw new Error('Initial Issuance must be greater than 0');
+        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.initParachain(vcId, initialIssuance));
         let nonce = yield provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
         let signedTx = yield tx.signAsync(sudoAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
-exports.addParachain = addParachain;
+exports.initParachain = initParachain;
 /**
  * Remove parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString

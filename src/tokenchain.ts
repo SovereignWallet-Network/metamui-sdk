@@ -6,6 +6,7 @@ import { hexToString } from '@polkadot/util';
 import { HexString } from '@polkadot/util/types';
 import { utils } from '.';
 import { sanitiseCCode } from './token';
+import { getVCs } from './vc';
 
 /**
  * get Token List
@@ -76,13 +77,18 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
 
 /**
  * Add new parachain (requires sudo)
- * @param {string} vcId Currency Code HexString
+ * @param {HexString} vcId Currency Code HexString
  * @param {number} initialIssuance LOWEST FORM
  * @param {KeyringPair} sudoAccountKeyPair
  * @param {ApiPromise} api
  */
-async function initParachain(vcId: string, initialIssuance: number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
+async function initParachain(vcId: HexString, initialIssuance: number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
+    const vc_check = await getVCs(vcId, provider);
+    if(vc_check == null)
+        throw new Error('VC does not exist');
+    if(initialIssuance < 1 || initialIssuance == null)
+        throw new Error('Initial Issuance must be greater than 0');
     const tx = provider.tx.sudo.sudo(
         provider.tx.tokenchain.initParachain(vcId, initialIssuance)
     );

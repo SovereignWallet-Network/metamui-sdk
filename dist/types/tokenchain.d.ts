@@ -38,12 +38,12 @@ declare function getTokenIssuer(currencyCode: String, api: ApiPromise): Promise<
 declare function getTokenInfo(currencyCode: String, api: ApiPromise): Promise<any>;
 /**
  * Add new parachain (requires sudo)
- * @param {String} tokenName Currency Code HexString
- * @param {Number} paraId
+ * @param {HexString} vcId Currency Code HexString
+ * @param {number} initialIssuance LOWEST FORM
  * @param {KeyringPair} sudoAccountKeyPair
  * @param {ApiPromise} api
  */
-declare function addParachain(tokenName: String, paraId: Number, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function initParachain(vcId: HexString, initialIssuance: number, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
 /**
  * Remove parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
@@ -51,4 +51,4 @@ declare function addParachain(tokenName: String, paraId: Number, sudoAccountKeyP
  * @param {ApiPromise} api
  */
 declare function removeParachain(tokenName: String, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
-export { sanitiseCCode, getTokenList, lookup, lookUpParaId, addParachain, removeParachain, getTokenIssuer, getTokenInfo, };
+export { sanitiseCCode, getTokenList, lookup, lookUpParaId, initParachain, removeParachain, getTokenIssuer, getTokenInfo, };
