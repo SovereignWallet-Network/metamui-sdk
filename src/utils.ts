@@ -188,6 +188,8 @@ const ENCODE_TYPES = {
   "token_bytes": "[u8;16]",
   "CID": "[u8;64]",
   "Did": "[u8;32]",
+  "Input32Bytes": "[u8;32]",
+  "Input64Bytes": "[u8;64]",
 };
 
 const TOKEN_NAME_BYTES = 16;
