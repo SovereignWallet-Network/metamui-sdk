@@ -115,6 +115,59 @@ const sanitiseInput = (input: string) => {
   return utils.encodeData(input.padEnd(32, '\0'), 'Input32Bytes') as string;
 }
 
+/**
+ * Get all blacklisted dids with reasons
+ * @param {ApiPromise} api
+ */
+ async function getBlacklistedDids(api: ApiPromise): Promise<any> {
+  const provider = api || await buildConnection('local');
+  const blacklistedDids = await provider.query.checkAccess.blacklistedDids.entries();
+  if(!blacklistedDids) return null;
+  return blacklistedDids.map((did) => {
+    return {
+      did: did[0].toHuman(),
+      reason: did[1].toHuman()
+    }
+  });
+}
+
+/**
+ * Get reason for blacklisted did
+ * @param {string} did
+ * @param {ApiPromise} api
+ */
+ async function getBlacklistingReasonOfDid(did: string, api: ApiPromise): Promise<any> {
+  const provider = api || await buildConnection('local');
+  const reason = await provider.query.checkAccess.blacklistedDids(sanitiseDid(did));
+  if(!reason) return null;
+  return reason.toJSON();
+}
+
+/**
+ * Get blacklisting reson from reason code
+ * @param {number} reasonCode
+ * @param {ApiPromise} api
+ * @returns Blacklisting reason
+ */
+ async function getBlacklistingReasonFromCode(reasonCode: number, api: ApiPromise): Promise<any> {
+  const provider = api || await buildConnection('local');
+  const reason = await provider.query.checkAccess.blacklistingReasons(reasonCode);
+  if(!reason) return null;
+  return reason.toJSON();
+}
+
+/**
+ * Reverse lookup for blacklisting reason code
+ * @param {string} reasonName
+ * @param {ApiPromise} api
+ * @returns Blacklisting reason code
+ */
+ async function getBlacklistingReasonCode(reasonName: string, api: ApiPromise): Promise<any> {
+  const provider = api || await buildConnection('local');
+  const reasonCode = await provider.query.checkAccess.blacklistingReasonsRLookup(sanitiseInput(reasonName));
+  if(!reasonCode) return null;
+  return reasonCode.toJSON();
+}
 
 export {
   addAllowedExtrinsic,
@@ -123,5 +176,9 @@ export {
   removeBlacklistedDid,
   addBlacklistingReason,
   removeBlacklistingReason,
-  sanitiseInput
+  sanitiseInput,
+  getBlacklistedDids,
+  getBlacklistingReasonOfDid,
+  getBlacklistingReasonFromCode,
+  getBlacklistingReasonCode,
 };
