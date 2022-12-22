@@ -33,7 +33,7 @@ class Subscription {
       await this._api.query.token.account(sanitiseDid(this._did), (balance) => {
         if (this._subscribed) {
           console.log(this._did, balance.toJSON()?.['data'].free / 10 ** 6);
-          callback(balance.toJSON()?.['data'].free);
+          callback(balance.toJSON()?.['data'].free / 10 ** 6);
         }
       });
     }
