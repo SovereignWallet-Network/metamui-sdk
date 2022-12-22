@@ -9,10 +9,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transferWithMemo = exports.transfer = exports.getTotalSupply = exports.subscribeToDetailedBalanceChanges = exports.subscribeToBalanceChanges = exports.getDetailedBalance = exports.getBalance = void 0;
+exports.Subscription = exports.transferWithMemo = exports.transfer = exports.getTotalSupply = exports.subscribeToDetailedBalanceChanges = exports.subscribeToBalanceChanges = exports.getDetailedBalance = exports.getBalance = void 0;
 const connection_1 = require("./connection");
 const did_1 = require("./did");
 const helper_1 = require("./common/helper");
+class Subscription {
+    constructor(api, did, detailed = false) {
+        this._api = api;
+        this._did = did;
+        this._subscribed = false;
+        this._detailed = detailed;
+    }
+    subscribe(callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this._subscribed) {
+                return;
+            }
+            this._subscribed = true;
+            if (this._detailed) {
+                yield this._api.query.token.account((0, did_1.sanitiseDid)(this._did), (balance) => {
+                    var _a, _b;
+                    if (this._subscribed) {
+                        console.log(this._did, (_a = balance.toJSON()) === null || _a === void 0 ? void 0 : _a['data']);
+                        callback((_b = balance.toJSON()) === null || _b === void 0 ? void 0 : _b['data']);
+                    }
+                });
+            }
+            else {
+                yield this._api.query.token.account((0, did_1.sanitiseDid)(this._did), (balance) => {
+                    var _a, _b;
+                    if (this._subscribed) {
+                        console.log(this._did, ((_a = balance.toJSON()) === null || _a === void 0 ? void 0 : _a['data'].free) / Math.pow(10, 6));
+                        callback((_b = balance.toJSON()) === null || _b === void 0 ? void 0 : _b['data'].free);
+                    }
+                });
+            }
+        });
+    }
+    unsubscribe() {
+        if (!this._subscribed) {
+            return;
+        }
+        this._subscribed = false;
+    }
+    start(callback) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('Subscribing to balance', this._did);
+            yield this.subscribe(callback);
+        });
+    }
+    stop() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('Unsubscribing to balance', this._did);
+            this.unsubscribe();
+        });
+    }
+}
+exports.Subscription = Subscription;
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {string} did valid registered did
 * @param {ApiPromise} api (optional)
