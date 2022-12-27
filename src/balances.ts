@@ -9,6 +9,7 @@ class Subscription {
   private _did: string;
   private _subscribed: boolean;
   private _detailed: boolean;
+  private _decimals: number;
 
   constructor(api: ApiPromise, did: string, detailed: boolean = false) {
     this._api = api;
@@ -32,8 +33,9 @@ class Subscription {
     } else {
       await this._api.query.token.account(sanitiseDid(this._did), (balance) => {
         if (this._subscribed) {
-          console.log(this._did, balance.toJSON()?.['data'].free / 10 ** 6);
-          callback(balance.toJSON()?.['data'].free / 10 ** 6);
+          let bal = ( balance.toJSON()?.['data'].free * 1.0 ) / Math.pow(10, this._decimals);
+          console.log(this._did, bal);
+          callback(bal);
         }
       });
     }
@@ -48,6 +50,7 @@ class Subscription {
 
   public async start(callback: (balance: number) => void) {
     console.log('Subscribing to balance', this._did);
+    this._decimals = Number( (await this._api.rpc.system.properties()).toHuman()['tokenDecimals'][0] )
     await this.subscribe(callback);
   }
 

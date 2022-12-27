@@ -5,6 +5,7 @@ declare class Subscription {
     private _did;
     private _subscribed;
     private _detailed;
+    private _decimals;
     constructor(api: ApiPromise, did: string, detailed?: boolean);
     private subscribe;
     private unsubscribe;
