@@ -13,7 +13,7 @@ declare const generateMnemonic: () => string;
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function createPrivate(vcId: any, syncTo: any, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function createPrivate(vcId: any, syncTo: number | string | null, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
 /**
  * Create Private DID and store the generated DID object in blockchain
  * @param {HexString} vcId
@@ -22,7 +22,7 @@ declare function createPrivate(vcId: any, syncTo: any, signingKeypair: KeyringPa
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function createPublic(vcId: any, syncTo: any, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function createPublic(vcId: any, syncTo: number | string | null, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
 /**
  * Get did information from accountID
  * @param {string} identifier DID Identifier
@@ -55,7 +55,7 @@ declare function resolveAccountIdToDid(accountId: any, api: ApiPromise): Promise
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function updateDidKey(identifier: any, newKey: any, syncTo: any, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function updateDidKey(identifier: any, newKey: any, syncTo: number | string | null, signingKeypair: KeyringPair, api: ApiPromise): Promise<any>;
 /**
  * Convert to hex but return fixed size always, mimics substrate storage
  * @param {string} data
@@ -110,7 +110,7 @@ declare function updateMetadata(identifier: any, metadata: any, signingKeypair: 
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function syncDid(identifier: any, syncTo: any, signingKeypair: any, api: ApiPromise): Promise<any>;
+declare function syncDid(identifier: any, syncTo: number | string | null, signingKeypair: any, api: ApiPromise): Promise<any>;
 /**
  * Remove DID VC
  * @param {string} identifier
@@ -119,5 +119,5 @@ declare function syncDid(identifier: any, syncTo: any, signingKeypair: any, api:
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function removeDid(identifier: any, syncTo: any, signingKeypair: any, api: ApiPromise): Promise<any>;
+declare function removeDid(identifier: any, syncTo: number | string | null, signingKeypair: any, api: ApiPromise): Promise<any>;
 export { convertFixedSizeHex, generateMnemonic, createPrivate, createPublic, getDIDDetails, updateDidKey, resolveDIDToAccount, getDidKeyHistory, resolveAccountIdToDid, isDidValidator, updateMetadata, sanitiseDid, sanitiseSyncTo, syncDid, removeDid };
