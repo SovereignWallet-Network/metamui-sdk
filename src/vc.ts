@@ -499,7 +499,8 @@ function decodeVC(hexValue) {
         case VCType.TokenVC:
         case VCType.TokenTransferVC:
         vc["vc_property"] = decodeVCProperty(vc.vc_property, vc.vc_type);
-        
+        break;
+
         default:
         throw new Error("Unknown Type");
     }
