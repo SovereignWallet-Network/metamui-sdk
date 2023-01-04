@@ -2,7 +2,7 @@ import { buildConnection } from './connection';
 import { ApiPromise } from '@polkadot/api';
 import { submitTransaction } from './common/helper';
 import { KeyringPair } from '@polkadot/keyring/types';
-import { hexToString } from '@polkadot/util';
+import { hexToString } from './utils';
 import { HexString } from '@polkadot/util/types';
 import { utils } from '.';
 import { sanitiseCCode } from './token';
@@ -21,7 +21,7 @@ import { getVCs } from './vc';
         let tokenInfo = String(await provider.query.tokenchain.rLookup(paraIds[i]));
         tokenList.push({
             id: paraIds[i].toString(),
-            name: utils.tidy(hexToString(tokenInfo)),
+            name: hexToString(tokenInfo),
         });
     }
     tokenList.push({ id: null, name: 'MUI' });
@@ -72,7 +72,13 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
  */
  async function getTokenInfo(currencyCode: String, api: ApiPromise): Promise<any> {
     const provider = api || (await buildConnection('local'));
-    return (await provider.query.tokenchain.tokenInfo(currencyCode)).toJSON();
+    let tokenInfo: any = (await provider.query.tokenchain.tokenInfos(sanitiseCCode(currencyCode))).toJSON();
+    return {
+        tokenName: hexToString(tokenInfo.tokenName),
+        reservedBalance: tokenInfo.reservedBalance,
+        initialIssuance: tokenInfo.initialIssuance,
+        decimal: tokenInfo.decimal
+    };
 }
 
 /**
@@ -114,7 +120,6 @@ async function initParachain(vcId: HexString, initialIssuance: number, sudoAccou
 }
 
 export {
-    sanitiseCCode,
     getTokenList,
     lookup,
     lookUpParaId,

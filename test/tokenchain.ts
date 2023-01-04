@@ -40,6 +40,12 @@ describe('Tokenchain works correctly', () => {
         assert.equal(tokenName, "");
     });
 
+    it('getTokenInfo Works correctly', async () => {
+        const tokenInfo = await tokenchain.getTokenInfo(validTokenName, provider);
+        console.log(tokenInfo);
+        assert.notEqual(tokenInfo, null);
+    })
+
     // Add local tests for parachain addition and removal
 
 });

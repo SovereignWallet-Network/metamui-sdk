@@ -9,13 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTokenInfo = exports.getTokenIssuer = exports.removeParachain = exports.initParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = exports.sanitiseCCode = void 0;
+exports.getTokenInfo = exports.getTokenIssuer = exports.removeParachain = exports.initParachain = exports.lookUpParaId = exports.lookup = exports.getTokenList = void 0;
 const connection_1 = require("./connection");
 const helper_1 = require("./common/helper");
-const util_1 = require("@polkadot/util");
+const utils_1 = require("./utils");
 const _1 = require(".");
 const token_1 = require("./token");
-Object.defineProperty(exports, "sanitiseCCode", { enumerable: true, get: function () { return token_1.sanitiseCCode; } });
 const vc_1 = require("./vc");
 /**
  * get Token List
@@ -31,7 +30,7 @@ function getTokenList(api) {
             let tokenInfo = String(yield provider.query.tokenchain.rLookup(paraIds[i]));
             tokenList.push({
                 id: paraIds[i].toString(),
-                name: _1.utils.tidy((0, util_1.hexToString)(tokenInfo)),
+                name: (0, utils_1.hexToString)(tokenInfo),
             });
         }
         tokenList.push({ id: null, name: 'MUI' });
@@ -63,7 +62,7 @@ exports.lookup = lookup;
 function lookUpParaId(paraId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return _1.utils.tidy((0, util_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
+        return _1.utils.tidy((0, utils_1.hexToString)((yield provider.query.tokenchain.rLookup(paraId)).toString())).toUpperCase();
     });
 }
 exports.lookUpParaId = lookUpParaId;
@@ -89,7 +88,13 @@ exports.getTokenIssuer = getTokenIssuer;
 function getTokenInfo(currencyCode, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (yield provider.query.tokenchain.tokenInfo(currencyCode)).toJSON();
+        let tokenInfo = (yield provider.query.tokenchain.tokenInfos((0, token_1.sanitiseCCode)(currencyCode))).toJSON();
+        return {
+            tokenName: (0, utils_1.hexToString)(tokenInfo.tokenName),
+            reservedBalance: tokenInfo.reservedBalance,
+            initialIssuance: tokenInfo.initialIssuance,
+            decimal: tokenInfo.decimal
+        };
     });
 }
 exports.getTokenInfo = getTokenInfo;
