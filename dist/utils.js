@@ -186,6 +186,15 @@ const METABLOCKCHAIN_TYPES = {
             "V1_0_0",
             "V2_0_0"
         ]
+    },
+    "PalletName": "[u8;32]",
+    "FunctionName": "[u8;32]",
+    "BlacklistReason": "[u8;32]",
+    "ReasonCode": "u8",
+    "CurrentReasonCode": "u8",
+    "InitialExtrinsics": {
+        "pallet_name": "PalletName",
+        "function_name": "FunctionName"
     }
 };
 exports.METABLOCKCHAIN_TYPES = METABLOCKCHAIN_TYPES;
@@ -202,6 +211,8 @@ const ENCODE_TYPES = {
     "token_bytes": "[u8;16]",
     "CID": "[u8;64]",
     "Did": "[u8;32]",
+    "Input32Bytes": "[u8;32]",
+    "Input64Bytes": "[u8;64]",
 };
 const TOKEN_NAME_BYTES = 16;
 exports.TOKEN_NAME_BYTES = TOKEN_NAME_BYTES;

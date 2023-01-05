@@ -134,6 +134,15 @@ declare const METABLOCKCHAIN_TYPES: {
     VCPalletVersion: {
         _enum: string[];
     };
+    PalletName: string;
+    FunctionName: string;
+    BlacklistReason: string;
+    ReasonCode: string;
+    CurrentReasonCode: string;
+    InitialExtrinsics: {
+        pallet_name: string;
+        function_name: string;
+    };
 };
 declare const TOKEN_NAME_BYTES = 16;
 declare const CURRENCY_CODE_BYTES = 8;

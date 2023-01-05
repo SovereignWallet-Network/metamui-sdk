@@ -4,6 +4,63 @@ import { resolveDIDToAccount, sanitiseDid } from './did';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { submitTransaction } from './common/helper';
 
+class Subscription {
+  private _api: ApiPromise;
+  private _did: string;
+  private _subscribed: boolean;
+  private _detailed: boolean;
+  private _decimals: number;
+
+  constructor(api: ApiPromise, did: string, detailed: boolean = false) {
+    this._api = api;
+    this._did = did;
+    this._subscribed = false;
+    this._detailed = detailed;
+  }
+
+  private async subscribe(callback: (balance: number) => void) {
+    if (this._subscribed) {
+      return;
+    }
+    this._subscribed = true;
+    if(this._detailed) {
+      await this._api.query.token.account(sanitiseDid(this._did), (balance) => {
+        if (this._subscribed) {
+          console.log(this._did, balance.toJSON()?.['data']);
+          callback(balance.toJSON()?.['data']);
+        }
+      });
+    } else {
+      await this._api.query.token.account(sanitiseDid(this._did), (balance) => {
+        if (this._subscribed) {
+          let bal = ( balance.toJSON()?.['data'].free * 1.0 ) / Math.pow(10, this._decimals);
+          console.log(this._did, bal);
+          callback(bal);
+        }
+      });
+    }
+  }
+
+  private unsubscribe() {
+    if (!this._subscribed) {
+      return;
+    }
+    this._subscribed = false;
+  }
+
+  public async start(callback: (balance: number) => void) {
+    console.log('Subscribing to balance', this._did);
+    this._decimals = Number( (await this._api.rpc.system.properties()).toHuman()['tokenDecimals'][0] )
+    await this.subscribe(callback);
+  }
+
+  public async stop() {
+    console.log('Unsubscribing to balance', this._did);
+    this.unsubscribe();
+  }
+
+}
+
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {string} did valid registered did
 * @param {ApiPromise} api (optional)
@@ -184,5 +241,6 @@ export {
   subscribeToDetailedBalanceChanges,
   getTotalSupply,
   transfer,
-  transferWithMemo
+  transferWithMemo,
+  Subscription
 };

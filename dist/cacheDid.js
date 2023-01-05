@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reverseLookup = exports.lookup = exports.getPublicKey = exports.getDidType = void 0;
-const util_1 = require("@polkadot/util");
+const utils_1 = require("./utils");
 const connection_1 = require("./connection");
 const did_1 = require("./did");
 /**
@@ -61,7 +61,7 @@ exports.lookup = lookup;
 function reverseLookup(accountId, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
-        return (0, util_1.hexToString)((yield provider.query.cacheDid.rLookup(accountId)).toString());
+        return (0, utils_1.hexToString)((yield provider.query.cacheDid.rLookup(accountId)).toString());
     });
 }
 exports.reverseLookup = reverseLookup;

@@ -1,5 +1,17 @@
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
+declare class Subscription {
+    private _api;
+    private _did;
+    private _subscribed;
+    private _detailed;
+    private _decimals;
+    constructor(api: ApiPromise, did: string, detailed?: boolean);
+    private subscribe;
+    private unsubscribe;
+    start(callback: (balance: number) => void): Promise<void>;
+    stop(): Promise<void>;
+}
 /** Get account balance(Highest Form) based on the did supplied.
 * @param {string} did valid registered did
 * @param {ApiPromise} api (optional)
@@ -55,4 +67,4 @@ declare function transfer(senderAccountKeyPair: KeyringPair, receiverDID: string
  * @returns {Uint8Array}
  */
 declare function transferWithMemo(senderAccountKeyPair: KeyringPair, receiverDID: string, amount: number, memo: string, api: ApiPromise, nonce?: any): Promise<string>;
-export { getBalance, getDetailedBalance, subscribeToBalanceChanges, subscribeToDetailedBalanceChanges, getTotalSupply, transfer, transferWithMemo };
+export { getBalance, getDetailedBalance, subscribeToBalanceChanges, subscribeToDetailedBalanceChanges, getTotalSupply, transfer, transferWithMemo, Subscription };

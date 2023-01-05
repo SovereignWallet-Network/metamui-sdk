@@ -27,7 +27,7 @@ const checkIdentifierFormat = (identifier) => {
  * @returns {Object} Transaction Object
  */
 
-async function createPrivate(vcId, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function createPrivate(vcId, syncTo : number|string|null = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
   const tx = provider.tx.did.createPrivate(vcId, await sanitiseSyncTo(syncTo, provider));
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -44,7 +44,7 @@ async function createPrivate(vcId, syncTo = null, signingKeypair: KeyringPair, a
  * @returns {Object} Transaction Object
  */
 
-async function createPublic(vcId, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function createPublic(vcId, syncTo : number|string|null = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local')) as ApiPromise;
   const tx = provider.tx.did.createPublic(vcId, await sanitiseSyncTo(syncTo, provider));
   const nonce = await provider.rpc.system.accountNextIndex(signingKeypair.address);
@@ -170,7 +170,7 @@ async function resolveAccountIdToDid(accountId, api: ApiPromise): Promise<string
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function updateDidKey(identifier, newKey, syncTo = null, signingKeypair: KeyringPair, api: ApiPromise) {
+async function updateDidKey(identifier, newKey, syncTo : number|string|null = null, signingKeypair: KeyringPair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const data = await did.resolveDIDToAccount(did_hex, provider);
@@ -295,7 +295,7 @@ async function updateMetadata(identifier, metadata, signingKeypair, api: ApiProm
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function syncDid(identifier, syncTo = null, signingKeypair, api: ApiPromise) {
+async function syncDid(identifier, syncTo : number|string|null = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const tx = provider.tx.validatorCommittee.execute(provider.tx.did.syncDid(did_hex, await sanitiseSyncTo(syncTo, provider)), 1000);
@@ -312,7 +312,7 @@ async function syncDid(identifier, syncTo = null, signingKeypair, api: ApiPromis
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-async function removeDid(identifier, syncTo = null, signingKeypair, api: ApiPromise) {
+async function removeDid(identifier, syncTo : number|string|null = null, signingKeypair, api: ApiPromise) {
   const provider = api || (await buildConnection('local'));
   const did_hex = sanitiseDid(identifier);
   const tx = provider.tx.sudo.sudo(provider.tx.did.remove(did_hex, await sanitiseSyncTo(syncTo, provider)));

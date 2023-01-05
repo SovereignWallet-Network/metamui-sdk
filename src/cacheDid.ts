@@ -1,5 +1,5 @@
 import { ApiPromise } from '@polkadot/api';
-import { hexToString } from '@polkadot/util';
+import { hexToString } from './utils';
 import { buildConnection } from './connection';
 import { sanitiseDid } from './did';
 

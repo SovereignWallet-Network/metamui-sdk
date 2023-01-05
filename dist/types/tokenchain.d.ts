@@ -1,7 +1,6 @@
 import { ApiPromise } from '@polkadot/api';
 import { KeyringPair } from '@polkadot/keyring/types';
 import { HexString } from '@polkadot/util/types';
-import { sanitiseCCode } from './token';
 /**
  * get Token List
  * @param {ApiPromise} api
@@ -51,4 +50,4 @@ declare function initParachain(vcId: HexString, initialIssuance: number, sudoAcc
  * @param {ApiPromise} api
  */
 declare function removeParachain(tokenName: String, sudoAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
-export { sanitiseCCode, getTokenList, lookup, lookUpParaId, initParachain, removeParachain, getTokenIssuer, getTokenInfo, };
+export { getTokenList, lookup, lookUpParaId, initParachain, removeParachain, getTokenIssuer, getTokenInfo, };
