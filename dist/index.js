@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkAccess = exports.ledgers = exports.cacheDid = exports.tokenchain = exports.kycUtils = exports.token = exports.vc = exports.collective = exports.config = exports.utils = exports.balances = exports.did = exports.connection = void 0;
+exports.ssidVC = exports.checkAccess = exports.ledgers = exports.cacheDid = exports.tokenchain = exports.kycUtils = exports.token = exports.vc = exports.collective = exports.config = exports.utils = exports.balances = exports.did = exports.connection = void 0;
 const connection = __importStar(require("./connection"));
 exports.connection = connection;
 const did = __importStar(require("./did"));
@@ -50,5 +50,7 @@ const ledgers = __importStar(require("./ledgers"));
 exports.ledgers = ledgers;
 const checkAccess = __importStar(require("./checkAccess"));
 exports.checkAccess = checkAccess;
+const ssidVC = __importStar(require("./ssidVC"));
+exports.ssidVC = ssidVC;
 
 //# sourceMappingURL=index.js.map

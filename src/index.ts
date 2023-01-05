@@ -12,6 +12,7 @@ import * as tokenchain from './tokenchain';
 import * as cacheDid from './cacheDid';
 import * as ledgers from './ledgers';
 import * as checkAccess from './checkAccess';
+import * as ssidVC from './ssidVC';
 
 export {
   connection,
@@ -27,4 +28,5 @@ export {
   cacheDid,
   ledgers,
   checkAccess,
+  ssidVC,
 };

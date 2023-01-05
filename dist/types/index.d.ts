@@ -11,4 +11,5 @@ import * as tokenchain from './tokenchain';
 import * as cacheDid from './cacheDid';
 import * as ledgers from './ledgers';
 import * as checkAccess from './checkAccess';
-export { connection, did, balances, utils, config, collective, vc, token, kycUtils, tokenchain, cacheDid, ledgers, checkAccess, };
+import * as ssidVC from './ssidVC';
+export { connection, did, balances, utils, config, collective, vc, token, kycUtils, tokenchain, cacheDid, ledgers, checkAccess, ssidVC, };
