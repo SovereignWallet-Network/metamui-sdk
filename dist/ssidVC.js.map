@@ -1,0 +1,1 @@
+{"version":3,"sources":["../src/ssidVC.ts"],"names":[],"mappings":";;;AAAA,yCAAoE;AAE3D,6FAFA,uBAAY,OAEA;AAAE,2FAFA,qBAAU,OAEA;AAAE,6FAFA,uBAAY,OAEA","file":"ssidVC.js","sourcesContent":["import { createSsidVC, signSsidVC, verifySsidVC } from \"./kycUtils\";\n\nexport { createSsidVC, signSsidVC, verifySsidVC };"]}
