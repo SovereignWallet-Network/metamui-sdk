@@ -73,7 +73,7 @@ describe('Collective works correctly', () => {
       if (vote == null) {
         return
       }
-      index = vote[index];
+      index = vote["index"];
       if (typeof actualProposals === 'number')
         assert.strictEqual(actualProposals > 0, true);
     });

@@ -209,7 +209,7 @@ async function slashToken(
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
- async function transferTokenWithMemo(
+ async function transferWithMemo(
    destDid,
    currencyCode,
    amount,
@@ -223,7 +223,7 @@ async function slashToken(
    if (!dest_did_check) {
       throw new Error('DID.RecipentDIDNotRegistered');
    }
-   const tx = provider.tx.tokens.transferTokenWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
+   const tx = provider.tx.tokens.transferWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
    return submitTransaction(signedTx, provider);
@@ -490,7 +490,7 @@ export {
    slashToken,
    transfer,
    transferAll,
-   transferTokenWithMemo,
+   transferWithMemo,
    transferToken,
    sanitiseCCode,
    getLocks,
