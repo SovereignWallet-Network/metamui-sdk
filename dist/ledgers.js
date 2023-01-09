@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.totalIssuance = exports.tokenIssuer = exports.tokenInfoRLookup = exports.tokenInfo = exports.tokenData = exports.getTokenList = exports.tokenCurrencyCounter = exports.removedTokens = exports.getLocks = exports.sanitiseCCode = exports.transferToken = exports.transferTokenWithMemo = exports.transferAll = exports.transfer = exports.slashToken = exports.subscribeToDetailedBalanceChanges = exports.subscribeToBalanceChanges = exports.getDetailedBalance = exports.setBalance = exports.getBalance = exports.removeToken = exports.mintToken = exports.issueToken = void 0;
+exports.totalIssuance = exports.tokenIssuer = exports.tokenInfoRLookup = exports.tokenInfo = exports.tokenData = exports.getTokenList = exports.tokenCurrencyCounter = exports.removedTokens = exports.getLocks = exports.sanitiseCCode = exports.transferToken = exports.transferWithMemo = exports.transferAll = exports.transfer = exports.slashToken = exports.subscribeToDetailedBalanceChanges = exports.subscribeToBalanceChanges = exports.getDetailedBalance = exports.setBalance = exports.getBalance = exports.removeToken = exports.mintToken = exports.issueToken = void 0;
 const connection_1 = require("./connection");
 const did_1 = require("./did");
 const helper_1 = require("./common/helper");
@@ -191,7 +191,7 @@ exports.transferAll = transferAll;
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-function transferTokenWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api) {
+function transferWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         let dest_did_hex = (0, did_1.sanitiseDid)(destDid);
@@ -199,13 +199,13 @@ function transferTokenWithMemo(destDid, currencyCode, amount, memo, senderAccoun
         if (!dest_did_check) {
             throw new Error('DID.RecipentDIDNotRegistered');
         }
-        const tx = provider.tx.tokens.transferTokenWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
+        const tx = provider.tx.tokens.transferWithMemo(dest_did_hex, sanitiseCCode(currencyCode), amount, memo);
         let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
         let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
-exports.transferTokenWithMemo = transferTokenWithMemo;
+exports.transferWithMemo = transferWithMemo;
 /**
  * Transfer tokens to a DID
  * @param {HexString} vcId

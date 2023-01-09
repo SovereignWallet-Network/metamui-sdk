@@ -22,7 +22,7 @@
 <dt><a href="#transferAll">transferAll(destDid, currencyCode, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Transfer all token balance to another account</p>
 </dd>
-<dt><a href="#transferTokenWithMemo">transferTokenWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
+<dt><a href="#transferWithMemo">transferWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
 <dd><p>Transfer token balance to another account</p>
 </dd>
 <dt><a href="#transferToken">transferToken(vcId, toDid, senderAccountKeyPair, api)</a> ⇒ <code>Object</code></dt>
@@ -180,9 +180,9 @@ Transfer all token balance to another account
 | senderAccountKeyPair | <code>KeyringPair</code> | 
 | api | <code>ApiPromise</code> | 
 
-<a name="transferTokenWithMemo"></a>
+<a name="transferWithMemo"></a>
 
-## transferTokenWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api) ⇒ <code>Object</code>
+## transferWithMemo(destDid, currencyCode, amount, memo, senderAccountKeyPair, api) ⇒ <code>Object</code>
 Transfer token balance to another account
 
 **Kind**: global function  

@@ -75,7 +75,7 @@ declare function transferAll(destDid: any, currencyCode: any, senderAccountKeyPa
  * @param {ApiPromise} api
  * @returns {Object} Transaction Object
  */
-declare function transferTokenWithMemo(destDid: any, currencyCode: any, amount: any, memo: any, senderAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
+declare function transferWithMemo(destDid: any, currencyCode: any, amount: any, memo: any, senderAccountKeyPair: KeyringPair, api: ApiPromise): Promise<any>;
 /**
  * Transfer tokens to a DID
  * @param {HexString} vcId
@@ -178,4 +178,4 @@ declare function tokenIssuer(currencyCode: String, api: ApiPromise): Promise<`0x
  * @returns {Number} Token Issuance
  */
 declare function totalIssuance(currencyCode: String, api: ApiPromise): Promise<string>;
-export { issueToken, mintToken, removeToken, getBalance, setBalance, getDetailedBalance, subscribeToBalanceChanges, subscribeToDetailedBalanceChanges, slashToken, transfer, transferAll, transferTokenWithMemo, transferToken, sanitiseCCode, getLocks, removedTokens, tokenCurrencyCounter, getTokenList, tokenData, tokenInfo, tokenInfoRLookup, tokenIssuer, totalIssuance };
+export { issueToken, mintToken, removeToken, getBalance, setBalance, getDetailedBalance, subscribeToBalanceChanges, subscribeToDetailedBalanceChanges, slashToken, transfer, transferAll, transferWithMemo, transferToken, sanitiseCCode, getLocks, removedTokens, tokenCurrencyCounter, getTokenList, tokenData, tokenInfo, tokenInfoRLookup, tokenIssuer, totalIssuance };
