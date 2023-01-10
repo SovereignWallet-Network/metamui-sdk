@@ -85,37 +85,35 @@ async function lookUpParaId(paraId: Number, api: ApiPromise): Promise<string> {
  * Add new parachain (requires sudo)
  * @param {HexString} vcId Currency Code HexString
  * @param {number} initialIssuance LOWEST FORM
- * @param {KeyringPair} sudoAccountKeyPair
+ * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  */
-async function initParachain(vcId: HexString, initialIssuance: number, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
+async function initParachain(vcId: HexString, initialIssuance: number, senderAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
     const vc_check = await getVCs(vcId, provider);
     if(vc_check == null)
         throw new Error('VC does not exist');
     if(initialIssuance < 1 || initialIssuance == null)
         throw new Error('Initial Issuance must be greater than 0');
-    const tx = provider.tx.sudo.sudo(
-        provider.tx.tokenchain.initParachain(vcId, initialIssuance)
-    );
-    let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
-    let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
+    const tx = provider.tx.tokenchain.initParachain(vcId, initialIssuance);
+    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
 }
 
 /**
  * Remove parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
- * @param {KeyringPair} sudoAccountKeyPair
+ * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  */
- async function removeParachain(tokenName: String, sudoAccountKeyPair:KeyringPair, api: ApiPromise) {
+ async function removeParachain(tokenName: String, senderAccountKeyPair:KeyringPair, api: ApiPromise) {
     const provider = api || (await buildConnection('local'));
     const tx = provider.tx.sudo.sudo(
         provider.tx.tokenchain.removeParachain(sanitiseCCode(tokenName))
     );
-    let nonce = await provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
-    let signedTx = await tx.signAsync(sudoAccountKeyPair, { nonce });
+    let nonce = await provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+    let signedTx = await tx.signAsync(senderAccountKeyPair, { nonce });
     return submitTransaction(signedTx, provider);
 }
 

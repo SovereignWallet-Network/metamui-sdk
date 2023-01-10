@@ -102,10 +102,10 @@ exports.getTokenInfo = getTokenInfo;
  * Add new parachain (requires sudo)
  * @param {HexString} vcId Currency Code HexString
  * @param {number} initialIssuance LOWEST FORM
- * @param {KeyringPair} sudoAccountKeyPair
+ * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  */
-function initParachain(vcId, initialIssuance, sudoAccountKeyPair, api) {
+function initParachain(vcId, initialIssuance, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const vc_check = yield (0, vc_1.getVCs)(vcId, provider);
@@ -113,9 +113,9 @@ function initParachain(vcId, initialIssuance, sudoAccountKeyPair, api) {
             throw new Error('VC does not exist');
         if (initialIssuance < 1 || initialIssuance == null)
             throw new Error('Initial Issuance must be greater than 0');
-        const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.initParachain(vcId, initialIssuance));
-        let nonce = yield provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
-        let signedTx = yield tx.signAsync(sudoAccountKeyPair, { nonce });
+        const tx = provider.tx.tokenchain.initParachain(vcId, initialIssuance);
+        let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+        let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
@@ -123,15 +123,15 @@ exports.initParachain = initParachain;
 /**
  * Remove parachain (requires sudo)
  * @param {String} tokenName Currency Code HexString
- * @param {KeyringPair} sudoAccountKeyPair
+ * @param {KeyringPair} senderAccountKeyPair
  * @param {ApiPromise} api
  */
-function removeParachain(tokenName, sudoAccountKeyPair, api) {
+function removeParachain(tokenName, senderAccountKeyPair, api) {
     return __awaiter(this, void 0, void 0, function* () {
         const provider = api || (yield (0, connection_1.buildConnection)('local'));
         const tx = provider.tx.sudo.sudo(provider.tx.tokenchain.removeParachain((0, token_1.sanitiseCCode)(tokenName)));
-        let nonce = yield provider.rpc.system.accountNextIndex(sudoAccountKeyPair.address);
-        let signedTx = yield tx.signAsync(sudoAccountKeyPair, { nonce });
+        let nonce = yield provider.rpc.system.accountNextIndex(senderAccountKeyPair.address);
+        let signedTx = yield tx.signAsync(senderAccountKeyPair, { nonce });
         return (0, helper_1.submitTransaction)(signedTx, provider);
     });
 }
