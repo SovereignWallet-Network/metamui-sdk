@@ -8,7 +8,7 @@ describe('Tokenchain works correctly', () => {
     let validTokenName: string = 'SGD';
     let invalidTokenName: string = 'SGD1';
     let validParaId: number = 2000;
-    let invalidParaId: number = 2001;
+    let invalidParaId: number = 9999;
 
     before(async () => {
         provider = await buildConnection('dev', true);
